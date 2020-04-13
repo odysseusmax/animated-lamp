@@ -9,3 +9,4 @@ class Config:
     USER_SESSION_STRING = os.environ.get('USER_SESSION_STRING')
     MIDDLE_MAN = int(os.environ.get('MIDDLE_MAN'))
     LINK_GEN_BOT = os.environ.get('LINK_GEN_BOT')
+    LOG_CHANNEL = int(os.environ.get('LOG_CHANNEL'))
