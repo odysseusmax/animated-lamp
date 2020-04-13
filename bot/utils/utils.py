@@ -48,7 +48,7 @@ async def generate_screenshots(input_file_link, num=5):
         aws = []
         for i in range(1, 1+num):
             sec = int(seconds/num) * i
-            thumbnail_template = output_folder.joinpath(f'screenshot-{i}.png')
+            thumbnail_template = output_folder.joinpath(f'{sec}.png')
             print(sec)
             ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
             aws.append(run_subprocess(ffmpeg_cmd))
