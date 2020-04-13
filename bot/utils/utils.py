@@ -45,12 +45,13 @@ async def generate_screenshots(input_file_link, num=5):
         seconds = hh*60*60 + mm*60 + ss
         print(seconds)
         
+        sec = int(seconds/num)
         for i in range(num):
             thumbnail_template = output_folder.joinpath(f'screenshot-{i}.png')
-            sec = int(i*int(seconds/num-1))
             print(sec)
             ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
+            sec += sec
         
         screenshots = []
         for i in output_folder.iterdir():
