@@ -40,7 +40,7 @@ async def generate_screenshots(input_file_link, num=5):
         ffmpeg_dur_cmd = f"ffmpeg -i {input_file_link}"
         output = await run_subprocess(ffmpeg_dur_cmd)
         re_duration = re.compile("Duration: (.*?)\.")
-        duration = re_duration.search(output[1]).groups()[0]
+        duration = re_duration.search(output[1].decode()).groups()[0]
         seconds = reduce(lambda x,y:x*60+y,map(int,duration.split(":")))
         print(seconds)
         
