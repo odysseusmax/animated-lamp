@@ -11,7 +11,7 @@ async def _(c, m):
         return
     
     await m.reply_text(
-        text="Please select how much screenshots you need",
+        text="Please select the number of screenshots you need",
         quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
