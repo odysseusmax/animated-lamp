@@ -60,7 +60,7 @@ async def generate_screenshots(input_file_link, num=5):
         for i in output_folder.iterdir():
             print(i)
             if i.match('*.png'):
-                screenshots.append(i)
+                screenshots.append(str(i))
         screenshots.sort()
         return screenshots
     except:
