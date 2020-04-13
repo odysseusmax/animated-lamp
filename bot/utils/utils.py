@@ -26,6 +26,7 @@ async def run_subprocess(cmd):
         stderr=asyncio.subprocess.PIPE
     )
     _ = await process.communicate()
+    print(_)
 
 
 async def generate_screenshots(input_file_link, num=5):
@@ -40,6 +41,7 @@ async def generate_screenshots(input_file_link, num=5):
         await run_subprocess(ffmpeg_cmd)
         screenshots = []
         for i in output_folder.iterdir():
+            print(i)
             if i.match('screenshot-\d.png'):
                 screenshots.append(i)
         return screenshots
