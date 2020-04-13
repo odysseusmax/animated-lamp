@@ -37,7 +37,8 @@ async def generate_screenshots(input_file_link, num=5):
             os.makedirs(output_folder)
         
         thumbnail_template = output_folder.joinpath('screenshot-%d.png')
-        ffmpeg_cmd = f"ffmpeg -i '{input_file_link}' -vf fps=1/$(echo 'scale=6;' $(ffprobe -loglevel quiet -of 'compact=nokey=1:print_section=0' -show_format_entry duration {input_file_link}) ' / {num}' | bc) -vframes {num} -qscale:v 2 {thumbnail_template}"
+        ffmpeg_cmd = f"ffmpeg -i '{input_file_link}' -vf fps=1/$(echo 'scale=6;' $(ffprobe -loglevel quiet -of 'compact=nokey=1:print_section=0' -show_format_entry duration '{input_file_link}') ' / {num}' | bc) -vframes {num} -qscale:v 2 {thumbnail_template}"
+        print(ffmpeg_cmd)
         await run_subprocess(ffmpeg_cmd)
         screenshots = []
         for i in output_folder.iterdir():
