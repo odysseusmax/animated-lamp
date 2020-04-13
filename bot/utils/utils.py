@@ -1,4 +1,5 @@
-import os 
+import os
+import re
 import uuid
 import asyncio
 import traceback
@@ -25,8 +26,8 @@ async def run_subprocess(cmd):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
-    _ = await process.communicate()
-    print(_)
+    return await process.communicate()
+    
 
 
 async def generate_screenshots(input_file_link, num=5):
@@ -36,10 +37,20 @@ async def generate_screenshots(input_file_link, num=5):
         if not output_folder.exists():
             os.makedirs(output_folder)
         
-        thumbnail_template = output_folder.joinpath('screenshot-%d.png')
-        ffmpeg_cmd = f"ffmpeg -i '{input_file_link}' -vf fps=1/$(echo 'scale=6;' $(ffprobe -loglevel quiet -of 'compact=nokey=1:print_section=0' -show_format_entry duration '{input_file_link}') ' / {num}' | bc) -vframes {num} -qscale:v 2 {thumbnail_template}"
-        print(ffmpeg_cmd)
-        await run_subprocess(ffmpeg_cmd)
+        ffmpeg_dur_cmd = f"ffmpeg -i {input_file_link}"
+        output = await run_subprocess(ffmpeg_dur_cmd)
+        re_duration = re.compile("Duration: (.*?)\.")
+        duration = re_duration.search(output[1]).groups()[0]
+        seconds = reduce(lambda x,y:x*60+y,map(int,duration.split(":")))
+        print(seconds)
+        
+        for i in range(num):
+            thumbnail_template = output_folder.joinpath(f'screenshot-{i}.png')
+            sec = int(i*int(seconds/num-1))
+            print(sec)
+            ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
+            output = await run_subprocess(ffmpeg_cmd)
+        
         screenshots = []
         for i in output_folder.iterdir():
             print(i)
