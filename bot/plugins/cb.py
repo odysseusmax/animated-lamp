@@ -48,7 +48,7 @@ async def screenshot_fn(c, m):
         await m.edit_message_text(f'🤓 {len(screenshots)} screenshots generated, Now starting to upload!')
         list_of_media = generate_list_of_media(screenshots)
         await media_msg.reply_chat_action("upload_photo")
-        await media_msg.reply_media_group(list_of_media)
+        await media_msg.reply_media_group(list_of_media, , True)
     except:
         traceback.print_exc()
         await m.edit_message_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')

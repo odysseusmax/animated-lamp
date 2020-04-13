@@ -45,20 +45,23 @@ async def generate_screenshots(input_file_link, num=5):
         seconds = hh*60*60 + mm*60 + ss
         print(seconds)
         
-        
+        aws = []
         for i in range(1, 1+num):
             sec = int(seconds/num) * i
             thumbnail_template = output_folder.joinpath(f'screenshot-{i}.png')
             print(sec)
             ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
-            output = await run_subprocess(ffmpeg_cmd)
+            aws.append(run_subprocess(ffmpeg_cmd))
+        
+        output = await asyncio.gather(*aws)
+        aws.clear()
         
         screenshots = []
         for i in output_folder.iterdir():
             print(i)
             if i.match('*.png'):
                 screenshots.append(i)
-        return screenshots
+        return screenshots.sort()
     except:
         traceback.print_exc()
         return traceback.format_exc()
