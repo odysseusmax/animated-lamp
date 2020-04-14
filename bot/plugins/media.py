@@ -12,19 +12,20 @@ async def _(c, m):
     
     file_link = await generate_stream_link(m)
     if file_link is None:
-        await m.reply_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
+        await m.reply_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.", quote=True)
         return
+    
+    snt = await m.reply_text("Hi there, I'm getting everything ready to process your request!", quote=True)
     
     duration = await get_duration(file_link)
     hh, mm, ss = [int(i) for i in duration.split(":")]
     seconds = hh*60*60 + mm*60 + ss
     if duration is None:
-        await m.reply_text(text="😟 Sorry! I cannot open the file.")
+        await snt.edit_message_text("😟 Sorry! I cannot open the file.")
         return
     
-    await m.reply_text(
+    await snt.edit_message_text(
         text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
-        quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
                 [
