@@ -7,6 +7,10 @@ from pathlib import Path
 
 from pyrogram import InputMediaPhoto
 
+from config import Config
+from bot import user
+
+
 screenshot_output_folder = Path('screenshots/')
 
 
@@ -37,13 +41,10 @@ async def generate_screenshots(input_file_link, num=5):
         if not output_folder.exists():
             os.makedirs(output_folder)
         
-        ffmpeg_dur_cmd = f"ffmpeg -i '{input_file_link}'"
-        output = await run_subprocess(ffmpeg_dur_cmd)
-        print(output[1].decode())
-        duration = re.findall("Duration: (.*?)\.", output[1].decode())
-        if not duration:
-            return "Failed to open file."
-        duration = duration[0]
+        duration = await get_duration(input_file_link)
+        if duration is None:
+            return "Cannot open file"
+        
         hh, mm, ss = [int(i) for i in duration.split(":")]
         seconds = hh*60*60 + mm*60 + ss
         print(seconds)
@@ -73,3 +74,26 @@ async def generate_screenshots(input_file_link, num=5):
 
 def generate_list_of_media(screenshots):
     return [InputMediaPhoto(str(i)) for i in screenshots]
+
+
+async def generate_stream_link(media_msg):
+    middle_msg = await media_msg.forward(Config.MIDDLE_MAN)
+    middle_msg = await user.get_messages(Config.MIDDLE_MAN, middle_msg.message_id)
+    link_req_msg = await middle_msg.forward(Config.LINK_GEN_BOT)
+    await user.read_history(Config.LINK_GEN_BOT)
+    await asyncio.sleep(5)
+    link_msg = await user.get_history(Config.LINK_GEN_BOT, 1)
+    link_msg = link_msg[0]
+    if link_msg.message_id == link_req_msg.message_id:
+        return None
+    return link_msg.text
+
+
+async def get_duration(input_file_link):
+    ffmpeg_dur_cmd = f"ffmpeg -i '{input_file_link}'"
+    output = await run_subprocess(ffmpeg_dur_cmd)
+    print(output[1].decode())
+    duration = re.findall("Duration: (.*?)\.", output[1].decode())
+    if not duration:
+        return None
+    return duration[0]

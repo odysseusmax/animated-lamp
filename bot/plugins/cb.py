@@ -26,36 +26,14 @@ async def screenshot_fn(c, m):
                 await asyncio.sleep(e.x)
             except:
                 break
-        while True:
-            try:
-                middle_msg = await media_msg.forward(Config.MIDDLE_MAN)
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
         
-        middle_msg = await user.get_messages(Config.MIDDLE_MAN, middle_msg.message_id)
-        link_req_msg = await middle_msg.forward(Config.LINK_GEN_BOT)
-        await user.read_history(Config.LINK_GEN_BOT)
-        
-        await asyncio.sleep(5)
-
-        link_msg = await user.get_history(Config.LINK_GEN_BOT, 1)
-        link_msg = link_msg[0]
-
-        if link_msg.message_id == link_req_msg.message_id:
-            while True:
-                try:
-                    await m.edit_message_text('😟 Sorry! Screenshot generation not possible right now due to some infrastructure failure 😥.')
-                    break
-                except FloodWait as e:
-                    await asyncio.sleep(e.x)
-                except:
-                    break
+        file_link = await generate_stream_link(m)
+        if file_link is None:
+            await m.edit_message_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
             await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url in 5 sec.', True)
             return
+            
         while True:
             try:
                 await m.edit_message_text('😀 Generating screenshots!')
@@ -64,7 +42,7 @@ async def screenshot_fn(c, m):
                 await asyncio.sleep(e.x)
             except:
                 break
-        file_link = link_msg.text
+        
         screenshots = await generate_screenshots(file_link, num_screenshots)
         print(screenshots)
         if not screenshots:
@@ -95,7 +73,7 @@ async def screenshot_fn(c, m):
             return
         while True:
             try:
-                await m.edit_message_text(f'🤓 {len(screenshots)} screenshots generated, Now starting to upload!')
+                await m.edit_message_text(f'🤓 You requested {num_screenshots} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
                 break
             except FloodWait as e:
                 await asyncio.sleep(e.x)
