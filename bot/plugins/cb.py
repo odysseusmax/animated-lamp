@@ -15,7 +15,8 @@ async def _(c, m):
 
 
 async def screenshot_fn(c, m):
-    num_screenshots = int(m.data)
+    _, num_screenshots = m.data.split('+')
+    num_screenshots = int(num_screenshots)
     media_msg = m.message.reply_to_message
     try:
         while True:
