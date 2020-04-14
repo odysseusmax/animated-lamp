@@ -16,4 +16,4 @@ async def _(c, m):
     if not isinstance(target.reply_markup, ForceReply):
         return
     
-    print(media_message)
+    print(target)
