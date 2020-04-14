@@ -24,15 +24,6 @@ async def screenshot_fn(c, m):
         return
     
     try:
-        while True:
-            try:
-                await m.edit_message_text('Processing your request, Please wait! 😴')
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
-        
         file_link = media_msg.text
 
         while True:
