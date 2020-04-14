@@ -8,6 +8,6 @@ async def _(c, m):
     await c.send_message(
         chat_id=m.from_user.id,
         text="Please provide list of seconds you want to extract separated by space.",
-        reply_to_message=reply_to_message
+        reply_to_message=reply_to_message,
         reply_markup=ForceReply()
     )
