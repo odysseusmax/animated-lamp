@@ -41,20 +41,17 @@ async def generate_screenshots(input_file_link, num=5):
         if not output_folder.exists():
             os.makedirs(output_folder)
         
-        duration = await get_duration(input_file_link)
-        if duration is None:
+        frames = await get_frames(input_file_link)
+        if frames is None:
             return "Cannot open file"
         
-        hh, mm, ss = [int(i) for i in duration.split(":")]
-        seconds = hh*60*60 + mm*60 + ss
-        print(seconds)
-        
+        print(frames)
         aws = []
-        for i in range(1, 1+num):
-            sec = int(seconds/num) * i
-            thumbnail_template = output_folder.joinpath(f'{sec}.png')
-            print(sec)
-            ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
+        for i in range(num):
+            frame = int(frames/num) * i
+            thumbnail_template = output_folder.joinpath(f'{frame}.png')
+            print(frame)
+            ffmpeg_cmd = f"ffmpeg -i '{input_file_link}' -vf select='eq(n\,{frame})' -vframes 1 '{thumbnail_template}'"
             aws.append(run_subprocess(ffmpeg_cmd))
         
         output = await asyncio.gather(*aws)
@@ -89,11 +86,11 @@ async def generate_stream_link(media_msg):
     return link_msg.text
 
 
-async def get_duration(input_file_link):
-    ffmpeg_dur_cmd = f"ffmpeg -i '{input_file_link}'"
+async def get_frames(input_file_link):
+    ffmpeg_dur_cmd = f"ffmpeg -i '{input_file_link}' -map 0:v:0 -c copy -f null -"
     output = await run_subprocess(ffmpeg_dur_cmd)
-    print(output[1].decode())
-    duration = re.findall("Duration: (.*?)\.", output[1].decode())
-    if not duration:
+    #print(output[1].decode())
+    frames = re.findall("frame=\s(\d+)", output[1].decode())
+    if not frames:
         return None
-    return duration[0]
+    return frames[0]

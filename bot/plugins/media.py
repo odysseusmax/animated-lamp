@@ -2,7 +2,7 @@ import asyncio
 
 from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.utils import is_valid_file, generate_stream_link, get_duration
+from bot.utils import is_valid_file, generate_stream_link, get_frames
 
 
 @Client.on_message(Filters.private & Filters.media)
@@ -15,15 +15,15 @@ async def _(c, m):
         await m.reply_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
         return
     
-    duration = await get_duration(file_link)
-    hh, mm, ss = [int(i) for i in duration.split(":")]
+    frames = await get_frames(file_link)
+    hh, mm, ss = [int(i) for i in frames.split(":")]
     seconds = hh*60*60 + mm*60 + ss
-    if duration is None:
+    if frames is None:
         await m.reply_text(text="😟 Sorry! I open the file.")
         return
     
     await m.reply_text(
-        text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
+        text=f"Hi, Choose the number of screenshots you need.\n\nTotal frames: `{frames}`",
         quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
