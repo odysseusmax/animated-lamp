@@ -13,11 +13,12 @@ async def _(c, m):
     snt = await m.reply_text("Hi there, Please wait while I'm getting everything ready to process your request!", quote=True)
 
     duration = await get_duration(m.text)
-    hh, mm, ss = [int(i) for i in duration.split(":")]
-    seconds = hh*60*60 + mm*60 + ss
     if duration is None:
         await snt.edit_text("😟 Sorry! I cannot open the file.")
         return
+    
+    hh, mm, ss = [int(i) for i in duration.split(":")]
+    seconds = hh*60*60 + mm*60 + ss
     
     await snt.edit_text(
         text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
