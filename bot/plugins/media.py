@@ -23,7 +23,7 @@ async def _(c, m):
         return
     
     await m.reply_text(
-        text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}`)",
+        text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
         quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
