@@ -14,4 +14,4 @@ async def start(c, m):
             f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
         )
     
-    await m.reply_text(text = f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm **Not The Only Screenshot Bot** that gives you screenshots with out downloading the entire file. Send me any telegram streamable or document video file, I'll generate the screenshots for you.", quote=True)
+    await m.reply_text(text = f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm **~~Not The Only Screenshot Bot~~** that gives you screenshots with out downloading the entire file. Send me any telegram streamable or document video file, I'll generate the screenshots for you.", quote=True)
