@@ -1,3 +1,4 @@
+from config import Config
 from .main import get_bot_client, get_user_client
 from .database import Database
 
