@@ -27,7 +27,7 @@ async def screenshot_fn(c, m):
             except:
                 break
         
-        file_link = await generate_stream_link(m)
+        file_link = await generate_stream_link(media_msg)
         if file_link is None:
             await m.edit_message_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
