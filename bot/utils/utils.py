@@ -23,6 +23,15 @@ def is_valid_file(msg):
         return True
     return False
 
+def is_url(text):
+    url = re.findall(
+        r"(http[s]*://.+)",
+        text
+    )
+    if url:
+        return True
+    return False
+
 
 async def run_subprocess(cmd):
     process = await asyncio.create_subprocess_shell(

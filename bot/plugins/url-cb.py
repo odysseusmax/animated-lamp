@@ -6,10 +6,10 @@ from pyrogram.errors import FloodWait
 
 from config import Config
 from bot import user
-from bot.utils import generate_screenshots, generate_list_of_media, generate_stream_link
+from bot.utils import generate_screenshots, generate_list_of_media
 
 
-@Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('tg')))
+@Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('url')))
 async def _(c, m):
     asyncio.create_task(screenshot_fn(c, m))
 
@@ -33,13 +33,8 @@ async def screenshot_fn(c, m):
             except:
                 break
         
-        file_link = await generate_stream_link(media_msg)
-        if file_link is None:
-            await m.edit_message_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
-            l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url in 5 sec.', True)
-            return
-            
+        file_link = media_msg.text
+
         while True:
             try:
                 await m.edit_message_text('😀 Generating screenshots!')
