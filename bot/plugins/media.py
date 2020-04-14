@@ -16,8 +16,6 @@ async def _(c, m):
         return
     
     frames = await get_frames(file_link)
-    hh, mm, ss = [int(i) for i in frames.split(":")]
-    seconds = hh*60*60 + mm*60 + ss
     if frames is None:
         await m.reply_text(text="😟 Sorry! I open the file.")
         return
