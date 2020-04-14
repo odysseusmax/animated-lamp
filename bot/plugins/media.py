@@ -46,10 +46,7 @@ async def _(c, m):
                 ],
                 [
                     InlineKeyboardButton('📸 10', 'auto+10')
-                ],
-                [
-                    InlineKeyboardButton('🧑‍🏭 Manual Mode 🧑‍🏭', 'man')
-                ],
+                ]
             ]
         )
     )
