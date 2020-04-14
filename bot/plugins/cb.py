@@ -9,7 +9,7 @@ from bot import user
 from bot.utils import generate_screenshots, generate_list_of_media, generate_stream_link
 
 
-@Client.on_callback_query()
+@Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('auto')))
 async def _(c, m):
     asyncio.create_task(screenshot_fn(c, m))
 

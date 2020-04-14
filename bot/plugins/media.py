@@ -28,26 +28,26 @@ async def _(c, m):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("📸 2", '2'),
-                    InlineKeyboardButton('📸 3', '3')
+                    InlineKeyboardButton("📸 2", 'auto+2'),
+                    InlineKeyboardButton('📸 3', 'auto+3')
                 ],
                 [
-                    InlineKeyboardButton('📸 4', '4'),
-                    InlineKeyboardButton('📸 5', '5')
+                    InlineKeyboardButton('📸 4', 'auto+4'),
+                    InlineKeyboardButton('📸 5', 'auto+5')
                 ],
                 [
-                    InlineKeyboardButton('📸 6', '6'),
-                    InlineKeyboardButton('📸 7', '7')
+                    InlineKeyboardButton('📸 6', 'auto+6'),
+                    InlineKeyboardButton('📸 7', 'auto+7')
                 ],
                 [
-                    InlineKeyboardButton('📸 8', '8'),
-                    InlineKeyboardButton('📸 9', '9')
+                    InlineKeyboardButton('📸 8', 'auto+8'),
+                    InlineKeyboardButton('📸 9', 'auto+9')
                 ],
                 [
-                    InlineKeyboardButton('📸 10', '10')
+                    InlineKeyboardButton('📸 10', 'auto+10')
                 ],
                 [
-                    InlineKeyboardButton('🧑‍🏭 Manual Mode 🧑‍🏭', '10')
+                    InlineKeyboardButton('🧑‍🏭 Manual Mode 🧑‍🏭', 'man')
                 ],
             ]
         )
