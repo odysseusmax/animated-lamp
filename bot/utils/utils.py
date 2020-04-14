@@ -39,8 +39,11 @@ async def generate_screenshots(input_file_link, num=5):
         
         ffmpeg_dur_cmd = f"ffmpeg -i {input_file_link}"
         output = await run_subprocess(ffmpeg_dur_cmd)
-        re_duration = re.compile("Duration: (.*?)\.")
-        duration = re_duration.search(output[1].decode()).groups()[0]
+        print(output[1].decode())
+        duration = re.findall("Duration: (.*?)\.", output[1].decode())
+        if not duration:
+            return "Failed to open file."
+        duration = duration[0]
         hh, mm, ss = [int(i) for i in duration.split(":")]
         seconds = hh*60*60 + mm*60 + ss
         print(seconds)
