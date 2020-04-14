@@ -37,7 +37,7 @@ async def generate_screenshots(input_file_link, num=5):
         if not output_folder.exists():
             os.makedirs(output_folder)
         
-        ffmpeg_dur_cmd = f"ffmpeg -i {input_file_link}"
+        ffmpeg_dur_cmd = f"ffmpeg -i '{input_file_link}'"
         output = await run_subprocess(ffmpeg_dur_cmd)
         print(output[1].decode())
         duration = re.findall("Duration: (.*?)\.", output[1].decode())
