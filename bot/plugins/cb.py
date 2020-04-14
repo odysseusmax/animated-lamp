@@ -18,6 +18,11 @@ async def screenshot_fn(c, m):
     _, num_screenshots = m.data.split('+')
     num_screenshots = int(num_screenshots)
     media_msg = m.message.reply_to_message
+    print(media_msg)
+    if media_msg is None:
+        await m.edit_message_text('Why did you delete the file 😠, Now i cannot help you 😒.')
+        return
+    
     try:
         while True:
             try:
