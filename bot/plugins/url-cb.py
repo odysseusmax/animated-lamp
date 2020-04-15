@@ -3,7 +3,7 @@ import uuid
 import time
 import asyncio
 import datetime
-import tracebac
+import traceback
 
 from pyrogram import Client, Filters
 from pyrogram.errors import FloodWait
