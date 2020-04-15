@@ -71,7 +71,7 @@ async def screenshot_fn(c, m):
                 if as_file:
                     screenshots.append({
                         'document':str(thumbnail_template),
-                        'caption':"ScreenShot at {datetime.timedelta(seconds=sec)}"
+                        'caption':f"ScreenShot at {datetime.timedelta(seconds=sec)}"
                     })
                 else:
                     screenshots.append(
