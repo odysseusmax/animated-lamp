@@ -3,10 +3,9 @@ import asyncio
 from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils import is_valid_file, generate_stream_link, get_duration
-from config import Config
 
 
-@Client.on_message(Filters.private & Filters.media & Filters.user(Config.AUTH_USERS))
+@Client.on_message(Filters.private & Filters.media)
 async def _(c, m):
     if not is_valid_file(m):
         return

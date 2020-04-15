@@ -4,7 +4,7 @@ from config import Config
 from bot import db
 
 
-@Client.on_message(Filters.private & Filters.command("start") & Filters.user(Config.AUTH_USERS))
+@Client.on_message(Filters.private & Filters.command("start"))
 async def start(c, m):
     
     if not await db.is_user_exist(m.chat.id):
