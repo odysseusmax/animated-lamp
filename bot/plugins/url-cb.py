@@ -5,7 +5,7 @@ import asyncio
 import datetime
 import traceback
 
-from pyrogram import Client, Filters
+from pyrogram import Client, Filters, InputMediaPhoto
 from pyrogram.errors import FloodWait
 
 from config import Config
