@@ -70,7 +70,7 @@ async def screenshot_fn(c, m):
                     screenshots.append(
                         InputMediaPhoto(
                             str(thumbnail_template),
-                            caption=f"ScreenShot at {datetime.timedelta(seconds=sec)})"
+                            caption=f"ScreenShot at {datetime.timedelta(seconds=sec)}"
                         )
                     )
         
