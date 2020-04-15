@@ -71,6 +71,7 @@ async def screenshot_fn(c, m):
                         InputMediaPhoto(
                             str(thumbnail_template),
                             caption=f"ScreenShot at {datetime.timedelta(seconds=sec)})"
+                        )
                     )
         
         if not screenshots:
