@@ -63,8 +63,8 @@ async def screenshot_fn(c, m):
             if thumbnail_template.exists():
                 if as_file:
                     screenshots.append({
-                        'photo':str(thumbnail_template),
-                        'caption':"ScreenShot at {datetime.timedelta(seconds=sec)})"
+                        'document':str(thumbnail_template),
+                        'caption':"ScreenShot at {datetime.timedelta(seconds=sec)}"
                     })
                 else:
                     screenshots.append(
@@ -85,7 +85,7 @@ async def screenshot_fn(c, m):
         await media_msg.reply_chat_action("upload_photo")
         
         if as_file:
-            aws = [media_msg.reply_photo(**photo) for photo in screenshots]
+            aws = [media_msg.reply_document(**photo) for photo in screenshots]
             await asyncio.gather(*aws)
         else:
             await media_msg.reply_media_group(screenshots, True)
