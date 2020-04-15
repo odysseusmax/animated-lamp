@@ -40,6 +40,6 @@ class Database:
         return user.get('as_file', False)
     
     
-    async def update_as_file(self, id, as_files):
+    async def update_as_file(self, id, as_file):
         await self.col.update_one({'id': id}, {'$set': {'as_file': as_file}})
         
