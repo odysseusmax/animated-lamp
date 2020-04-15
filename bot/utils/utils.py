@@ -87,10 +87,12 @@ async def generate_stream_link(media_msg):
     middle_msg = await user.get_messages(Config.MIDDLE_MAN, middle_msg.message_id)
     link_req_msg = await middle_msg.forward(Config.LINK_GEN_BOT)
     await user.read_history(Config.LINK_GEN_BOT)
-    await asyncio.sleep(3)
-    link_msg = await user.get_history(Config.LINK_GEN_BOT, 1)
-    link_msg = link_msg[0]
-    if link_msg.message_id == link_req_msg.message_id:
+    await asyncio.sleep(2)
+    link_msg = None
+    async for mes in user.iter_history(Config.LINK_GEN_BOT, limit=10):
+        if mes.reply_to_message and mes.reply_to_message.message_id == link_req_msg.message_id:
+            link_msg = mes
+    if link_msg is None:
         return None
     return link_msg.text
 

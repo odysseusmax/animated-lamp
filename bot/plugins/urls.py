@@ -3,9 +3,10 @@ import asyncio
 from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils import is_url, get_duration
+from config import Config
 
 
-@Client.on_message(Filters.private & Filters.text & Filters.incoming & ~Filters.edited)
+@Client.on_message(Filters.private & Filters.text & Filters.incoming & Filters.user(Config.AUTH_USERS) & ~Filters.edited)
 async def _(c, m):
     if not is_url(m.text):
         return
