@@ -85,7 +85,7 @@ async def screenshot_fn(c, m):
         await media_msg.reply_chat_action("upload_photo")
         
         if as_file:
-            aws = [media_msg.reply_document(**photo) for photo in screenshots]
+            aws = [media_msg.reply_document(quote=True, **photo) for photo in screenshots]
             await asyncio.gather(*aws)
         else:
             await media_msg.reply_media_group(screenshots, True)
