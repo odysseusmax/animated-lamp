@@ -90,7 +90,7 @@ async def screenshot_fn(c, m):
         else:
             await media_msg.reply_media_group(screenshots, True)
         
-        await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=time.time()-start_time)}')
+        await edit_message_text(m, text=f'Successfully completed process in {int(datetime.timedelta(seconds=time.time()-start_time))}')
     except:
         traceback.print_exc()
         await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
