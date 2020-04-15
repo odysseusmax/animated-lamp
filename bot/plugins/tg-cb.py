@@ -1,12 +1,16 @@
+import os
+import uuid
+import time
 import asyncio
+import datetime
 import traceback
 
-from pyrogram import Client, Filters
+from pyrogram import Client, Filters, InputMediaPhoto
 from pyrogram.errors import FloodWait
 
 from config import Config
-from bot import user
-from bot.utils import generate_screenshots, generate_list_of_media, generate_stream_link
+from bot import user, db
+from bot.utils import get_duration, generate_stream_link, edit_message_text, run_subprocess
 
 
 @Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('tg')))
@@ -20,83 +24,84 @@ async def screenshot_fn(c, m):
     media_msg = m.message.reply_to_message
     #print(media_msg)
     if media_msg.empty:
-        await m.edit_message_text('Why did you delete the file 😠, Now i cannot help you 😒.')
+        await edit_message_text(m, text='Why did you delete the file 😠, Now i cannot help you 😒.')
         return
     
+    uid = str(uuid.uuid4())
+    output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
+    if not output_folder.exists():
+        os.makedirs(output_folder)
+    
     try:
-        while True:
-            try:
-                await m.edit_message_text('Processing your request, Please wait! 😴')
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
+        start_time = time.time()
+        
+        await edit_message_text(m, text='Processing your request, Please wait! 😴')
         
         file_link = await generate_stream_link(media_msg)
         if file_link is None:
-            await m.edit_message_text(text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
+            await edit_message_text(m, text="😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url in 5 sec.', True)
+            await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url', True)
             return
             
-        while True:
-            try:
-                await m.edit_message_text('😀 Generating screenshots!')
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
+        await edit_message_text(m, text='😀 Generating screenshots!')
         
-        screenshots = await generate_screenshots(file_link, num_screenshots)
-        print(screenshots)
+        duration = await get_duration(file_link)
+        if duration is None:
+            await edit_message_text(m, text="😟 Sorry! I cannot open the file.")
+            l = await media_msg.forward(Config.LOG_CHANNEL)
+            await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} Could not open the file.', True)
+            return
+        
+        hh, mm, ss = [int(i) for i in duration.split(":")]
+        seconds = hh*60*60 + mm*60 + ss
+        reduced_sec = seconds - int(seconds*2 / 100)
+        print(f"Total seconds: {seconds}, Reduced seconds: {reduced_sec}")
+        as_file = await db.is_as_file(m.from_user.id)
+        
+        screenshots = []
+        for i in range(1, 1+num_screenshots):
+            sec = int(reduced_sec/num_screenshots) * i
+            thumbnail_template = output_folder.joinpath(f'{i}.png')
+            print(sec)
+            ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{file_link}' -vframes 1 '{thumbnail_template}'"
+            output = await run_subprocess(ffmpeg_cmd)
+            await edit_message_text(m, text=f'`{i}` of `{num_screenshots}` generated!')
+            if thumbnail_template.exists():
+                if as_file:
+                    screenshots.append({
+                        'photo':str(thumbnail_template),
+                        'caption':"ScreenShot at {datetime.timedelta(seconds=sec)})"
+                    })
+                else:
+                    screenshots.append(
+                        InputMediaPhoto(
+                            str(thumbnail_template),
+                            caption=f"ScreenShot at {datetime.timedelta(seconds=sec)})"
+                    )
+        
+        #print(screenshots)
         if not screenshots:
-            while True:
-                try:
-                    await m.edit_message_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
-                    break
-                except FloodWait as e:
-                    await asyncio.sleep(e.x)
-                except:
-                    break
+            await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
             await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} screenshots where requested and Screen shots where not generated.', True)
             return
-        if isinstance(screenshots, str):
-            while True:
-                try:
-                    await m.edit_message_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
-                    break
-                except FloodWait as e:
-                    await asyncio.sleep(e.x)
-                except:
-                    break
-            
-            l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} screenshots where requested and some error occoured\n\n{screenshots}', True)
-            return
-        while True:
-            try:
-                await m.edit_message_text(f'🤓 You requested {num_screenshots} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
-        list_of_media = generate_list_of_media(screenshots)
+        
+        await edit_message_text(m, text=f'🤓 You requested {num_screenshots} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
+        
         await media_msg.reply_chat_action("upload_photo")
-        await media_msg.reply_media_group(list_of_media, True)
+        
+        if as_file:
+            aws = [media_msg.reply_photo(**photo) for photo in screenshots]
+            await asyncio.gather(*aws)
+        else:
+            await media_msg.reply_media_group(screenshots, True)
+        
+        await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=time.time()-start_time)}')
     except:
         traceback.print_exc()
-        while True:
-            try:
-                await m.edit_message_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
-                break
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-            except:
-                break
+        await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
+        
         l = await media_msg.forward(Config.LOG_CHANNEL)
         await l.reply_text(f'{num_screenshots} screenshots where requested and some error occoured\n\n{traceback.format_exc()}', True)

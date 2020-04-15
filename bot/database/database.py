@@ -15,7 +15,8 @@ class Database:
     def new_user(self, id):
         return dict(
             id = id,
-            join_date = datetime.date.today().isoformat()
+            join_date = datetime.date.today().isoformat(),
+            as_file=False
         )
     
     
@@ -32,3 +33,13 @@ class Database:
     async def total_users_count(self):
         count = await self.col.count_documents({})
         return count
+    
+    
+    async def is_as_file(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('as_file', False)
+    
+    
+    async def update_as_file(self, id, as_file=False):
+        await self.col.update_one({'id': id}, {'$set': {'as_file': as_file}})
+        

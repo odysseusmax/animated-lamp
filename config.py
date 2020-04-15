@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 class Config:
     
@@ -12,3 +13,5 @@ class Config:
     LOG_CHANNEL = int(os.environ.get('LOG_CHANNEL'))
     DATABASE_URL = os.environ.get('DATABASE_URL')
     AUTH_USERS = [int(i) for i in os.environ.get('AUTH_USERS', '').split(' ')]
+    
+    SCRST_OP_FLDR = Path('screenshots/')

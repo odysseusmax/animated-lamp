@@ -3,15 +3,13 @@ import re
 import uuid
 import asyncio
 import traceback
-from pathlib import Path
 
 from pyrogram import InputMediaPhoto
+from pyrogram.errors import FloodWait
 
 from config import Config
 from bot import user
 
-
-screenshot_output_folder = Path('screenshots/')
 
 
 def is_valid_file(msg):
@@ -43,45 +41,6 @@ async def run_subprocess(cmd):
     
 
 
-async def generate_screenshots(input_file_link, num=5):
-    try:
-        uid = str(uuid.uuid4())
-        output_folder = screenshot_output_folder.joinpath(uid)
-        if not output_folder.exists():
-            os.makedirs(output_folder)
-        
-        duration = await get_duration(input_file_link)
-        if duration is None:
-            return "Cannot open file"
-        
-        hh, mm, ss = [int(i) for i in duration.split(":")]
-        seconds = hh*60*60 + mm*60 + ss
-        print(seconds)
-        
-        reduced_sec = seconds - int(seconds*2 / 100)
-        for i in range(1, 1+num):
-            sec = int(reduced_sec/num) * i
-            thumbnail_template = output_folder.joinpath(f'{sec}.png')
-            print(sec)
-            ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{input_file_link}' -vframes 1 '{thumbnail_template}'"
-            output = await run_subprocess(ffmpeg_cmd)
-        
-        screenshots = []
-        for i in output_folder.iterdir():
-            print(i)
-            if i.match('*.png'):
-                screenshots.append(str(i))
-        #screenshots.sort()
-        return screenshots
-    except:
-        traceback.print_exc()
-        return traceback.format_exc()
-
-
-def generate_list_of_media(screenshots):
-    return [InputMediaPhoto(str(i)) for i in screenshots]
-
-
 async def generate_stream_link(media_msg):
     middle_msg = await media_msg.forward(Config.MIDDLE_MAN)
     middle_msg = await user.get_messages(Config.MIDDLE_MAN, middle_msg.message_id)
@@ -105,3 +64,13 @@ async def get_duration(input_file_link):
     if not duration:
         return None
     return duration[0]
+
+
+async def edit_message_text(m, **kwargs):
+    while True:
+        try:
+            return await m.edit_message_text(**kwargs)
+        except FloodWait as e:
+            await asyncio.sleep(e.x)
+        except:
+            break
