@@ -16,6 +16,8 @@ async def _(c, m):
     duration = await get_duration(m.text)
     if duration is None:
         await snt.edit_text("😟 Sorry! I cannot open the file.")
+        l = await m.forward(Config.LOG_CHANNEL)
+        await l.reply_text(f' Could not open the file.', True)
         return
     
     hh, mm, ss = [int(i) for i in duration.split(":")]

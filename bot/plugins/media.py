@@ -3,6 +3,7 @@ import asyncio
 from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils import is_valid_file, generate_stream_link, get_duration
+from config import Config
 
 
 @Client.on_message(Filters.private & Filters.media)
@@ -15,11 +16,15 @@ async def _(c, m):
     file_link = await generate_stream_link(m)
     if file_link is None:
         await snt.edit_text("😟 Sorry! I cannot help you right now, I'm having hard time processing the file.", quote=True)
+        l = await m.forward(Config.LOG_CHANNEL)
+        await l.reply_text(f'Could not create stream link', True)
         return
     
     duration = await get_duration(file_link)
     if duration is None:
         await snt.edit_text("😟 Sorry! I cannot open the file.")
+        l = await m.forward(Config.LOG_CHANNEL)
+        await l.reply_text(f'stream link : {file_link}\n\n Could not open the file.', True)
         return
     
     hh, mm, ss = [int(i) for i in duration.split(":")]
