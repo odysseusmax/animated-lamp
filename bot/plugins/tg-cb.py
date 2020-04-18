@@ -65,7 +65,7 @@ async def screenshot_fn(c, m):
             sec = int(reduced_sec/num_screenshots) * i
             thumbnail_template = output_folder.joinpath(f'{i}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -ss {sec} -i '{shlex.quote(file_link)}' -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -ss {sec} -i {shlex.quote(file_link)} -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'`{i}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
