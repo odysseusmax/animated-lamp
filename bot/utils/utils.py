@@ -5,11 +5,11 @@ import shlex
 import asyncio
 import traceback
 
-from pyrogram import InputMediaPhoto
+from pyrogram import InputMediaPhoto, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
 
 from config import Config
-from bot import user
+from bot import user, db
 
 
 
@@ -59,6 +59,7 @@ async def generate_stream_link(media_msg):
 
 async def get_duration(input_file_link):
     ffmpeg_dur_cmd = f"ffmpeg -i {shlex.quote(input_file_link)}"
+    #print(ffmpeg_dur_cmd)
     output = await run_subprocess(ffmpeg_dur_cmd)
     print(output[1].decode())
     duration = re.findall("Duration: (.*?)\.", output[1].decode())
@@ -75,3 +76,35 @@ async def edit_message_text(m, **kwargs):
             await asyncio.sleep(e.x)
         except:
             break
+
+
+async def display_settings(m, cb=False):
+    chat_id = m.from_user.id if cb else m.chat.id
+    
+    as_file = await db.is_as_file(chat_id)
+    watermark_text = await db.get_watermark_text(chat_id)
+    
+    
+    if as_file:
+        as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj'), InlineKeyboardButton("📁 Uploading as Document.", 'set+af+0')]
+    else:
+        as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj'), InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af+1')]
+    
+    if watermark_text:
+        wm_btn = [InlineKeyboardButton("Watermark", 'rj'), InlineKeyboardButton(f"{watermark_text}", 'set+wm+0')]
+    else:
+        wm_btn = [InlineKeyboardButton("Watermark", 'rj'), InlineKeyboardButton("No watermark exists!", 'set+wm+1')]
+    
+    settings_btn = [as_file_btn, wm_btn]
+    
+    if cb:
+        await m.edit_message_reply_markup(
+            InlineKeyboardMarkup(settings_btn)
+        )
+        return
+    
+    await m.reply_text(
+        text = f"Here You can configure the bot's behavior.",
+        quote=True,
+        reply_markup=InlineKeyboardMarkup(settings_btn)
+    )

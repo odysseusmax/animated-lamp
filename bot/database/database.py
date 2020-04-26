@@ -16,7 +16,8 @@ class Database:
         return dict(
             id = id,
             join_date = datetime.date.today().isoformat(),
-            as_file=False
+            as_file=False,
+            watermark_text=''
         )
     
     
@@ -42,4 +43,12 @@ class Database:
     
     async def update_as_file(self, id, as_file):
         await self.col.update_one({'id': id}, {'$set': {'as_file': as_file}})
-        
+    
+    
+    async def update_watermark_text(self, id, watermark_text=''):
+        await self.col.update_one({'id': id}, {'$set': {'watermark_text': watermark_text}})
+    
+    
+    async def get_watermark_text(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('watermark_text', '')
