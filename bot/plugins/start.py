@@ -1,4 +1,4 @@
-from pyrogram import Client, Filters
+from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from config import Config
 from bot import db
@@ -14,4 +14,13 @@ async def start(c, m):
             f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
         )
     
-    await m.reply_text(text = f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm **~~Not The Only Screenshot Bot~~** that gives you screenshots with out downloading the entire file. Send me any telegram streamable/document video file or a streaming link, I'll generate the screenshots for you.", quote=True)
+    await m.reply_text(
+        text=f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm **Not ~~The Only Screenshot Bot~~** that gives you screenshots with out downloading the entire file. Send me any telegram streamable/document video file or a streaming link, I'll generate the screenshots for you.",
+        quote=True,
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton('Source 😒', url='https://github.com/odysseusmax/animated-lamp')],
+                [InlineKeyboardButton('Project Channel', 'https://t.me/odbots')],
+            ]
+        )
+    )
