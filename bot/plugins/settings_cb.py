@@ -5,7 +5,7 @@ from bot.utils import display_settings
 
 
 @Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('set')))
-async def _(c, m):
+async def settings_cb(c, m):
     _, typ, action = m.data.split('+')
     
     if typ == 'af':
