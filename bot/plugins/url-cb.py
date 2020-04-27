@@ -92,9 +92,7 @@ async def screenshot_fn(c, m):
         else:
             await media_msg.reply_media_group(screenshots, True)
         
-        await edit_message_text(m, text='If You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)')
-        
-        await m.answer(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}', show_alert=True)
+        await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)')
         
     except:
         traceback.print_exc()
