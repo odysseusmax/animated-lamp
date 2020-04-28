@@ -46,9 +46,7 @@ async def _(c, m):
     ]
     
     if seconds >= 600:
-        btns.append([
-            [InlineKeyboardButton('Generate Sample Video!', 'smpl')]
-        ])
+        btns.append([InlineKeyboardButton('Generate Sample Video!', 'smpl')])
     
     await snt.edit_text(
         text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
