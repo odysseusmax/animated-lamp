@@ -276,7 +276,7 @@ async def sample_fn(c, m):
         
         watermark = await db.get_watermark_text(m.from_user.id)
         
-        sample_file = output_folder.joinpath(f'out.mkv')
+        sample_file = output_folder.joinpath(f'sample_video.mkv')
         
         ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)

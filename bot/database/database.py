@@ -18,7 +18,7 @@ class Database:
             join_date = datetime.date.today().isoformat(),
             as_file=False,
             watermark_text='',
-            sample_duration=60
+            sample_duration=30
         )
     
     
@@ -61,4 +61,4 @@ class Database:
     
     async def get_sample_duration(self, id):
         user = await self.col.find_one({'id':int(id)})
-        return user.get('sample_duration', 60)
+        return user.get('sample_duration', 30)
