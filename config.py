@@ -16,3 +16,4 @@ class Config:
     
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')
+    THUMB_OP_FLDR = Path('thumbnails/')

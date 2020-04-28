@@ -21,11 +21,11 @@ async def settings_cb(c, m):
             await db.update_watermark_text(m.from_user.id)
             alert_text = 'Successfully removed watermark text'
         else:
-            alert_text = 'Use /set_watermark to add new watermark text.'
+            alert_text = f'Use /set_watermark to add new watermark text.'
     
     elif typ == 'sv':
         sample_duration = await db.get_sample_duration(m.from_user.id)
-        if sample_duration+30 >=150:
+        if sample_duration+30 >=180:
             sample_duration = 0
         sample_duration += 30
         await db.update_sample_duration(m.from_user.id, sample_duration)

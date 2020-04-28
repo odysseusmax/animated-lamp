@@ -40,7 +40,19 @@ async def run_subprocess(cmd):
         stderr=asyncio.subprocess.PIPE
     )
     return await process.communicate()
+
+
+async def generate_thumbnail_file(file_path, uid):
+    output_folder = Config.THUMB_OP_FLDR.joinpath(uid)
+    if not output_folder.exists():
+        os.makedirs(output_folder)
     
+    thumb_file = output_folder.joinpath('thumb.jpg')
+    ffmpeg_cmd = f"ffmpeg -ss 0 -i {shlex.quote(file_path)} -vframes 1 '{thumb_file}'"
+    output = await run_subprocess(ffmpeg_cmd)
+    if not thumb_file.exists():
+        return None
+    return thumb_file
 
 
 async def generate_stream_link(media_msg):
@@ -245,7 +257,7 @@ async def sample_fn(c, m):
                 await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url', True)
                 return
             
-        await edit_message_text(m, text='😀 Generating Sample Video!')
+        await edit_message_text(m, text='😀 Generating Sample Video! This might take some time.')
         
         duration = await get_duration(file_link)
         if duration is None:
@@ -277,11 +289,20 @@ async def sample_fn(c, m):
             await l.reply_text(f'stream link : {file_link}\n\n duration {sample_duration} sample video generation failed', True)
             return
         
+        thumb = await generate_thumbnail_file(sample_file, uid)
+        
         await edit_message_text(m, text=f'🤓 Sample video was generated successfully!, Now starting to upload!')
         
         await media_msg.reply_chat_action("upload_video")
         
-        await media_msg.reply_video(sample_file, True)
+        await media_msg.reply_video(
+            video=sample_file, 
+            quote=True,
+            caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}"
+            duration=sample_duration,
+            thumb=thumb,
+            supports_streaming=True
+        )
         
         await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)')
         
