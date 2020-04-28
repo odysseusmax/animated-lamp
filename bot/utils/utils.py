@@ -278,9 +278,9 @@ async def sample_fn(c, m):
         
         sample_file = output_folder.joinpath(f'out.mp4')
         
-        ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -vf \"drawtext=fontcolor=white:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{watermark}'\" -acodec copy -y {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -vf \"drawtext=fontcolor=white:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{watermark}'\" -c:a copy -y {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
-        print(output[1].decode())
+        #print(output[1].decode())
         
         if not sample_file.exists():
             await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
@@ -298,7 +298,7 @@ async def sample_fn(c, m):
         await media_msg.reply_video(
             video=sample_file, 
             quote=True,
-            caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}"
+            caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}",
             duration=sample_duration,
             thumb=thumb,
             supports_streaming=True
