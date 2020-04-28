@@ -278,7 +278,7 @@ async def sample_fn(c, m):
         
         sample_file = output_folder.joinpath(f'out.mp4')
         
-        ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -vf \"drawtext=fontcolor=white:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{watermark}'\" -c:a copy -y {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -c copy {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
