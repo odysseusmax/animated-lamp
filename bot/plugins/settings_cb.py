@@ -23,6 +23,14 @@ async def settings_cb(c, m):
         else:
             alert_text = 'Use /set_watermark to add new watermark text.'
     
+    elif typ == 'sv':
+        sample_duration = await db.get_sample_duration(m.from_user.id)
+        if sample_duration+30 >=150:
+            sample_duration = 0
+        sample_duration += 30
+        await db.update_sample_duration(m.from_user.id, sample_duration)
+        alert_text = 'Sample video duration changed to {sample_duration}s'
+    
     await m.answer(alert_text, show_alert=True)
 
     await display_settings(m, cb=True)

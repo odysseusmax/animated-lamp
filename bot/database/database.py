@@ -17,7 +17,8 @@ class Database:
             id = id,
             join_date = datetime.date.today().isoformat(),
             as_file=False,
-            watermark_text=''
+            watermark_text='',
+            sample_duration=60
         )
     
     
@@ -49,6 +50,15 @@ class Database:
         await self.col.update_one({'id': id}, {'$set': {'watermark_text': watermark_text}})
     
     
+    async def update_sample_duration(self, id, sample_duration):
+        await self.col.update_one({'id': id}, {'$set': {'sample_duration': sample_duration}})
+    
+    
     async def get_watermark_text(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_text', '')
+    
+    
+    async def get_sample_duration(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('sample_duration', 60)

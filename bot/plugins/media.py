@@ -30,29 +30,36 @@ async def _(c, m):
     hh, mm, ss = [int(i) for i in duration.split(":")]
     seconds = hh*60*60 + mm*60 + ss
     
+    btns = [
+        [
+            InlineKeyboardButton("📸 2", 'scht+2'),
+            InlineKeyboardButton('📸 3', 'scht+3')
+        ],
+        [
+            InlineKeyboardButton('📸 4', 'scht+4'),
+            InlineKeyboardButton('📸 5', 'scht+5')
+        ],
+        [
+            InlineKeyboardButton('📸 6', 'scht+6'),
+            InlineKeyboardButton('📸 7', 'scht+7')
+        ],
+        [
+            InlineKeyboardButton('📸 8', 'scht+8'),
+            InlineKeyboardButton('📸 9', 'scht+9')
+        ],
+        [
+            InlineKeyboardButton('📸 10', 'scht+10')
+        ]
+    ]
+        
+    if seconds >= 600:
+        btns.append([
+            [InlineKeyboardButton('Generate Sample Video!', 'smpl')]
+        ])
+    
     await snt.edit_text(
         text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{duration}` (`{seconds}s`)",
         reply_markup=InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("📸 2", 'tg+2'),
-                    InlineKeyboardButton('📸 3', 'tg+3')
-                ],
-                [
-                    InlineKeyboardButton('📸 4', 'tg+4'),
-                    InlineKeyboardButton('📸 5', 'tg+5')
-                ],
-                [
-                    InlineKeyboardButton('📸 6', 'tg+6'),
-                    InlineKeyboardButton('📸 7', 'tg+7')
-                ],
-                [
-                    InlineKeyboardButton('📸 8', 'tg+8'),
-                    InlineKeyboardButton('📸 9', 'tg+9')
-                ],
-                [
-                    InlineKeyboardButton('📸 10', 'tg+10')
-                ]
-            ]
+            
         )
     )

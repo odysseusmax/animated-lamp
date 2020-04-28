@@ -15,3 +15,4 @@ class Config:
     AUTH_USERS = [int(i) for i in os.environ.get('AUTH_USERS', '').split(' ')]
     
     SCRST_OP_FLDR = Path('screenshots/')
+    SMPL_OP_FLDR = Path('samples/')
