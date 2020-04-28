@@ -48,7 +48,7 @@ async def generate_thumbnail_file(file_path, uid):
         os.makedirs(output_folder)
     
     thumb_file = output_folder.joinpath('thumb.jpg')
-    ffmpeg_cmd = f"ffmpeg -ss 0 -i {shlex.quote(file_path)} -vframes 1 '{thumb_file}'"
+    ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 '{thumb_file}'"
     output = await run_subprocess(ffmpeg_cmd)
     if not thumb_file.exists():
         return None
