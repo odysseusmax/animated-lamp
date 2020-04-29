@@ -97,6 +97,7 @@ async def display_settings(m, cb=False):
     as_file = await db.is_as_file(chat_id)
     watermark_text = await db.get_watermark_text(chat_id)
     sample_duration = await db.get_sample_duration(chat_id)
+    watermark_color_code = await db.get_watermark_color(chat_id)
     
     
     if as_file:
@@ -110,8 +111,9 @@ async def display_settings(m, cb=False):
         wm_btn = [InlineKeyboardButton("Watermark", 'rj'), InlineKeyboardButton("No watermark exists!", 'set+wm+1')]
     
     sv_btn = [InlineKeyboardButton("Sample Video Duration", 'rj'), InlineKeyboardButton(f"{sample_duration}s", 'set+sv+1')]
+    wc_btn = [InlineKeyboardButton("Watermark Color", 'rj'), InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc+1')]
     
-    settings_btn = [as_file_btn, wm_btn, sv_btn]
+    settings_btn = [as_file_btn, wm_btn, wc_btn, sv_btn]
     
     if cb:
         await m.edit_message_reply_markup(
@@ -177,11 +179,14 @@ async def screenshot_fn(c, m):
         
         screenshots = []
         watermark = await db.get_watermark_text(m.from_user.id)
+        watermark_color_code = await db.get_watermark_color(m.from_user.id)
+        watermark_color = Config.COLORS[watermark_color_code]
+        
         for i in range(1, 1+num_screenshots):
             sec = int(reduced_sec/num_screenshots) * i
             thumbnail_template = output_folder.joinpath(f'{i}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor=white:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'`{i}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
@@ -273,8 +278,6 @@ async def sample_fn(c, m):
         sample_duration = await db.get_sample_duration(m.from_user.id)
         
         start_at = get_random_start_at(reduced_sec, sample_duration)
-        
-        watermark = await db.get_watermark_text(m.from_user.id)
         
         sample_file = output_folder.joinpath(f'sample_video.mkv')
         
