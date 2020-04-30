@@ -36,7 +36,7 @@ Properly setup the environment variables.
 * `API_HASH`(required) - Get your telegram API_HASH from [https://my.telegram.org/](https://my.telegram.org/)
 * `BOT_TOKEN`(required) - Obtain your bot token from [Bot Father](https://t.me/BotFather "Bot Father")
 * `SESSION_NAME`(required) - Name you want to call your bot's session, Eg: bot username
-* `USER_SESSION_STRING`(required) - Userbot's session string.
+* `USER_SESSION_STRING`(required) - Userbot's session string ([Generate Session String](https://generatesessionstring.christyroys.repl.run/)).
 * `MIDDLE_MAN`(required) - Middle man channel's id.
 * `LINK_GEN_BOT`(required) - Username of the bot that generates streamable links for the telegram files.
 * `LOG_CHANNEL`(required) Log channel's id.
