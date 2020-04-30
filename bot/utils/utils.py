@@ -323,7 +323,7 @@ def gen_ik_buttons():
     for i in range(2, 11):
         i_keyboard.append(
             InlineKeyboardButton(
-                f"? {i}",
+                f"{i}",
                 f"scht+{i}"
             )
         )
