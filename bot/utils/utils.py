@@ -317,19 +317,19 @@ async def sample_fn(c, m):
         await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
 
 
-def gen_ik_buttons(n):
+def gen_ik_buttons():
     btns = []
     i_keyboard = []
-    for i in range(n):
-        c = i + 1
+    for i in range(2, 11):
         i_keyboard.append(
             InlineKeyboardButton(
-                '? '  + f"{c}",
-                f"scht+{c}"
+                '? '  + f"{i}",
+                f"scht+{i}"
             )
         )
-        if (i % 2) == 1:
-            if len(i_keyboard) > 0:
-                btns.append(i_keyboard)
-                i_keyboard = []
+        if (i>2) and (i%2) == 1:
+            btns.append(i_keyboard)
+            i_keyboard = []
+        if i==10:
+            btns.append(i_keyboard)
     return btns

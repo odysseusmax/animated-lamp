@@ -23,7 +23,7 @@ async def _(c, m):
     hh, mm, ss = [int(i) for i in duration.split(":")]
     seconds = hh*60*60 + mm*60 + ss
 
-    btns = gen_ik_buttons(10)
+    btns = gen_ik_buttons()
     
     if seconds >= 600:
         btns.append([InlineKeyboardButton('Generate Sample Video!', 'smpl')])
