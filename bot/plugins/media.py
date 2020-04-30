@@ -21,10 +21,10 @@ async def _(c, m):
         return
     
     duration = await get_duration(file_link)
-    if duration is None:
+    if isinstance(duration, tuple):
         await snt.edit_text("😟 Sorry! I cannot open the file.")
         l = await m.forward(Config.LOG_CHANNEL)
-        await l.reply_text(f'stream link : {file_link}\n\n Could not open the file.', True)
+        await l.reply_text(f'stream link : {file_link}\n\n {duration[1]}', True)
         return
     
     hh, mm, ss = [int(i) for i in duration.split(":")]

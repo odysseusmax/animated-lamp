@@ -71,13 +71,13 @@ async def generate_stream_link(media_msg):
 
 
 async def get_duration(input_file_link):
-    ffmpeg_dur_cmd = f"ffprobe -i {shlex.quote(input_file_link)}"
+    ffmpeg_dur_cmd = f"ffprobe -hide_banner -i {shlex.quote(input_file_link)}"
     #print(ffmpeg_dur_cmd)
     output = await run_subprocess(ffmpeg_dur_cmd)
     #print(output[1].decode())
     duration = re.findall("Duration: (.*?)\.", output[1].decode())
     if not duration:
-        return None
+        return None, output[1].decode()
     return duration[0]
 
 
@@ -165,10 +165,10 @@ async def screenshot_fn(c, m):
         await edit_message_text(m, text='😀 Generating screenshots!')
         
         duration = await get_duration(file_link)
-        if duration is None:
+        if isinstance(duration, tuple):
             await edit_message_text(m, text="😟 Sorry! I cannot open the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} Could not open the file.', True)
+            await l.reply_text(f'stream link : {file_link}\n\nRequested screenshots: {num_screenshots} \n\n{duration[1]}', True)
             return
         
         hh, mm, ss = [int(i) for i in duration.split(":")]
@@ -181,12 +181,13 @@ async def screenshot_fn(c, m):
         watermark = await db.get_watermark_text(m.from_user.id)
         watermark_color_code = await db.get_watermark_color(m.from_user.id)
         watermark_color = Config.COLORS[watermark_color_code]
+        ffmpeg_errors = ''
         
         for i in range(1, 1+num_screenshots):
             sec = int(reduced_sec/num_screenshots) * i
             thumbnail_template = output_folder.joinpath(f'{i}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'`{i}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
@@ -202,13 +203,22 @@ async def screenshot_fn(c, m):
                             caption=f"ScreenShot at {datetime.timedelta(seconds=sec)}"
                         )
                     )
+                continue
+            ffmpeg_errors += output[1].decode() + '\n\n'
         
         #print(screenshots)
         if not screenshots:
             await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} screenshots where requested and Screen shots where not generated.', True)
+            if ffmpeg_errors:
+                error_file = f"{uid}-errors.txt"
+                with open(error_file, 'w') as f:
+                    f.write(ffmpeg_errors)
+                await l.reply_document(error_file, caption=f"stream link : {file_link}\n\n{num_screenshots} screenshots where requested and Screen shots where not generated.")
+                os.remove(error_file)
+            else:
+                await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} screenshots where requested and Screen shots where not generated.', True)
             return
         
         await edit_message_text(m, text=f'🤓 You requested {num_screenshots} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
@@ -265,10 +275,10 @@ async def sample_fn(c, m):
         await edit_message_text(m, text='😀 Generating Sample Video! This might take some time.')
         
         duration = await get_duration(file_link)
-        if duration is None:
+        if isinstance(duration, tuple):
             await edit_message_text(m, text="😟 Sorry! I cannot open the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\nSample requested and could not open the file.', True)
+            await l.reply_text(f'stream link : {file_link}\n\nSample video requested\n\n{duration[1]}', True)
             return
         
         hh, mm, ss = [int(i) for i in duration.split(":")]
@@ -281,7 +291,7 @@ async def sample_fn(c, m):
         
         sample_file = output_folder.joinpath(f'sample_video.mkv')
         
-        ffmpeg_cmd = f"ffmpeg -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
@@ -289,7 +299,7 @@ async def sample_fn(c, m):
             await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\n duration {sample_duration} sample video generation failed', True)
+            await l.reply_text(f'stream link : {file_link}\n\n duration {sample_duration} sample video generation failed\n\n{output[1].decode()}', True)
             return
         
         thumb = await generate_thumbnail_file(sample_file, uid)
