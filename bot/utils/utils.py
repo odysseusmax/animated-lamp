@@ -324,7 +324,7 @@ def gen_ik_buttons(n):
         c = i + 1
         i_keyboard.append(
             InlineKeyboardButton(
-                f"í³¸ {c}",
+                f"? {c}",
                 f"scht+{c}"
             )
         )
