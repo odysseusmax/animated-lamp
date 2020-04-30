@@ -315,3 +315,20 @@ async def sample_fn(c, m):
         
         l = await media_msg.forward(Config.LOG_CHANNEL)
         await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
+
+
+def gen_ik_buttons(n):
+    btns = []
+    i_keyboard = []
+    for i in range(n):
+        c = i + 1
+        i_keyboard.append(
+            InlineKeyboardButton(
+                f"í³¸ {c}",
+                f"scht+{c}"
+        )
+        if (i % 2) == 1:
+            if len(i_keyboard) > 0:
+                btns.append(i_keyboard)
+                i_keyboard = []
+    return btns

@@ -2,7 +2,7 @@ import asyncio
 
 from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.utils import is_url, get_duration
+from bot.utils import is_url, get_duration, gen_ik_buttons
 from config import Config
 
 
@@ -23,19 +23,7 @@ async def _(c, m):
     hh, mm, ss = [int(i) for i in duration.split(":")]
     seconds = hh*60*60 + mm*60 + ss
 
-    btns = []
-    i_keyboard = []
-    for i in range(10):
-        c = i + 1
-        i_keyboard.append(
-            InlineKeyboardButton(
-                f"📸 {c}",
-                f"scht+{c}"
-        )
-        if (i % 2) == 1:
-            if len(i_keyboard) > 0:
-                btns.append(i_keyboard)
-                i_keyboard = []
+    btns = gen_ik_buttons(10)
     
     if seconds >= 600:
         btns.append([InlineKeyboardButton('Generate Sample Video!', 'smpl')])
