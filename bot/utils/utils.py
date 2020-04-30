@@ -326,6 +326,7 @@ def gen_ik_buttons(n):
             InlineKeyboardButton(
                 f"í³¸ {c}",
                 f"scht+{c}"
+            )
         )
         if (i % 2) == 1:
             if len(i_keyboard) > 0:
