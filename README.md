@@ -38,7 +38,7 @@ Properly setup the environment variables.
 * `SESSION_NAME`(required) - Name you want to call your bot's session, Eg: bot username
 * `USER_SESSION_STRING`(required) - Userbot's session string ([Generate Session String](https://generatesessionstring.christyroys.repl.run/)).
 * `MIDDLE_MAN`(required) - Middle man channel's id.
-* `LINK_GEN_BOT`(required) - Username of the bot that generates streamable links for the telegram files.
+* `LINK_GEN_BOT`(required) - Username of the bot that generates streamable links for the telegram files ([Bot source](https://github.com/tulir/tgfilestream)).
 * `LOG_CHANNEL`(required) Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
@@ -57,5 +57,6 @@ You can contact me [@odysseusmax](https://tx.me/odysseusmax)
 ## Thanks
 Thanks to [Dan](https://github.com/delivrance) for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
+Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.
 ## License
 Code released under [The GNU General Public License](LICENSE).
