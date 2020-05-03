@@ -19,7 +19,8 @@ class Database:
             as_file=False,
             watermark_text='',
             sample_duration=30,
-            watermark_color=0
+            watermark_color=0,
+            screenshot_mode=0
         )
     
     
@@ -59,6 +60,10 @@ class Database:
         await self.col.update_one({'id': id}, {'$set': {'watermark_color': watermark_color}})
     
     
+    async def update_screenshot_mode(self, id, screenshot_mode):
+        await self.col.update_one({'id': id}, {'$set': {'screenshot_mode': screenshot_mode}})
+    
+    
     async def get_watermark_text(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_text', '')
@@ -72,3 +77,7 @@ class Database:
     async def get_watermark_color(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_color', 0)
+    
+    async def get_screenshot_mode(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('screenshot_mode', 0)

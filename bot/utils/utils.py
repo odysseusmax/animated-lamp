@@ -101,27 +101,44 @@ async def display_settings(m, cb=False):
     watermark_text = await db.get_watermark_text(chat_id)
     sample_duration = await db.get_sample_duration(chat_id)
     watermark_color_code = await db.get_watermark_color(chat_id)
+    screenshot_mode = await db.get_screenshot_mode(chat_id)
     
+    sv_btn = [
+        InlineKeyboardButton("Sample Video Duration", 'rj'),
+        InlineKeyboardButton(f"{sample_duration}s", 'set+sv+1')
+    ]
+    wc_btn = [
+        InlineKeyboardButton("Watermark Color", 'rj'),
+        InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc+1')
+    ]
+    as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj')]
+    wm_btn = [InlineKeyboardButton("Watermark", 'rj')]
+    sm_btn = [InlineKeyboardButton("Screenshot Generation Mode", 'rj')]
     
     if as_file:
-        as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj'), InlineKeyboardButton("📁 Uploading as Document.", 'set+af+0')]
+        as_file_btn.append(InlineKeyboardButton("📁 Uploading as Document.", 'set+af+0'))
     else:
-        as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj'), InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af+1')]
+        as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af+1'))
     
     if watermark_text:
-        wm_btn = [InlineKeyboardButton("Watermark", 'rj'), InlineKeyboardButton(f"{watermark_text}", 'set+wm+0')]
+        wm_btn.append(InlineKeyboardButton(f"{watermark_text}", 'set+wm+0'))
     else:
-        wm_btn = [InlineKeyboardButton("Watermark", 'rj'), InlineKeyboardButton("No watermark exists!", 'set+wm+1')]
+        wm_btn.append(InlineKeyboardButton("No watermark exists!", 'set+wm+1'))
     
-    sv_btn = [InlineKeyboardButton("Sample Video Duration", 'rj'), InlineKeyboardButton(f"{sample_duration}s", 'set+sv+1')]
-    wc_btn = [InlineKeyboardButton("Watermark Color", 'rj'), InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc+1')]
+    if screenshot_mode == 0:
+        sm_btn.append(InlineKeyboardButton("Equally spaced screenshots", 'set+sm+1'))
+    else:
+        sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm+1'))
     
-    settings_btn = [as_file_btn, wm_btn, wc_btn, sv_btn]
+    settings_btn = [as_file_btn, wm_btn, wc_btn, sv_btn, sm_btn]
     
     if cb:
-        await m.edit_message_reply_markup(
-            InlineKeyboardMarkup(settings_btn)
-        )
+        try:
+            await m.edit_message_reply_markup(
+                InlineKeyboardMarkup(settings_btn)
+            )
+        except:
+            pass
         return
     
     await m.reply_text(
@@ -188,21 +205,25 @@ async def screenshot_fn(c, m):
 
         reduced_sec = duration - int(duration*2 / 100)
         print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
-        as_file = await db.is_as_file(m.from_user.id)
-        
         screenshots = []
-        watermark = await db.get_watermark_text(m.from_user.id)
-        watermark_color_code = await db.get_watermark_color(m.from_user.id)
+        watermark = await db.get_watermark_text(chat_id)
+        watermark_color_code = await db.get_watermark_color(chat_id)
         watermark_color = Config.COLORS[watermark_color_code]
+        as_file = await db.is_as_file(chat_id)
+        screenshot_mode = await db.get_screenshot_mode(chat_id)
         ffmpeg_errors = ''
         
-        for i in range(1, 1+num_screenshots):
-            sec = get_random_start_at(reduced_sec)
-            thumbnail_template = output_folder.joinpath(f'{i}.png')
+        if screenshot_mode == 0:
+            screenshot_secs = [int(reduced_sec/10)*i for i in range(1, 1+num_screenshots)]
+        else:
+            screenshot_secs = [get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
+        
+        for i, sec in enumerate(screenshot_secs):
+            thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             print(sec)
             ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
-            await edit_message_text(m, text=f'`{i}` of `{num_screenshots}` generated!')
+            await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
                 if as_file:
                     screenshots.append({

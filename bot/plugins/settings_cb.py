@@ -32,6 +32,7 @@ async def settings_cb(c, m):
         sample_duration += 30
         await db.update_sample_duration(chat_id, sample_duration)
         alert_text = f'Sample video duration changed to {sample_duration}s'
+    
     elif typ == 'wc':
         watermark_color_code = await db.get_watermark_color(chat_id)
         if watermark_color_code+1 == len(Config.COLORS):
@@ -39,6 +40,15 @@ async def settings_cb(c, m):
         watermark_color_code += 1
         await db.update_watermark_color(chat_id, watermark_color_code)
         alert_text = f'Successfully changed watermark text color to {Config.COLORS[watermark_color_code]}'
+    
+    elif typ == 'sm':
+        screenshot_mode = await db.get_screenshot_mode(chat_id)
+        if screenshot_mode == 0:
+            screenshot_mode = 1
+        else:
+            screenshot_mode = 0
+        await db.update_screenshot_mode(chat_id, screenshot_mode)
+        alert_text = 'Successfully changed screenshot generation mode'
     
     await m.answer(alert_text, show_alert=True)
 
