@@ -38,7 +38,7 @@ async def _(c, m):
     
     btns = gen_ik_buttons()
     
-    if seconds >= 600:
+    if duration >= 600:
         btns.append([InlineKeyboardButton('Generate Sample Video!', 'smpl')])
     
     await snt.edit_text(
