@@ -135,7 +135,7 @@ async def screenshot_fn(c, m):
     
     chat_id = m.from_user.id
     if CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
-        await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', alert=True)
+        await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', show_alert=True)
         return
     if not CURRENT_PROCESSES.get(chat_id):
         CURRENT_PROCESSES[chat_id] = 0
@@ -260,7 +260,7 @@ async def screenshot_fn(c, m):
 async def sample_fn(c, m):
     chat_id = m.from_user.id
     if CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
-        await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', alert=True)
+        await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', show_alert=True)
         return
     if not CURRENT_PROCESSES.get(chat_id):
         CURRENT_PROCESSES[chat_id] = 0
