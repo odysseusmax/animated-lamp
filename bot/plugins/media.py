@@ -5,6 +5,7 @@ from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils import is_valid_file, generate_stream_link, get_duration, gen_ik_buttons
 from config import Config
+from bot import db
 
 
 @Client.on_message(Filters.private & Filters.media)

@@ -5,6 +5,7 @@ from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils import is_url, get_duration, gen_ik_buttons
 from config import Config
+from bot import db
 
 
 @Client.on_message(Filters.private & Filters.text & Filters.incoming & ~Filters.edited)

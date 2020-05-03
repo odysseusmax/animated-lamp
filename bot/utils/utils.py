@@ -29,7 +29,7 @@ def is_url(text):
     return text.startswith('http')
 
 
-def get_random_start_at(seconds, dur):
+def get_random_start_at(seconds, dur=0):
     return random.randint(0, seconds-dur)
 
 
@@ -197,7 +197,7 @@ async def screenshot_fn(c, m):
         ffmpeg_errors = ''
         
         for i in range(1, 1+num_screenshots):
-            sec = int(reduced_sec/num_screenshots) * i
+            sec = get_random_start_at(reduced_sec)
             thumbnail_template = output_folder.joinpath(f'{i}.png')
             print(sec)
             ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
