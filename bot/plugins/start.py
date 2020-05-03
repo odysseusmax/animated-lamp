@@ -15,7 +15,7 @@ async def start(c, m):
         )
     
     await m.reply_text(
-        text=f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm **Not ~~The Only Screenshot Bot~~** that gives you screenshots with out downloading the entire file. Send me any telegram streamable/document video file or a streaming link, I'll generate the screenshots for you.",
+        text=f"Hi {m.from_user.first_name}.\n\nI'm Screenshot Generator Bot. I'm not ~~The Only Screenshot Bot~~** that gives you screenshots with out downloading the entire file. Send me any telegram streamable/document video file or a streaming link, I'll generate the screenshots or sample videos for you.",
         quote=True,
         reply_markup=InlineKeyboardMarkup(
             [
