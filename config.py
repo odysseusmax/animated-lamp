@@ -14,6 +14,7 @@ class Config:
     DATABASE_URL = os.environ.get('DATABASE_URL')
     AUTH_USERS = [int(i) for i in os.environ.get('AUTH_USERS', '').split(' ')]
     MAX_PROCESSES_PER_USER = int(os.environ.get('MAX_PROCESSES_PER_USER', 2))
+    MAX_TRIM_DURATION = int(os.environ.get('MAX_TRIM_DURATION', 600))
     
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')

@@ -45,6 +45,7 @@ Properly setup the environment variables.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
+* `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 
 ### Run bot
 `$ python3 run.py`
