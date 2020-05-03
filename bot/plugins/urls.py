@@ -33,7 +33,7 @@ async def _(c, m):
     
     if duration >= 600:
         btns.append([InlineKeyboardButton('Generate Sample Video!', 'smpl')])
-        btns.append([InlineKeyboardButton('Trim Video', 'trim')])
+        btns.append([InlineKeyboardButton('Trim Video!', 'trim')])
     
     await snt.edit_text(
         text=f"Hi, Choose the number of screenshots you need.\n\nTotal duration: `{datetime.timedelta(seconds=duration)}` (`{duration}s`)",

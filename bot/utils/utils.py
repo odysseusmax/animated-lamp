@@ -442,13 +442,13 @@ async def trim_fn(c, m):
                 CURRENT_PROCESSES[chat_id] -= 1
                 return
             
-        await snt.edit_text('😀 Generating Sample Video! This might take some time.')
+        await snt.edit_text('😀 Trimming Your Video! This might take some time.')
         
         duration = await get_duration(file_link)
         if isinstance(duration, str):
             await snt.edit_text("😟 Sorry! I cannot open the file.")
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'stream link : {file_link}\n\nSample video requested\n\n{duration}', True)
+            await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}', True)
             CURRENT_PROCESSES[chat_id] -= 1
             return
         
@@ -457,14 +457,14 @@ async def trim_fn(c, m):
             CURRENT_PROCESSES[chat_id] -= 1
             return
         
-        sample_file = output_folder.joinpath(f'sample_video.mkv')
+        sample_file = output_folder.joinpath(f'trim_video.mkv')
         
         ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
         if not sample_file.exists():
-            await snt.edit_text('😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
+            await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
             await l.reply_text(f'stream link : {file_link}\n\nVideo trimm failed. **{start}:{end}**\n\n{output[1].decode()}', True)
