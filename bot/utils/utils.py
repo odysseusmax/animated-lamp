@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import time
+import math
 import shlex
 import random
 import asyncio
@@ -68,6 +69,18 @@ async def generate_stream_link(media_msg):
     if link_msg is None:
         return None
     return link_msg.text
+
+
+async def get_dimentions(input_file_link):
+    ffprobe_cmd = f"ffprobe -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+    output = await run_subprocess(ffprobe_cmd)
+    #print(output)
+    try:
+        width, height = [int(i.strip()) for i in output[0].decode().split('x')]
+    except Exception as e:
+        print(e)
+        width, height = 1280, 534
+    return width, height
 
 
 async def get_duration(input_file_link):
@@ -218,10 +231,13 @@ async def screenshot_fn(c, m):
         else:
             screenshot_secs = [get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
         
+        width, height = await get_dimentions(file_link)
+        fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * 45.0)
+        
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize=40:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
