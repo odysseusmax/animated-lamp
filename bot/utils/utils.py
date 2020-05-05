@@ -237,7 +237,7 @@ async def screenshot_fn(c, m):
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=(W-tw)/2:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
@@ -347,7 +347,7 @@ async def sample_fn(c, m):
         
         reduced_sec = duration - int(duration*10 / 100)
         print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
-        sample_duration = await db.get_sample_duration(m.from_user.id)
+        sample_duration = await db.get_sample_duration(chat_id)
         
         start_at = get_random_start_at(reduced_sec, sample_duration)
         
