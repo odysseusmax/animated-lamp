@@ -232,7 +232,7 @@ async def screenshot_fn(c, m):
             screenshot_secs = [get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
         
         width, height = await get_dimentions(file_link)
-        fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * 45.0)
+        fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.DEFAULT_FONT_SIZE)
         
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
