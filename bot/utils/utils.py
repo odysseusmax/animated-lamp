@@ -84,17 +84,14 @@ async def get_dimentions(input_file_link):
 
 
 async def get_duration(input_file_link):
-    ffmpeg_dur_cmd = f"ffprobe -hide_banner -i {shlex.quote(input_file_link)}"
+    ffmpeg_dur_cmd = f"ffprobe -i {shlex.quote(input_file_link)} -show_entries format=duration -v quiet -of csv=p=0"
     #print(ffmpeg_dur_cmd)
     output = await run_subprocess(ffmpeg_dur_cmd)
-    #print(output[1].decode())
-    duration = re.findall("Duration: (.*?)\.", output[1].decode())
-    if not duration:
-        return output[1].decode()
-    
-    hh, mm, ss = [int(i) for i in duration[0].split(":")]
-    seconds = hh*60*60 + mm*60 + ss
-    return seconds
+    if output:
+        seconds = round(float(output[0].decode()))
+        return seconds
+    else:
+        return output[0].decode()
 
 
 async def edit_message_text(m, **kwargs):
