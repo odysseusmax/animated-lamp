@@ -16,6 +16,7 @@ class Config:
     MAX_PROCESSES_PER_USER = int(os.environ.get('MAX_PROCESSES_PER_USER', 2))
     MAX_TRIM_DURATION = int(os.environ.get('MAX_TRIM_DURATION', 600))
     DEFAULT_FONT_SIZE = float(os.environ.get('DEFAULT_FONT_SIZE', 45))
+    BANNED_USERS = [int(i) for i in os.environ.get('BANNED_USERS', '').split(' ')]
     
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')
