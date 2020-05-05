@@ -47,6 +47,7 @@ Properly setup the environment variables.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 * `DEFAULT_FONT_SIZE`(optional) - Font size to be used for watermark texts. Defaults to 45.
+* `BANNED_USERS`(required) - Block user(s) id separated by space.
 
 ### Run bot
 `$ python3 run.py`
