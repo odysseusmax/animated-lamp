@@ -16,6 +16,14 @@ async def _(c, m):
             Config.LOG_CHANNEL,
             f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
         )
+        return   
+    if m.chat.id in Config.BANNED_USERS:
+        await c.send_message(
+            chat_id=m.chat.id,
+            text=f"Sorry Dear You misused me. So you are Blocked.",
+            reply_to_message_id=m.message_id
+        )
+        return
     
     if not is_url(m.text):
         return
