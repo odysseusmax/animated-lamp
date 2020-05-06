@@ -46,6 +46,7 @@ Properly setup the environment variables.
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
+* `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
 
 ### Run bot
 `$ python3 run.py`

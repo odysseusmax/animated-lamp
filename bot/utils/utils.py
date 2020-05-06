@@ -209,7 +209,9 @@ async def screenshot_fn(c, m):
                 await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url', True)
                 CURRENT_PROCESSES[chat_id] -= 1
                 return
-            
+        if Config.TRACK_CHANNEL:
+            await c.send_message(Config.TRACK_CHANNEL, f"`{file_link}` \n\nUser id: `{chat_id}`")
+        
         await edit_message_text(m, text='😀 Generating screenshots!')
         
         duration = await get_duration(file_link)
@@ -232,7 +234,7 @@ async def screenshot_fn(c, m):
         ffmpeg_errors = ''
         
         if screenshot_mode == 0:
-            screenshot_secs = [int(reduced_sec/10)*i for i in range(1, 1+num_screenshots)]
+            screenshot_secs = [int(reduced_sec/num_screenshots)*i for i in range(1, 1+num_screenshots)]
         else:
             screenshot_secs = [get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
         
@@ -339,7 +341,10 @@ async def sample_fn(c, m):
                 await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url', True)
                 CURRENT_PROCESSES[chat_id] -= 1
                 return
-            
+        
+        if Config.TRACK_CHANNEL:
+            await c.send_message(Config.TRACK_CHANNEL, f"`{file_link}` \n\nUser id: `{chat_id}`")
+        
         await edit_message_text(m, text='😀 Generating Sample Video! This might take some time.')
         
         duration = await get_duration(file_link)
@@ -462,7 +467,10 @@ async def trim_fn(c, m):
                 await l.reply_text(f'@{Config.LINK_GEN_BOT} did not respond with stream url', True)
                 CURRENT_PROCESSES[chat_id] -= 1
                 return
-            
+        
+        if Config.TRACK_CHANNEL:
+            await c.send_message(Config.TRACK_CHANNEL, f"`{file_link}` \n\nUser id: `{chat_id}`")
+        
         await snt.edit_text('😀 Trimming Your Video! This might take some time.')
         
         duration = await get_duration(file_link)

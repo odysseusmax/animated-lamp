@@ -17,6 +17,17 @@ async def _(c, m):
             f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
         )
     
+    ban_status = await db.get_ban_status(m.chat.id)
+    if ban_status['is_banned']:
+        if (datetime.date.today() - datetime.date.fromisoformat(ban_status['banned_on'])).days > ban_status['ban_duration']:
+            await db.remove_ban(m.chat.id)
+        else:
+            await m.reply_text(
+                f"Sorry Dear, You misused me. So you are Blocked!.\n\nBlock Reason: __{ban_status['ban_reason']}__",
+                quote=True
+            )
+            return
+    
     if not is_valid_file(m):
         return
     

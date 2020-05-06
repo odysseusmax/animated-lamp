@@ -21,7 +21,13 @@ class Database:
             sample_duration=30,
             watermark_color=0,
             screenshot_mode=0,
-            font_size=1
+            font_size=1,
+            ban_status=dict(
+                is_banned=False,
+                ban_duration=0,
+                banned_on=datetime.date.max.isoformat(),
+                ban_reason=''
+            )
         )
     
     
@@ -67,6 +73,26 @@ class Database:
     
     async def update_font_size(self, id, font_size):
         await self.col.update_one({'id': id}, {'$set': {'font_size': font_size}})
+        
+    
+    async def remove_ban(self, id):
+        ban_status = dict(
+            is_banned=False,
+            ban_duration=0,
+            banned_on=datetime.date.max.isoformat(),
+            ban_reason=''
+        )
+        await self.col.update_one({'id': id}, {'$set': {'ban_status': ban_status}})
+    
+    
+    async def ban_user(self, user_id, ban_duration, ban_reason):
+        ban_status = dict(
+            is_banned=True,
+            ban_duration=ban_duration,
+            banned_on=datetime.date.today().isoformat(),
+            ban_reason=ban_reason
+        )
+        await self.col.update_one({'id': user_id}, {'$set': {'ban_status': ban_status}})
     
     
     async def get_watermark_text(self, id):
@@ -92,3 +118,14 @@ class Database:
     async def get_font_size(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('font_size', 1)
+    
+    async def get_ban_status(self, id):
+        default = dict(
+            is_banned=False,
+            ban_duration=0,
+            banned_on=datetime.date.max.isoformat(),
+            ban_reason=''
+        )
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('ban_status', default)
+    
