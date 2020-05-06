@@ -53,6 +53,33 @@ Properly setup the environment variables.
 
 Now go to your bot and do a `/start`.
 
+## Supported commands and functions
+
+### Commands
+
+* `/start` - Command to start bot or check whether bot is alive.
+* `/settings` - Command to configure bot's behavior'
+* `/set_watermark` - Command to add custom watermark text to screenshots. Usage: `/set_watermark watermark_text`
+
+* `/status` - Admin/Auth users only command. Returns number of total users.
+* `/ban_user` - Admin/Auth users only command. Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`.
+* `/unban_user` - Admin/Auth users only command. Command to ban any banned user. Usage: `/unban_user user_id`.
+
+### Functions
+* `Screenshot Generation` - Generates screenshots from telegram video files or streaming links. Number of screenshots range from 2-10.
+* `Sample Video Generation` - Generates sample video from telegram video files or streaming links. Video duration range from 30s to 150s. Configurable in `/settings`.
+* `Video Trimming` - Trims any telegram video files or streaming links. Video duration depends on the environment. By default upto 10 mins (600s).
+
+### Settings
+In bot settings.
+* `Upload Mode` - Screenshot upload mode. Either `as image file` or `as document file`. Defaults to `as image file`.
+* `Watermark` - Watermark text to be embedded to screenshots. Texts upto 30 characters supported. Disabled by default.
+* `Watermark Color` - Font color to be used for watermark. Any of `white`, `black`, `red`, `blue`, `green`, `yellow`, `orange`, `purple`, `brown`, `gold`, `silver`, `pink`. Defaults to `white`.
+* `Watermark Font Size` - Font size to be used for watermarks. Any of `small(30)`, `medium(40)`, `large(50)`. Defaults to `medium`.
+* `Sample Video Duration` - Sample video's duration. Any of `30s`, `60s`, `90s`, `120s`, `150s`. Defaults to `30s`.
+* `Screenshot Genetation Mode` - Either `random` or `equally spaced`. Defaults to `equally spaced`.
+
+
 ## Contributions
 Contributions are welcome.
 
