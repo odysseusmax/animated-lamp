@@ -50,6 +50,14 @@ async def settings_cb(c, m):
         await db.update_screenshot_mode(chat_id, screenshot_mode)
         alert_text = 'Successfully changed screenshot generation mode'
     
+    elif typ == 'fs':
+        font_size = await db.get_font_size(chat_id)
+        if font_size == len(Config.FONT_SIZES)-1:
+            font_size = -1
+        font_size += 1
+        await db.update_font_size(chat_id, font_size)
+        alert_text = f'Successfully changed font size to {Config.FONT_SIZES_NAME[font_size]}'
+    
     await m.answer(alert_text, show_alert=True)
 
     await display_settings(m, cb=True)

@@ -20,7 +20,8 @@ class Database:
             watermark_text='',
             sample_duration=30,
             watermark_color=0,
-            screenshot_mode=0
+            screenshot_mode=0,
+            font_size=1
         )
     
     
@@ -64,6 +65,10 @@ class Database:
         await self.col.update_one({'id': id}, {'$set': {'screenshot_mode': screenshot_mode}})
     
     
+    async def update_font_size(self, id, font_size):
+        await self.col.update_one({'id': id}, {'$set': {'font_size': font_size}})
+    
+    
     async def get_watermark_text(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_text', '')
@@ -78,6 +83,12 @@ class Database:
         user = await self.col.find_one({'id':int(id)})
         return user.get('watermark_color', 0)
     
+    
     async def get_screenshot_mode(self, id):
         user = await self.col.find_one({'id':int(id)})
         return user.get('screenshot_mode', 0)
+    
+    
+    async def get_font_size(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('font_size', 1)

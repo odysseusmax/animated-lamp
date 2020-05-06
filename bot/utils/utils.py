@@ -113,6 +113,7 @@ async def display_settings(m, cb=False):
     sample_duration = await db.get_sample_duration(chat_id)
     watermark_color_code = await db.get_watermark_color(chat_id)
     screenshot_mode = await db.get_screenshot_mode(chat_id)
+    font_size = await db.get_font_size(chat_id)
     
     sv_btn = [
         InlineKeyboardButton("Sample Video Duration", 'rj'),
@@ -122,9 +123,14 @@ async def display_settings(m, cb=False):
         InlineKeyboardButton("Watermark Color", 'rj'),
         InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc+1')
     ]
+    fs_btn = [
+        InlineKeyboardButton("Watermark Font Size", 'rj'),
+        InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", 'set+fs+1')
+    ]
     as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj')]
     wm_btn = [InlineKeyboardButton("Watermark", 'rj')]
     sm_btn = [InlineKeyboardButton("Screenshot Generation Mode", 'rj')]
+    
     
     if as_file:
         as_file_btn.append(InlineKeyboardButton("📁 Uploading as Document.", 'set+af+0'))
@@ -141,7 +147,7 @@ async def display_settings(m, cb=False):
     else:
         sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm+1'))
     
-    settings_btn = [as_file_btn, wm_btn, wc_btn, sv_btn, sm_btn]
+    settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, sm_btn]
     
     if cb:
         try:
@@ -222,6 +228,7 @@ async def screenshot_fn(c, m):
         watermark_color = Config.COLORS[watermark_color_code]
         as_file = await db.is_as_file(chat_id)
         screenshot_mode = await db.get_screenshot_mode(chat_id)
+        font_size = await db.get_font_size(chat_id)
         ffmpeg_errors = ''
         
         if screenshot_mode == 0:
@@ -230,12 +237,12 @@ async def screenshot_fn(c, m):
             screenshot_secs = [get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
         
         width, height = await get_dimentions(file_link)
-        fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.DEFAULT_FONT_SIZE)
+        fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
         
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=10:y=H-th-10:text='{shlex.quote(watermark)}'\" -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
