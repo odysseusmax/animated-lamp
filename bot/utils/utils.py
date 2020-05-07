@@ -49,7 +49,7 @@ async def generate_thumbnail_file(file_path, uid):
         os.makedirs(output_folder)
     
     thumb_file = output_folder.joinpath('thumb.jpg')
-    ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 '{thumb_file}'"
+    ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 -vf \"scale=320:-1\" -y '{thumb_file}'"
     output = await run_subprocess(ffmpeg_cmd)
     if not thumb_file.exists():
         return None
@@ -143,9 +143,9 @@ async def display_settings(m, cb=False):
         as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af'))
     
     if as_round:
-        as_round_btn.append(InlineKeyboardButton("Uploading as Video file.", 'set+ar'))
-    else:
         as_round_btn.append(InlineKeyboardButton("Uploading as Round Video.", 'set+ar'))
+    else:
+        as_round_btn.append(InlineKeyboardButton("Uploading as Video file.", 'set+ar'))
     
     if watermark_text:
         wm_btn.append(InlineKeyboardButton(f"{watermark_text}", 'set+wm'))
@@ -397,7 +397,8 @@ async def sample_fn(c, m):
                 video_note=sample_file,
                 quote=True,
                 duration=sample_duration,
-                thumb=thumb
+                length=320,
+                thumb=thumb,
             )
         else:
             await media_msg.reply_video(
