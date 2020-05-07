@@ -399,7 +399,7 @@ async def sample_fn(c, m):
                 duration=sample_duration,
                 thumb=thumb
             )
-        else
+        else:
             await media_msg.reply_video(
                 video=sample_file, 
                 quote=True,
