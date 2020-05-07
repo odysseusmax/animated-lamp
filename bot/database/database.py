@@ -19,6 +19,7 @@ class Database:
             as_file=False,
             watermark_text='',
             sample_duration=30,
+            as_round=False,
             watermark_color=0,
             screenshot_mode=0,
             font_size=1,
@@ -51,8 +52,17 @@ class Database:
         return user.get('as_file', False)
     
     
+    async def is_as_round(self, id):
+        user = await self.col.find_one({'id':int(id)})
+        return user.get('as_round', False)
+    
+    
     async def update_as_file(self, id, as_file):
         await self.col.update_one({'id': id}, {'$set': {'as_file': as_file}})
+    
+    
+    async def update_as_round(self, id, as_round):
+        await self.col.update_one({'id': id}, {'$set': {'as_round': as_round}})
     
     
     async def update_watermark_text(self, id, watermark_text=''):

@@ -7,21 +7,27 @@ from config import Config
 
 @Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('set')))
 async def settings_cb(c, m):
-    _, typ, action = m.data.split('+')
+    try:
+        _, typ, action = m.data.split('+') # Reverse compatibility.
+    except: 
+        _, typ = m.data.split('+')
     chat_id = m.from_user.id
     
     if typ == 'af':
-        if int(action) == 0:
-            await db.update_as_file(chat_id, False)
-            alert_text = 'From now on I\'ll upload as image files'
-        else:
-            await db.update_as_file(chat_id, True)
-            alert_text = 'From now on I\'ll upload as document files'
+        as_file = await db.is_as_file(chat_id)
+        await db.update_as_file(chat_id, not as_file)
+        alert_text = 'Successfully changed screenshot upload mode!'
+    
+    elif typ == 'ar':
+        as_file = await db.is_as_round(chat_id)
+        await db.update_as_round(chat_id, not as_file)
+        alert_text = 'Successfully changed sample video upload mode!'
     
     elif typ == 'wm':
-        if int(action) == 0:
+        watermark_text = await db.get_watermark_text(chat_id)
+        if watermark_text:
             await db.update_watermark_text(chat_id)
-            alert_text = 'Successfully removed watermark text'
+            alert_text = 'Successfully removed watermark text.'
         else:
             alert_text = 'Use /set_watermark to add new watermark text.'
     

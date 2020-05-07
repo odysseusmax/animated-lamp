@@ -112,6 +112,7 @@ async def display_settings(m, cb=False):
     chat_id = m.from_user.id if cb else m.chat.id
     
     as_file = await db.is_as_file(chat_id)
+    as_round = await db.is_as_round(chat_id)
     watermark_text = await db.get_watermark_text(chat_id)
     sample_duration = await db.get_sample_duration(chat_id)
     watermark_color_code = await db.get_watermark_color(chat_id)
@@ -120,35 +121,41 @@ async def display_settings(m, cb=False):
     
     sv_btn = [
         InlineKeyboardButton("Sample Video Duration", 'rj'),
-        InlineKeyboardButton(f"{sample_duration}s", 'set+sv+1')
+        InlineKeyboardButton(f"{sample_duration}s", 'set+sv')
     ]
     wc_btn = [
         InlineKeyboardButton("Watermark Color", 'rj'),
-        InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc+1')
+        InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", 'set+wc')
     ]
     fs_btn = [
         InlineKeyboardButton("Watermark Font Size", 'rj'),
-        InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", 'set+fs+1')
+        InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", 'set+fs')
     ]
     as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj')]
+    as_round_btn = [InlineKeyboardButton("Sample Video Upload Mode", 'rj')]
     wm_btn = [InlineKeyboardButton("Watermark", 'rj')]
     sm_btn = [InlineKeyboardButton("Screenshot Generation Mode", 'rj')]
     
     
     if as_file:
-        as_file_btn.append(InlineKeyboardButton("📁 Uploading as Document.", 'set+af+0'))
+        as_file_btn.append(InlineKeyboardButton("📁 Uploading as Document.", 'set+af'))
     else:
-        as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af+1'))
+        as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af'))
+    
+    if as_round:
+        as_round_btn.append(InlineKeyboardButton("Uploading as Video file.", 'set+ar'))
+    else:
+        as_round_btn.append(InlineKeyboardButton("Uploading as Round Video.", 'set+ar'))
     
     if watermark_text:
-        wm_btn.append(InlineKeyboardButton(f"{watermark_text}", 'set+wm+0'))
+        wm_btn.append(InlineKeyboardButton(f"{watermark_text}", 'set+wm'))
     else:
-        wm_btn.append(InlineKeyboardButton("No watermark exists!", 'set+wm+1'))
+        wm_btn.append(InlineKeyboardButton("No watermark exists!", 'set+wm'))
     
     if screenshot_mode == 0:
-        sm_btn.append(InlineKeyboardButton("Equally spaced screenshots", 'set+sm+1'))
+        sm_btn.append(InlineKeyboardButton("Equally spaced screenshots", 'set+sm'))
     else:
-        sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm+1'))
+        sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm'))
     
     settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, sm_btn]
     
@@ -361,6 +368,7 @@ async def sample_fn(c, m):
         reduced_sec = duration - int(duration*10 / 100)
         print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
         sample_duration = await db.get_sample_duration(chat_id)
+        as_round = await db.is_as_round(chat_id)
         
         start_at = get_random_start_at(reduced_sec, sample_duration)
         
@@ -384,14 +392,22 @@ async def sample_fn(c, m):
         
         await media_msg.reply_chat_action("upload_video")
         
-        await media_msg.reply_video(
-            video=sample_file, 
-            quote=True,
-            caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}",
-            duration=sample_duration,
-            thumb=thumb,
-            supports_streaming=True
-        )
+        if as_round:
+            await media_msg.reply_video_note(
+                video_note=sample_file,
+                quote=True,
+                duration=sample_duration,
+                thumb=thumb
+            )
+        else
+            await media_msg.reply_video(
+                video=sample_file, 
+                quote=True,
+                caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}",
+                duration=sample_duration,
+                thumb=thumb,
+                supports_streaming=True
+            )
         
         await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)')
         CURRENT_PROCESSES[chat_id] -= 1
