@@ -89,7 +89,7 @@ async def get_duration(input_file_link):
     _, out = await run_subprocess(ffmpeg_dur_cmd)
     out = out.decode()
     raw_dur = re.findall(r'Duration: ([^\.]+)', out)
-    print(raw_dur)
+    #print(raw_dur)
     if not raw_dur:
         return out
     hh, mm, ss = [int(i) for i in raw_dur[0].strip().split(':')]
