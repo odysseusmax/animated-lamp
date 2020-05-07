@@ -92,7 +92,10 @@ async def get_duration(input_file_link):
         return error.decode()
     else:
         seconds = round(float(out.decode()))
-        return seconds
+        if seconds:
+            return seconds
+        else:
+            return 'No duration!'
 
 
 async def edit_message_text(m, **kwargs):
