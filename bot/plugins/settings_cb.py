@@ -17,12 +17,7 @@ async def settings_cb(c, m):
         as_file = await db.is_as_file(chat_id)
         await db.update_as_file(chat_id, not as_file)
         alert_text = 'Successfully changed screenshot upload mode!'
-    
-    elif typ == 'ar':
-        as_file = await db.is_as_round(chat_id)
-        await db.update_as_round(chat_id, not as_file)
-        alert_text = 'Successfully changed sample video upload mode!'
-    
+
     elif typ == 'wm':
         watermark_text = await db.get_watermark_text(chat_id)
         if watermark_text:

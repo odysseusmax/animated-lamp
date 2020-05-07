@@ -132,7 +132,6 @@ async def display_settings(m, cb=False):
         InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", 'set+fs')
     ]
     as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj')]
-    as_round_btn = [InlineKeyboardButton("Sample Video Upload Mode", 'rj')]
     wm_btn = [InlineKeyboardButton("Watermark", 'rj')]
     sm_btn = [InlineKeyboardButton("Screenshot Generation Mode", 'rj')]
     
@@ -141,11 +140,6 @@ async def display_settings(m, cb=False):
         as_file_btn.append(InlineKeyboardButton("📁 Uploading as Document.", 'set+af'))
     else:
         as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", 'set+af'))
-    
-    if as_round:
-        as_round_btn.append(InlineKeyboardButton("Uploading as Round Video.", 'set+ar'))
-    else:
-        as_round_btn.append(InlineKeyboardButton("Uploading as Video file.", 'set+ar'))
     
     if watermark_text:
         wm_btn.append(InlineKeyboardButton(f"{watermark_text}", 'set+wm'))
@@ -157,7 +151,7 @@ async def display_settings(m, cb=False):
     else:
         sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm'))
     
-    settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, as_round_btn, sm_btn]
+    settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, sm_btn]
     
     if cb:
         try:
@@ -368,7 +362,6 @@ async def sample_fn(c, m):
         reduced_sec = duration - int(duration*10 / 100)
         print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
         sample_duration = await db.get_sample_duration(chat_id)
-        as_round = await db.is_as_round(chat_id)
         
         start_at = get_random_start_at(reduced_sec, sample_duration)
         
@@ -392,16 +385,7 @@ async def sample_fn(c, m):
         
         await media_msg.reply_chat_action("upload_video")
         
-        if as_round:
-            await media_msg.reply_video_note(
-                video_note=sample_file,
-                quote=True,
-                duration=sample_duration,
-                length=320,
-                thumb=thumb,
-            )
-        else:
-            await media_msg.reply_video(
+        await media_msg.reply_video(
                 video=sample_file, 
                 quote=True,
                 caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}",
