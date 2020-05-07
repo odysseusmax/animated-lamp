@@ -157,7 +157,7 @@ async def display_settings(m, cb=False):
     else:
         sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm'))
     
-    settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, sm_btn]
+    settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, as_round_btn, sm_btn]
     
     if cb:
         try:
