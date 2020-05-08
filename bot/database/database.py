@@ -129,6 +129,7 @@ class Database:
         user = await self.col.find_one({'id':int(id)})
         return user.get('font_size', 1)
     
+    
     async def get_ban_status(self, id):
         default = dict(
             is_banned=False,
@@ -138,4 +139,9 @@ class Database:
         )
         user = await self.col.find_one({'id':int(id)})
         return user.get('ban_status', default)
+    
+    
+    async def get_all_banned_users(self):
+        banned_users = self.col.find({'ban_status.is_banned': True})
+        return banned_users
     

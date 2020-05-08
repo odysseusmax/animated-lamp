@@ -23,7 +23,7 @@ async def _(c, m):
             await db.remove_ban(m.chat.id)
         else:
             await m.reply_text(
-                f"Sorry Dear, You misused me. So you are Blocked!.\n\nBlock Reason: __{ban_status['ban_reason']}__", 
+                f"Sorry Dear, You misused me. So you are **Blocked!**!.\n\nBlock Reason: __{ban_status['ban_reason']}__", 
                 quote=True
             )
             return

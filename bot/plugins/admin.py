@@ -1,4 +1,5 @@
 import traceback
+import os
 
 from pyrogram import Client, Filters
 
@@ -27,7 +28,7 @@ async def ban(c, m):
         user_id = int(m.command[1])
         ban_duration = int(m.command[2])
         ban_reason = ' '.join(m.command[3:])
-        ban_log_text = f"Banning user {user_id} for {ban_duration} days for the reason {ban_reason}"
+        ban_log_text = f"Banning user {user_id} for {ban_duration} days for the reason {ban_reason}."
         
         try:
             await c.send_message(
@@ -86,3 +87,25 @@ async def unban(c, m):
             f"Error occoured! Traceback given below\n\n`{traceback.format_exc()}`",
             quote=True
         )
+
+
+@Client.on_message(Filters.private & Filters.command("banned_users") & Filters.user(Config.AUTH_USERS))
+async def _banned_usrs(c, m):
+    all_banned_users = await db.get_all_banned_users()
+    banned_usr_count = 0
+    text = ''
+    async for banned_user in all_banned_users:
+        user_id = banned_user['id']
+        ban_duration = banned_user['ban_status']['ban_duration']
+        banned_on = banned_user['ban_status']['banned_on']
+        ban_reason = banned_user['ban_status']['ban_reason']
+        banned_usr_count += 1
+        text += f"> **user_id**: `{user_id}`, **Ban Duration**: `{ban_duration}`, **Banned on**: `{banned_on}`, **Reason**: `{ban_reason}`\n\n"
+    reply_text = f"Total banned users: `{banned_usr_count}`\n\n{text}"
+    if len(reply_text) > 4096:
+        with open('banned-users.txt', 'w') as f:
+            f.write(reply_text)
+        await m.reply_document('banned-users.txt', True)
+        os.remove('banned-users.txt')
+        return
+    await m.reply_text(reply_text, True)

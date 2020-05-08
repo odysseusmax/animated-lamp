@@ -84,16 +84,13 @@ async def get_dimentions(input_file_link):
 
 
 async def get_duration(input_file_link):
-    ffmpeg_dur_cmd = f"ffprobe -hide_banner -i {shlex.quote(input_file_link)} "
+    ffmpeg_dur_cmd = f"ffprobe -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
     #print(ffmpeg_dur_cmd)
-    _, out = await run_subprocess(ffmpeg_dur_cmd)
-    out = out.decode()
-    raw_dur = re.findall(r'Duration: ([^\.]+)', out)
-    #print(raw_dur)
-    if not raw_dur:
-        return out
-    hh, mm, ss = [int(i) for i in raw_dur[0].strip().split(':')]
-    duration = hh*60**2 + mm*60 + ss
+    out, err = await run_subprocess(ffmpeg_dur_cmd)
+    out = out.decode().strip()
+    if not out:
+        return err.decode()
+    duration = round(float(out))
     if duration:
         return duration
     return 'No duration!'
@@ -164,7 +161,7 @@ async def display_settings(m, cb=False):
         return
     
     await m.reply_text(
-        text = f"Here You can configure the bot's behavior.",
+        text = f"Here You can configure my behavior.",
         quote=True,
         reply_markup=InlineKeyboardMarkup(settings_btn)
     )
