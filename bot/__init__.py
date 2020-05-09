@@ -7,6 +7,7 @@ bot = get_bot_client()
 user = get_user_client()
 db = Database(Config.DATABASE_URL)
 CURRENT_PROCESSES = {}
+CHAT_FLOOD = {}
 
 
 async def run_bot():

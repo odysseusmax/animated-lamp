@@ -16,6 +16,7 @@ class Config:
     MAX_PROCESSES_PER_USER = int(os.environ.get('MAX_PROCESSES_PER_USER', 2))
     MAX_TRIM_DURATION = int(os.environ.get('MAX_TRIM_DURATION', 600))
     TRACK_CHANNEL = int(os.environ.get('TRACK_CHANNEL', False))
+    SLOW_SPEED_DELAY = int(os.environ.get('SLOW_SPEED_DELAY', 15))
     
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')

@@ -47,6 +47,7 @@ Properly setup the environment variables.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
+* `SLOW_SPEED_DELAY`(optional) - Delay required between each request. Defaults to 15s.
 
 ### Run bot
 `$ python3 run.py`
