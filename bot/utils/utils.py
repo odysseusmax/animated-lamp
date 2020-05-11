@@ -56,19 +56,20 @@ async def generate_thumbnail_file(file_path, uid):
     return thumb_file
 
 
+def pack_id(msg):
+    file_id = 0
+    chat_id_offset = 2
+    pack_bits = 32
+    msg_id_offset = pack_bits + chat_id_offset
+    
+    file_id |= msg.chat.id << chat_id_offset
+    file_id |= msg.message_id << msg_id_offset
+    return file_id
+
+
 async def generate_stream_link(media_msg):
-    middle_msg = await media_msg.forward(Config.MIDDLE_MAN)
-    middle_msg = await user.get_messages(Config.MIDDLE_MAN, middle_msg.message_id)
-    link_req_msg = await middle_msg.forward(Config.LINK_GEN_BOT)
-    await user.read_history(Config.LINK_GEN_BOT)
-    await asyncio.sleep(2)
-    link_msg = None
-    async for mes in user.iter_history(Config.LINK_GEN_BOT, limit=10):
-        if mes.reply_to_message and mes.reply_to_message.message_id == link_req_msg.message_id:
-            link_msg = mes
-    if link_msg is None:
-        return None
-    return link_msg.text
+    file_id = pack_id(media_msg)
+    return f"{Config.HOST}/stream/{file_id}"
 
 
 async def get_dimentions(input_file_link):
@@ -246,7 +247,7 @@ async def screenshot_fn(c, m):
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             print(sec)
-            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=10:y=H-th-10:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=20:y=H-th-10:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():

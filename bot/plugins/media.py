@@ -45,11 +45,6 @@ async def _(c, m):
     snt = await m.reply_text("Hi there, Please wait while I'm getting everything ready to process your request!", quote=True)
     
     file_link = await generate_stream_link(m)
-    if file_link is None:
-        await snt.edit_text("😟 Sorry! I cannot help you right now, I'm having hard time processing the file.")
-        l = await m.forward(Config.LOG_CHANNEL)
-        await l.reply_text(f'Could not create stream link', True)
-        return
     
     duration = await get_duration(file_link)
     if isinstance(duration, str):
