@@ -194,7 +194,7 @@ async def screenshot_fn(c, m):
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-        await tr.reply_text(f"User id: `{chat_id}`")
+        await tr_msg.reply_text(f"User id: `{chat_id}`")
     
     if media_msg.media:
         typ = 1
@@ -322,7 +322,7 @@ async def sample_fn(c, m):
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-        await tr.reply_text(f"User id: `{chat_id}`")
+        await tr_msg.reply_text(f"User id: `{chat_id}`")
     
     if media_msg.media:
         typ = 1
@@ -443,7 +443,7 @@ async def trim_fn(c, m):
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-        await tr.reply_text(f"User id: `{chat_id}`")
+        await tr_msg.reply_text(f"User id: `{chat_id}`")
     
     if media_msg.media:
         typ = 1
