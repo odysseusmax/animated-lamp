@@ -242,7 +242,7 @@ async def screenshot_fn(c, m):
         
         for i, sec in enumerate(screenshot_secs):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-            print(sec)
+            #print(sec)
             ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=20:y=H-th-10:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
