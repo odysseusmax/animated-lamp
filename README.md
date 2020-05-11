@@ -38,12 +38,10 @@ Properly setup the environment variables.
 * `API_HASH`(required) - Get your telegram API_HASH from [https://my.telegram.org/](https://my.telegram.org/).
 * `BOT_TOKEN`(required) - Obtain your bot token from [Bot Father](https://t.me/BotFather "Bot Father").
 * `SESSION_NAME`(required) - Name you want to call your bot's session, Eg: bot username.
-* `USER_SESSION_STRING`(required) - Userbot's session string ([Generate Session String](https://generatesessionstring.christyroys.repl.run/)).
-* `MIDDLE_MAN`(required) - Middle man channel's id.
-* `LINK_GEN_BOT`(required) - Username of the bot that generates streamable links for the telegram files ([Bot source](https://github.com/tulir/tgfilestream)).
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
+* `HOST`(required) - Public URL of streaming service.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.

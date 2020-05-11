@@ -44,7 +44,7 @@ async def _(c, m):
     
     snt = await m.reply_text("Hi there, Please wait while I'm getting everything ready to process your request!", quote=True)
     
-    file_link = await generate_stream_link(m)
+    file_link = generate_stream_link(m)
     
     duration = await get_duration(file_link)
     if isinstance(duration, str):
