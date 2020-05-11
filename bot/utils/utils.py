@@ -492,7 +492,7 @@ async def trim_fn(c, m):
         
         ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy -c:s srt {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
-        print(output[1].decode())
+        #print(output[1].decode())
         
         if not sample_file.exists():
             await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
