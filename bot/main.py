@@ -16,12 +16,3 @@ def get_bot_client():
         plugins = plugins
     )
     return bot
-
-
-def get_user_client():
-    user = pyrogram.Client(
-        Config.USER_SESSION_STRING,
-        api_id = Config.API_ID,
-        api_hash = Config.API_HASH,
-    )
-    return user
