@@ -490,7 +490,7 @@ async def trim_fn(c, m):
         
         sample_file = output_folder.joinpath(f'trim_video.mkv')
         
-        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy -c:s srt {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
