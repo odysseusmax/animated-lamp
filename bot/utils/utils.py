@@ -97,6 +97,25 @@ async def get_duration(input_file_link):
     return 'No duration!'
 
 
+async def fix_subtitle_codec(file_link):
+    fixable_codecs = ['mov_text']
+    
+    ffmpeg_dur_cmd = f"ffprobe -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1  {shlex.quote(file_link)}"
+    
+    out, err = await run_subprocess(ffmpeg_dur_cmd)
+    out = out.decode().strip()
+    if not out:
+        return ''
+    
+    fix_cmd = ''
+    codecs = [i.strip() for i in out.split('\n')]
+    for indx, codec in enumerate(codecs):
+        if any(fixable_codec in codec for fixable_codec in fixable_codecs):
+            fix_cmd += f'-c:s:{indx} srt '
+    
+    return fix_cmd
+    
+
 async def edit_message_text(m, **kwargs):
     while True:
         try:
@@ -356,8 +375,9 @@ async def sample_fn(c, m):
         start_at = get_random_start_at(reduced_sec, sample_duration)
         
         sample_file = output_folder.joinpath(f'sample_video.mkv')
+        subtitle_option = await fix_subtitle_codec(file_link)
         
-        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy -c:s srt {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy {subtitle_option} {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
@@ -476,8 +496,9 @@ async def trim_fn(c, m):
             return
         
         sample_file = output_folder.joinpath(f'trim_video.mkv')
+        subtitle_option = await fix_subtitle_codec(file_link)
         
-        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy -c:s srt {sample_file}"
+        ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
@@ -509,7 +530,7 @@ async def trim_fn(c, m):
         
     except:
         traceback.print_exc()
-        await snt.edit_text('😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
+        await snt.edit_text('😟 Sorry! Video trimming failed possibly due to some infrastructure failure 😥.')
         
         l = await media_msg.forward(Config.LOG_CHANNEL)
         await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
