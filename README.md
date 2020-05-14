@@ -9,7 +9,7 @@ An attempt to implement the screenshot generation of telegram files without down
 
 ### Prerequisites
 * FFmpeg
-* Python3 (3.8.2)
+* Python3 (3.6 or higher)
 
 ### Local setup
 * Clone to local machine.
@@ -18,7 +18,7 @@ $ git clone https://github.com/odysseusmax/animated-lamp.git
 $ cd animated-lamp
 ````
 
-* Create virtualenv
+* Create and activate virtual environment.
 ```
 $ pip3 install virtualenv
 $ virtualenv venv
@@ -27,12 +27,12 @@ $ source venv/bin/activate
 
 * Install dependencies
 ```
-$ pip3 install -r requirements.txt
+$ pip3 install -U -r requirements.txt
 ```
 
 ### Environment Variables
 
-Properly setup the environment variables.
+Properly setup the environment variables or populate `config.py` with the values (some of the values are sensitive data, so keep them safe).
 
 * `API_ID`(required) - Get your telegram API_ID from [https://my.telegram.org/](https://my.telegram.org/).
 * `API_HASH`(required) - Get your telegram API_HASH from [https://my.telegram.org/](https://my.telegram.org/).
@@ -41,14 +41,14 @@ Properly setup the environment variables.
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
-* `HOST`(required) - Public URL of streaming service.
+* `HOST`(required) - Public URL of streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
 * `SLOW_SPEED_DELAY`(optional) - Delay required between each request. Defaults to 15s.
 
 ### Run bot
-`$ python3 run.py`
+`$ python3 -m bot`
 
 Now go to your bot and do a `/start`.
 
@@ -90,5 +90,6 @@ You can contact me [@odysseusmax](https://tx.me/odysseusmax)
 Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
 Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.
+
 ## License
 Code released under [The GNU General Public License](LICENSE).
