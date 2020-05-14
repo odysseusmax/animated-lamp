@@ -1,6 +1,6 @@
 from pyrogram import Filters
 
-from config import Config
+from ..config import Config
 from ..screenshotbot import ScreenShotBot
 
 

@@ -12,8 +12,7 @@ import traceback
 from pyrogram import InputMediaPhoto, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
 
-from config import Config
-from bot import db, CURRENT_PROCESSES
+from ..config import Config
 
 
 

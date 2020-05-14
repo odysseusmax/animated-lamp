@@ -1,6 +1,6 @@
-from pyrogram import Client, Filters
+from pyrogram import Filters
 
-from config import Config
+from ..config import Config
 from ..screenshotbot import ScreenShotBot
 from ..utils import display_settings
 

@@ -2,7 +2,7 @@ import asyncio
 
 from pyrogram import Filters, ForceReply
 
-from config import Config
+from ..config import Config
 from ..utils import trim_fn
 from ..screenshotbot import ScreenShotBot
 

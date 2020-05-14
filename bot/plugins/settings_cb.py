@@ -2,7 +2,7 @@ from pyrogram import Filters
 
 from ..screenshotbot import ScreenShotBot
 from ..utils import display_settings
-from config import Config
+from ..config import Config
 
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('set')))

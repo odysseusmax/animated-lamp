@@ -1,6 +1,6 @@
 from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
-from config import Config
+from ..config import Config
 from ..screenshotbot import ScreenShotBot
 
 

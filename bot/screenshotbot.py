@@ -1,6 +1,6 @@
 from pyrogram import Client
 
-from config import Config
+from .config import Config
 from .database import Database
 
 
@@ -18,6 +18,6 @@ class ScreenShotBot(Client):
             )
         )
         
-        self.db = Database(Config.DATABASE_URL)
+        self.db = Database(Config.DATABASE_URL, Config.SESSION_NAME)
         self.CURRENT_PROCESSES = {}
         self.CHAT_FLOOD = {}
