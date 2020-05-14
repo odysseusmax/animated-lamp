@@ -1,15 +1,15 @@
 # [Screenshotit_bot](https://tx.me/screenshotit_bot)
-> Telegram Bot For Screenshot Generation
+> Telegram Bot For Screenshot Generation.
 
 ## Description
 
-An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot")
+An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot").
 
 ## Installation Guide
 
 ### Prerequisites
-* FFmpeg
-* Python3 (3.6 or higher)
+* FFmpeg.
+* Python3 (3.6 or higher).
 
 ### Local setup
 * Clone to local machine.
@@ -25,7 +25,7 @@ $ virtualenv venv
 $ source venv/bin/activate
 ```
 
-* Install dependencies
+* Install dependencies.
 ```
 $ pip3 install -U -r requirements.txt
 ```
@@ -58,7 +58,7 @@ Now go to your bot and do a `/start`.
 
 * `/start` - Command to start bot or check whether bot is alive.
 * `/settings` - Command to configure bot's behavior'
-* `/set_watermark` - Command to add custom watermark text to screenshots. Usage: `/set_watermark watermark_text`
+* `/set_watermark` - Command to add custom watermark text to screenshots. Usage: `/set_watermark watermark_text`.
 
 * `/status` - Admin/Auth users only command. Returns number of total users.
 * `/ban_user` - Admin/Auth users only command. Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`. `user_id` - telegram id of the user, `ban_duration` - ban duration in days, `ban_reason` - reason for ban. All 3 parameters are required.
@@ -84,7 +84,7 @@ In bot settings.
 Contributions are welcome.
 
 ## Contact
-You can contact me [@odysseusmax](https://tx.me/odysseusmax)
+You can contact me [@odysseusmax](https://tx.me/odysseusmax).
 
 ## Thanks
 Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.

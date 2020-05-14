@@ -11,7 +11,7 @@ from ..screenshotbot import ScreenShotBot
 async def sts(c, m):
     
     total_users = await c.db.total_users_count()
-    await m.reply_text(text=f"Total user {total_users}", quote=True)
+    await m.reply_text(text=f"Total user(s) {total_users}", quote=True)
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("ban_user") & Filters.user(Config.AUTH_USERS))
@@ -101,7 +101,7 @@ async def _banned_usrs(c, m):
         ban_reason = banned_user['ban_status']['ban_reason']
         banned_usr_count += 1
         text += f"> **user_id**: `{user_id}`, **Ban Duration**: `{ban_duration}`, **Banned on**: `{banned_on}`, **Reason**: `{ban_reason}`\n\n"
-    reply_text = f"Total banned users: `{banned_usr_count}`\n\n{text}"
+    reply_text = f"Total banned user(s): `{banned_usr_count}`\n\n{text}"
     if len(reply_text) > 4096:
         with open('banned-users.txt', 'w') as f:
             f.write(reply_text)
