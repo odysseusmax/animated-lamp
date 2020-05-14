@@ -1,14 +1,14 @@
-from pyrogram import Client, Filters
+from pyrogram import Filters
 
 from config import Config
-from bot import db
+from ..screenshotbot import ScreenShotBot
 
 
-@Client.on_message(Filters.private &  Filters.command("set_watermark"))
+@ScreenShotBot.on_message(Filters.private &  Filters.command("set_watermark"))
 async def _(c, m):
     
-    if not await db.is_user_exist(m.chat.id):
-        await db.add_user(m.chat.id)
+    if not await c.db.is_user_exist(m.chat.id):
+        await c.db.add_user(m.chat.id)
         await c.send_message(
             Config.LOG_CHANNEL,
             f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
@@ -31,7 +31,7 @@ async def _(c, m):
         )
         return
     
-    await db.update_watermark_text(m.chat.id, watermark_text)
+    await c.db.update_watermark_text(m.chat.id, watermark_text)
     await m.reply_text(
         text=f"You have successfully set __{watermark_text}__ as your watermark text. From now on this will be applied to your screenshots! To remove watermark text see /settings.",
         quote=True,

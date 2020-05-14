@@ -1,7 +1,6 @@
-from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton
 
-from config import Config
-from bot import db
+from ..screenshotbot import ScreenShotBot
 
 
 HELP_TEXT = """
@@ -22,7 +21,7 @@ Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate
 __If issues persists contact my father.__"""
 
 
-@Client.on_message(Filters.private & Filters.command("help"))
+@ScreenShotBot.on_message(Filters.private & Filters.command("help"))
 async def help(c, m):
     
     await m.reply_text(

@@ -1,12 +1,13 @@
 import asyncio
 
-from pyrogram import Client, Filters, ForceReply
+from pyrogram import Filters, ForceReply
 
-from bot.utils import sample_fn
+from ..utils import sample_fn
+from ..screenshotbot import ScreenShotBot
 from config import Config
 
 
-@Client.on_callback_query(Filters.create(lambda _, query: query.data.startswith('trim')))
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('trim')))
 async def _(c, m):
     await m.message.delete(True)
     await c.send_message(
