@@ -61,7 +61,7 @@
       "description": "Delay required between each request. Defaults to 15s.",
       "value": "15",
       "required": false
-  }, 
+  } 
  },
   "addons": [
   ],
