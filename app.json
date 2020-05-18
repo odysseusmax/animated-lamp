@@ -3,11 +3,7 @@
  "description": "Screenshot /Sample Video / Trim Video files",
  "logo": "https://telegra.ph/file/a3a32dcceb8201635c1f0.jpg",
  "keywords": [
-   "telegram",
-   "Screenshot-Generator-Bot",
-   "Sample-video-Generator-Bot",
-   "Trim-Video",
-   "without-downloading-the-entire-file",
+   "telegram"
   ],
   "repository": "https://github.com/TGExplore/Screenshot-Bot",
   "env": {
