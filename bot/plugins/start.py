@@ -25,7 +25,7 @@ async def start(c, m):
                 ],
                 [
                     InlineKeyboardButton('💡  Source Code', url='https://github.com/TGExplore/Screenshot-Bot'),
-                    InlineKeyboardButton('👨  Master', url='https://github.com/TGExplore/Screenshot-Bot')
+                    InlineKeyboardButton('👨  Master', url='https://t.me/odbots')
                 ]
             ]
         )
