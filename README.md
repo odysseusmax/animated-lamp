@@ -1,11 +1,18 @@
-# [Screenshotit_bot](https://tx.me/screenshotit_bot)
+# [ScreenShot Bot](https://tx.me/ScreenShotTGBot)
 > Telegram Bot For Screenshot Generation.
 
 ## Description
 
-An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot").
+An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@ScreenShot Bot](https://tx.me/ScreenShotTGBot).
+> Screenshot Generation with Custom Watermark---Sample Video Generation---Trim video.
 
 ## Installation Guide
+
+### You can also tap the Deploy To Heroku button below to deploy straight to Heroku!
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/TGExplore/Screenshot-Bot)
+
+### Watch our YouTube video for more details -
 
 ### Prerequisites
 * FFmpeg.
@@ -41,7 +48,7 @@ Properly setup the environment variables or populate `config.py` with the values
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Authorised user(s) id separated by space.
-* `HOST`(required) - Public URL of streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
+* `HOST`(required) - Public URL of streaming service ([Source](https://github.com/TGExplore/musical-waddle)).
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
@@ -84,9 +91,12 @@ In bot settings.
 Contributions are welcome.
 
 ## Contact
-You can contact me [@odysseusmax](https://tx.me/odysseusmax).
+You can contact me [@InFoTelGroup](https://tx.me/InFoTelGroup).
 
 ## Thanks
+
+Thanks to [@odysseusmax](https://tx.me/odysseusmax) for his [animated-lamp](https://github.com/odysseusmax/animated-lamp) Bot.
+
 Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
 Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.

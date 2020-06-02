@@ -40,7 +40,7 @@
       "value": ""
     },
     "HOST": {
-      "description": "Public URL of streaming service (https://github.com/TGExplore/TG-Files-to-Link)",
+      "description": "Public URL of streaming service (https://github.com/TGExplore/musical-waddle)",
       "value": ""
     },
     "MAX_PROCESSES_PER_USER": {
@@ -67,5 +67,7 @@
   ],
   "buildpacks": [{
     "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+  }, {
+    "url": "heroku/python"
   }]
 }
