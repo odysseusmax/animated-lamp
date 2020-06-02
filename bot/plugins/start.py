@@ -21,10 +21,11 @@ async def start(c, m):
             [
                 [
                     InlineKeyboardButton('📌  Support Group', url='https://t.me/InFoTelGroup'),
-                    InlineKeyboardButton('🔖  Updates Channel', url='https://t.me/TGBotsZ')
+                    InlineKeyboardButton('🔖  Projects Channel', url='https://t.me/TGBotsZ')
                 ],
                 [
-                    InlineKeyboardButton('Source Code', url='https://github.com/TGExplore/Screenshot-Bot')
+                    InlineKeyboardButton('💡  Source Code', url='https://github.com/TGExplore/Screenshot-Bot'),
+                    InlineKeyboardButton('👨  Master', url='https://github.com/TGExplore/Screenshot-Bot'
                 ]
             ]
         )
