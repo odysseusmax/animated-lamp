@@ -380,7 +380,7 @@ async def sample_fn(c, m):
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
-        if not sample_file.exists():
+        if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
             await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
@@ -501,7 +501,7 @@ async def trim_fn(c, m):
         output = await run_subprocess(ffmpeg_cmd)
         #print(output[1].decode())
         
-        if not sample_file.exists():
+        if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
             await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
             
             l = await media_msg.forward(Config.LOG_CHANNEL)
