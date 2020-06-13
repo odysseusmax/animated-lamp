@@ -7,6 +7,8 @@ import asyncio
 import datetime
 import traceback
 
+from pyrogram import InputMediaPhoto
+
 from ..config import Config
 from .utils import generate_stream_link, get_duration, get_random_start_at, get_dimentions, run_subprocess
 
