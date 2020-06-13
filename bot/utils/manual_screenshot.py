@@ -79,7 +79,7 @@ async def manual_screenshot_fn(c, m):
         invalid_positions = []
         for pos in raw_user_input:
             if pos<0 or pos>duration:
-                invalid_positions.append(pos)
+                invalid_positions.append(str(pos))
             else:
                 valid_positions.append(pos)
         
