@@ -8,6 +8,8 @@ from ..config import Config
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('mscht')))
 async def _(c, m):
+    t = m.text.markdown.split('\n')
+    print(t)
     await m.message.delete(True)
     await c.send_message(
         m.from_user.id,
