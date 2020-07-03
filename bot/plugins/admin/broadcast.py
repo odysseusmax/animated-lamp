@@ -6,7 +6,7 @@ import random
 import time
 
 from pyrogram import Filters
-from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked
+from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 import aiofiles
 
 from bot.config import Config
@@ -24,6 +24,8 @@ async def send_msg(user_id, message):
         return 400, f"{user_id} : deactivated\n"
     except UserIsBlocked:
         return 400, f"{user_id} : blocked the bot\n"
+    except PeerIdInvalid:
+        return 400, f"{user_id} : user id invalid\n"
     except Exception as e:
         return 500, f"{user_id} : {traceback.format_exc()}\n"
         
