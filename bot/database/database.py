@@ -147,7 +147,7 @@ class Database:
     
     async def get_all_users(self):
         all_users = self.col.find({})
-        return banned_users
+        return all_users
     
     
     async def delete_user(self, user_id):
