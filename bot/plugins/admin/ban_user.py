@@ -2,8 +2,8 @@ import traceback
 
 from pyrogram import Filters
 
-from ..config import Config
-from ..screenshotbot import ScreenShotBot
+from bot.config import Config
+from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("ban_user") & Filters.user(Config.AUTH_USERS))

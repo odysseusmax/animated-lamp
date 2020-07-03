@@ -9,8 +9,8 @@ from pyrogram import Filters
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked
 import aiofiles
 
-from ..config import Config
-from ..screenshotbot import ScreenShotBot
+from bot.config import Config
+from bot.screenshotbot import ScreenShotBot
 
 
 async def send_msg(user_id, message):
