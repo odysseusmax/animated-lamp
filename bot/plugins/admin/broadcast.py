@@ -8,6 +8,7 @@ import time
 from pyrogram import Filters
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 import aiofiles
+import aiofiles.os
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
