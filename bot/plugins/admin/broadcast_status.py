@@ -20,7 +20,7 @@ async def sts_broadcast_(c, m):
     
     sts_txt = ''
     for key, value in c.broadcast_ids[broadcast_id].items():
-        sts_txt += '{key} = {value}\n'
+        sts_txt += f'{key} = {value}\n'
     
     await m.reply_text(
         f"Broadcast Status for `{broadcast_id}`\n\n{sts_txt}",

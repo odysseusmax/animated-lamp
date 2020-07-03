@@ -62,9 +62,6 @@ async def broadcast_(c, m):
     async with aiofiles.open('broadcast.txt', 'w') as broadcast_log_file:
         async for user in all_users:
             
-            if c.broadcast_ids.get(broadcast_id) is None:
-                break
-            
             sts, msg = await send_msg(
                 user_id = int(user['id']),
                 message = broadcast_msg
@@ -81,13 +78,16 @@ async def broadcast_(c, m):
                 await c.db.delete_user(user['id'])
             
             done += 1
-            c.broadcast_ids[broadcast_id].update(
-                dict(
-                    current = done,
-                    failed = failed,
-                    success = success
+            if c.broadcast_ids.get(broadcast_id) is None:
+                break
+            else:
+                c.broadcast_ids[broadcast_id].update(
+                    dict(
+                        current = done,
+                        failed = failed,
+                        success = success
+                    )
                 )
-            )
     if c.broadcast_ids.get(broadcast_id):
         c.broadcast_ids.pop(broadcast_id)
     completed_in = datetime.timedelta(seconds=int(time.time()-start_time))
