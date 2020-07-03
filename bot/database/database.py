@@ -144,3 +144,12 @@ class Database:
         banned_users = self.col.find({'ban_status.is_banned': True})
         return banned_users
     
+    
+    async def get_all_users(self):
+        all_users = self.col.find({})
+        return banned_users
+    
+    
+    async def delete_user(self, user_id):
+        await await self.col.delete_many({'id': int(user_id)})
+    

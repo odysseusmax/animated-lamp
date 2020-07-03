@@ -21,3 +21,4 @@ class ScreenShotBot(Client):
         self.db = Database(Config.DATABASE_URL, Config.SESSION_NAME)
         self.CURRENT_PROCESSES = {}
         self.CHAT_FLOOD = {}
+        self.broadcast_ids = {}
