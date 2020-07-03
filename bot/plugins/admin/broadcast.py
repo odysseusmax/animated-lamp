@@ -29,7 +29,7 @@ async def send_msg(user_id, message):
         
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.command("broadcast") & Filters.user(Config.AUTH_USERS) & Filters.reply)
+@ScreenShotBot.on_message(Filters.private & Filters.command("broadcast") & Filters.user(Config.AUTH_USERS) & Filters.reply, group=1)
 async def broadcast_(c, m):
     all_users = await c.db.get_all_users()
     

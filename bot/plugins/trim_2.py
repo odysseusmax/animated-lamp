@@ -9,7 +9,7 @@ from ..screenshotbot import ScreenShotBot
 
 @ScreenShotBot.on_message(Filters.private & Filters.reply)
 async def _(c, m):
-    
+    m.continue_propagation()
     if not await c.db.is_user_exist(m.chat.id):
         await c.db.add_user(m.chat.id)
         await c.send_message(
