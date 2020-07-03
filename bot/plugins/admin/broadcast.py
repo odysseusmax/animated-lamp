@@ -43,8 +43,8 @@ async def broadcast_(c, m):
         if not c.broadcast_ids.get(broadcast_id):
             break
     
-    await m.reply_text(
-        f"Broadcast initiated! You will be notified with log file when the all users are notified. To cancel this broadcast send `/cancel_broadcast {broadcast_id}`. To check status send `/check_broadcast_status {broadcast_id}`."
+    out = await m.reply_text(
+        f"Broadcast initiated! You will be notified with log file when the all users are notified. To cancel this broadcast send `/cancel_broadcast {broadcast_id}`. To check status send `/check_broadcast_status {broadcast_id}`.", True
     )
     start_time = time.time()
     total_users = await c.db.total_users_count()
@@ -98,5 +98,7 @@ async def broadcast_(c, m):
         await m.reply_text(f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", True)
     else:
         await m.reply_document('broadcast.txt', caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", quote=True)
+    
+    await out.delete()
     
     await aiofiles.os.remove('broadcast.txt')
