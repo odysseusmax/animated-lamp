@@ -94,6 +94,9 @@ async def broadcast_(c, m):
     
     await asyncio.sleep(3)
     
-    await m.reply_document('broadcast.txt', caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.")
+    if failed == 0:
+        await m.reply_text(f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", True)
+    else:
+        await m.reply_document('broadcast.txt', caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", quote=True)
     
     await aiofiles.os.remove('broadcast.txt')
