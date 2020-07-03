@@ -64,6 +64,7 @@ Now go to your bot and do a `/start`.
 * `/ban_user` - Admin/Auth users only command. Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`. `user_id` - telegram id of the user, `ban_duration` - ban duration in days, `ban_reason` - reason for ban. All 3 parameters are required.
 * `/unban_user` - Admin/Auth users only command. Command to ban any banned user. Usage: `/unban_user user_id`. `user_id` - telegram id of the user. The parameter is required.
 * `/banned_users` - Admin/Auth users only command. Command to view all banned users. Usage: `/banned_users`. This takes no parameters.
+* `/broadcast` - Admin/Auth user only command. Command to broadcast some message to all users. Usage: reply `/broadcast` to the message you want to broadcast.
 
 ### Functions
 * `Screenshot Generation` - Generates screenshots from telegram video files or streaming links. Number of screenshots range from 2-10.
