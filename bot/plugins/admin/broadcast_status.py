@@ -12,7 +12,7 @@ async def sts_broadcast_(c, cb):
     
     if not c.broadcast_ids.get(broadcast_id):
         await cb.answer(
-            f"No active broadcast with id {broadcast_id}",
+            text=f"No active broadcast with id {broadcast_id}",
             show_alert=True
         )
         return
@@ -22,6 +22,6 @@ async def sts_broadcast_(c, cb):
         sts_txt += f'{key} = {value}\n'
     
     await cb.answer(
-        f"Broadcast Status for {broadcast_id}\n\n{sts_txt}",
+        text=f"Broadcast Status for {broadcast_id}\n\n{sts_txt}",
         show_alert=True
     )

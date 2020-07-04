@@ -43,8 +43,8 @@ async def broadcast_(c, m):
         if not c.broadcast_ids.get(broadcast_id):
             break
     
-    await m.reply_text(
-        text = f"Broadcast initiated! You will be notified with log file when the all users are notified."
+    out = await m.reply_text(
+        text = f"Broadcast initiated! You will be notified with log file when all the users are notified."
         reply_markup = InlineKeyboardMarkup(
             [
                 [
@@ -102,9 +102,18 @@ async def broadcast_(c, m):
     
     await asyncio.sleep(3)
     
+    await out.delete()
+    
     if failed == 0:
-        await m.reply_text(f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", True)
+        await m.reply_text(
+            text="broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
+            quote=True
+        )
     else:
-        await m.reply_document('broadcast.txt', caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.", quote=True)
+        await m.reply_document(
+            document='broadcast.txt',
+            caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
+            quote=True
+        )
     
     await aiofiles.os.remove('broadcast.txt')

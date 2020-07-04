@@ -11,12 +11,15 @@ async def cncl_broadcast_(c, cb):
     _, broadcast_id = cb.data.split('+')
     
     if not c.broadcast_ids.get(broadcast_id):
-        await cb.answer(f"No active broadcast with id {broadcast_id}", show_alert=True)
+        await cb.answer(
+            text=f"No active broadcast with id {broadcast_id}",
+            show_alert=True
+        )
         return
     
     c.broadcast_ids.pop(broadcast_id)
     
     await cb.answer(
-        "Broadcast will be canceled soon.",
+        text="Broadcast will be canceled soon.",
         show_alert=True
     )
