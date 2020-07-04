@@ -44,7 +44,7 @@ async def broadcast_(c, m):
             break
     
     out = await m.reply_text(
-        text = f"Broadcast initiated! You will be notified with log file when all the users are notified."
+        text = f"Broadcast initiated! You will be notified with log file when all the users are notified.",
         reply_markup = InlineKeyboardMarkup(
             [
                 [
