@@ -5,7 +5,7 @@ import string
 import random
 import time
 
-from pyrogram import Filters
+from pyrogram import Filters, InlineKeyboardMarkups, InlineKeyboardButton
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 import aiofiles
 import aiofiles.os
@@ -44,7 +44,15 @@ async def broadcast_(c, m):
             break
     
     await m.reply_text(
-        f"Broadcast initiated! You will be notified with log file when the all users are notified. To cancel this broadcast send `/cancel_broadcast {broadcast_id}`. To check status send `/check_broadcast_status {broadcast_id}`."
+        text = f"Broadcast initiated! You will be notified with log file when the all users are notified."
+        reply_markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Cancel Broadcast", callback_data=f"cncl_bdct+{broadcast_id}"),
+                    InlineKeyboardButton("View broadcast status", callback_data=f"sts_bdct+{broadcast_id}")
+                ]
+            ]
+        )
     )
     start_time = time.time()
     total_users = await c.db.total_users_count()

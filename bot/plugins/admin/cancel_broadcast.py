@@ -4,23 +4,19 @@ from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.command("cancel_broadcast") & Filters.user(Config.AUTH_USERS))
-async def cncl_broadcast_(c, m):
-    if len(m.command) == 1:
-        return
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('cncl_bdct')) 
+                                 & Filters.user(Config.AUTH_USERS))
+async def cncl_broadcast_(c, cb):
     
-    broadcast_id = m.command[1]
+    _, broadcast_id = cb.data.split('+')
     
     if not c.broadcast_ids.get(broadcast_id):
-        await m.reply_text(
-            f"No active broadcast with id `{broadcast_id}`.",
-            True
-        )
+        await cb.answer(f"No active broadcast with id {broadcast_id}", show_alert=True)
         return
     
     c.broadcast_ids.pop(broadcast_id)
     
-    await m.reply_text(
-        f"Broadcast will be canceled soon.",
-        True
+    await cb.answer(
+        "Broadcast will be canceled soon.",
+        show_alert=True
     )
