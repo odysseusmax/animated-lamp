@@ -3,13 +3,12 @@ import asyncio
 from pyrogram import Filters, ForceReply
 
 from ..config import Config
-from ..utils import trim_fn
+from ..utils import trim_fn, manual_screenshot_fn
 from ..screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.reply)
 async def _(c, m):
-    
     if not await c.db.is_user_exist(m.chat.id):
         await c.db.add_user(m.chat.id)
         await c.send_message(
@@ -25,4 +24,7 @@ async def _(c, m):
         print('not ForceReply')
         return
     
-    asyncio.create_task(trim_fn(c, m))
+    if m.reply_to_message.text.startswith('#trim_video'):
+        asyncio.create_task(trim_fn(c, m))
+    else:
+        asyncio.create_task(manual_screenshot_fn(c, m))
