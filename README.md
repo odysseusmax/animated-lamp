@@ -71,9 +71,11 @@ Now go to your bot and do a `/start`.
 * `/ban_user` - Admin/Auth users only command. Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`. `user_id` - telegram id of the user, `ban_duration` - ban duration in days, `ban_reason` - reason for ban. All 3 parameters are required.
 * `/unban_user` - Admin/Auth users only command. Command to ban any banned user. Usage: `/unban_user user_id`. `user_id` - telegram id of the user. The parameter is required.
 * `/banned_users` - Admin/Auth users only command. Command to view all banned users. Usage: `/banned_users`. This takes no parameters.
+* `/broadcast` - Admin/Auth user only command. Command to broadcast some message to all users. Usage: reply `/broadcast` to the message you want to broadcast.
 
 ### Functions
 * `Screenshot Generation` - Generates screenshots from telegram video files or streaming links. Number of screenshots range from 2-10.
+* `Manual Screenshot` - Generates screenshots of specific time. Number of screenshots range from 1-10.
 * `Sample Video Generation` - Generates sample video from telegram video files or streaming links. Video duration range from 30s to 150s. Configurable in `/settings`.
 * `Video Trimming` - Trims any telegram video files or streaming links. Video duration depends on the environment. By default upto 10 mins (600s).
 
