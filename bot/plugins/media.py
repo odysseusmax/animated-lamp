@@ -38,7 +38,11 @@ async def _(c, m):
                 quote=True
             )
             return
-    
+        
+    if m.document:
+        if "video" not in m.document.mime_type:
+            await m.reply_text(f"**😟 Sorry! Only support Media Files.**\n**Your File type :** `{m.document.mime_type}`", quote=True)
+
     if not is_valid_file(m):
         return
     
