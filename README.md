@@ -37,15 +37,15 @@ Properly setup the environment variables or populate `config.py` with the values
 * `API_ID`(required) - Get your telegram API_ID from [https://my.telegram.org/](https://my.telegram.org/).
 * `API_HASH`(required) - Get your telegram API_HASH from [https://my.telegram.org/](https://my.telegram.org/).
 * `BOT_TOKEN`(required) - Obtain your bot token from [Bot Father](https://t.me/BotFather "Bot Father").
-* `SESSION_NAME`(required) - Name you want to call your bot's session, Eg: bot username.
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
-* `AUTH_USERS`(required) - Authorised user(s) id separated by space.
-* `HOST`(required) - Public URL of streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
+* `AUTH_USERS`(required) - Admin(s) of the bot. User's telegram id separated by space.
+* `HOST`(required) - Public URL of file streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
+* `SESSION_NAME`(optional) - Name you want to call your bot's session, Eg: bot's username.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
-* `MAX_TRIM_DURATION`(optional) - Maximum allowed seconds for trimming. Defaults to 600.
+* `MAX_TRIM_DURATION`(optional) - Maximum allowed trim duration in seconds. Defaults to 600s.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
-* `SLOW_SPEED_DELAY`(optional) - Delay required between each request. Defaults to 15s.
+* `SLOW_SPEED_DELAY`(optional) - Delay required between each request from users in seconds. Defaults to 15s.
 
 ### Run bot
 `$ python3 -m bot`
@@ -56,20 +56,26 @@ Now go to your bot and do a `/start`.
 
 ### Commands
 
+**General commands**
+
 * `/start` - Command to start bot or check whether bot is alive.
 * `/settings` - Command to configure bot's behavior'
 * `/set_watermark` - Command to add custom watermark text to screenshots. Usage: `/set_watermark watermark_text`.
 
-* `/status` - Admin/Auth users only command. Returns number of total users.
-* `/ban_user` - Admin/Auth users only command. Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`. `user_id` - telegram id of the user, `ban_duration` - ban duration in days, `ban_reason` - reason for ban. All 3 parameters are required.
-* `/unban_user` - Admin/Auth users only command. Command to ban any banned user. Usage: `/unban_user user_id`. `user_id` - telegram id of the user. The parameter is required.
-* `/banned_users` - Admin/Auth users only command. Command to view all banned users. Usage: `/banned_users`. This takes no parameters.
-* `/broadcast` - Admin/Auth user only command. Command to broadcast some message to all users. Usage: reply `/broadcast` to the message you want to broadcast.
+**Admin commands**
+
+> Any user specified in `AUTH_USERS` can use these commands.
+
+* `/status` - Returns number of total users.
+* `/ban_user` - Command to ban any user. Usage: `/ban_user user_id ban_duration ban_reason`. `user_id` - telegram id of the user, `ban_duration` - ban duration in days, `ban_reason` - reason for ban. All 3 parameters are required.
+* `/unban_user` - Command to unban any banned user. Usage: `/unban_user user_id`. `user_id` - telegram id of the user. The parameter is required.
+* `/banned_users` - Command to view all banned users. Usage: `/banned_users`. This takes no parameters.
+* `/broadcast` - Command to broadcast some message to all users. Usage: reply `/broadcast` to the message you want to broadcast.
 
 ### Functions
 * `Screenshot Generation` - Generates screenshots from telegram video files or streaming links. Number of screenshots range from 2-10.
 * `Sample Video Generation` - Generates sample video from telegram video files or streaming links. Video duration range from 30s to 150s. Configurable in `/settings`.
-* `Video Trimming` - Trims any telegram video files or streaming links. Video duration depends on the environment. By default upto 10 mins (600s).
+* `Video Trimming` - Trims any telegram video files or streaming links.
 
 ### Settings
 In bot settings.

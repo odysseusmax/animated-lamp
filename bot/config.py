@@ -6,7 +6,7 @@ class Config:
     API_ID = int(os.environ.get('API_ID'))
     API_HASH = os.environ.get('API_HASH')
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
-    SESSION_NAME = os.environ.get('SESSION_NAME')
+    SESSION_NAME = os.environ.get('SESSION_NAME', ':memory:')
     LOG_CHANNEL = int(os.environ.get('LOG_CHANNEL'))
     DATABASE_URL = os.environ.get('DATABASE_URL')
     AUTH_USERS = [int(i) for i in os.environ.get('AUTH_USERS', '').split(' ')]
