@@ -27,8 +27,7 @@ async def sample_fn(c, m):
     
     uid = str(uuid.uuid4())
     output_folder = Config.SMPL_OP_FLDR.joinpath(uid)
-    if not output_folder.exists():
-        os.makedirs(output_folder)
+    os.makedirs(output_folder, exist_ok=True)
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
@@ -87,7 +86,7 @@ async def sample_fn(c, m):
         await media_msg.reply_chat_action("upload_video")
         
         await media_msg.reply_video(
-                video=sample_file, 
+                video=str(sample_file), 
                 quote=True,
                 caption=f"Sample video. {sample_duration}s from {datetime.timedelta(seconds=start_at)}",
                 duration=sample_duration,

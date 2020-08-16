@@ -34,8 +34,7 @@ async def screenshot_fn(c, m):
     
     uid = str(uuid.uuid4())
     output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
-    if not output_folder.exists():
-        os.makedirs(output_folder)
+    os.makedirs(output_folder, exist_ok=True)
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)

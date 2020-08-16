@@ -52,8 +52,7 @@ async def trim_fn(c, m):
     
     uid = str(uuid.uuid4())
     output_folder = Config.SMPL_OP_FLDR.joinpath(uid)
-    if not output_folder.exists():
-        os.makedirs(output_folder)
+    os.makedirs(output_folder, exist_ok=True)
     
     if Config.TRACK_CHANNEL:
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
@@ -111,7 +110,7 @@ async def trim_fn(c, m):
         await m.reply_chat_action("upload_video")
         
         await m.reply_video(
-            video=sample_file, 
+            video=str(sample_file), 
             quote=True,
             caption=f"Trimmed video from {datetime.timedelta(seconds=start)} to {datetime.timedelta(seconds=end)}",
             duration=request_duration,
