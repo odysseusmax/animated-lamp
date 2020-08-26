@@ -68,7 +68,7 @@ async def broadcast_(c, m):
         success = success
     )
     log_file = f'broadcast_{broadcast_id}.txt'
-    async with aiofiles.open(, 'w') as broadcast_log_file:
+    async with aiofiles.open(log_file, 'w') as broadcast_log_file:
         async for user in all_users:
             await asyncio.sleep(1)
             sts, msg = await send_msg(
