@@ -1,4 +1,5 @@
-from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import filters as  Filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..screenshotbot import ScreenShotBot
 
@@ -12,6 +13,7 @@ Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate
 
 👉 I support any kind of **telegram video file** (streaming video or document video files) provided it --has proper mime-type-- and --is not corrupted--. 
 👉 I also support **Streaming URLs**. The URL should be a --streaming URL--, --non IP specific--, and --should return proper response codes--.
+Just send me the telegram file or the streaming URL.
 
 **General FAQ.**
 

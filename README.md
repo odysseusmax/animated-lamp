@@ -46,6 +46,7 @@ Properly setup the environment variables or populate `config.py` with the values
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed trim duration in seconds. Defaults to 600s.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
 * `SLOW_SPEED_DELAY`(optional) - Delay required between each request from users in seconds. Defaults to 15s.
+* `DEBUG` (optional) - Set some value to use DEBUG logging level. INFO by default.
 
 ### Run bot
 `$ python3 -m bot`

@@ -3,13 +3,17 @@ import re
 import shlex
 import random
 import asyncio
+import logging
 import datetime
 import traceback
 
-from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
 
 from ..config import Config
+
+
+log = logging.getLogger(__name__)
 
 
 def is_valid_file(msg):
@@ -41,8 +45,7 @@ async def run_subprocess(cmd):
 
 async def generate_thumbnail_file(file_path, uid):
     output_folder = Config.THUMB_OP_FLDR.joinpath(uid)
-    if not output_folder.exists():
-        os.makedirs(output_folder)
+    os.makedirs(output_folder, exist_ok=True)
     
     thumb_file = output_folder.joinpath('thumb.jpg')
     ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 -vf \"scale=320:-1\" -y '{thumb_file}'"
@@ -71,19 +74,19 @@ def generate_stream_link(media_msg):
 async def get_dimentions(input_file_link):
     ffprobe_cmd = f"ffprobe -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
     output = await run_subprocess(ffprobe_cmd)
-    #print(output)
+    log.debug(output)
     try:
         width, height = [int(i.strip()) for i in output[0].decode().split('x')]
     except Exception as e:
-        print(e)
+        log.debug(e, exc_info=True)
         width, height = 1280, 534
     return width, height
 
 
 async def get_duration(input_file_link):
     ffmpeg_dur_cmd = f"ffprobe -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
-    #print(ffmpeg_dur_cmd)
     out, err = await run_subprocess(ffmpeg_dur_cmd)
+    log.debug(f"{out} \n {err}")
     out = out.decode().strip()
     if not out:
         return err.decode()
@@ -99,6 +102,7 @@ async def fix_subtitle_codec(file_link):
     ffmpeg_dur_cmd = f"ffprobe -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1  {shlex.quote(file_link)}"
     
     out, err = await run_subprocess(ffmpeg_dur_cmd)
+    log.debug(f"{out} \n {err}")
     out = out.decode().strip()
     if not out:
         return ''

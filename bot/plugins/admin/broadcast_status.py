@@ -1,10 +1,10 @@
-from pyrogram import Filters
+from pyrogram import filters as Filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
 
-@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('sts_bdct')) 
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('sts_bdct')) 
                                  & Filters.user(Config.AUTH_USERS))
 async def sts_broadcast_(c, cb):
     

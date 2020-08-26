@@ -4,13 +4,17 @@ import time
 import math
 import shlex
 import asyncio
+import logging
 import datetime
 import traceback
 
-from pyrogram import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto
 
 from ..config import Config
 from .utils import generate_stream_link, get_duration, get_random_start_at, get_dimentions, run_subprocess
+
+
+log = logging.getLogger(__name__)
 
 
 async def manual_screenshot_fn(c, m):
@@ -111,11 +115,14 @@ async def manual_screenshot_fn(c, m):
         width, height = await get_dimentions(file_link)
         fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
         
+        log.info(f"Generating screenshots at positions {valid_positions} from location: {file_link} for {chat_id}")
+        
         for i, sec in enumerate(valid_positions):
             thumbnail_template = output_folder.joinpath(f'{i+1}.png')
             #print(sec)
             ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=20:y=H-th-10:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
+            log.debug(output)
             await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')
             if thumbnail_template.exists():
                 if as_file:
@@ -133,7 +140,6 @@ async def manual_screenshot_fn(c, m):
                 continue
             ffmpeg_errors += output[0].decode() + '\n' + output[1].decode() + '\n\n'
         
-        #print(screenshots)
         if not screenshots:
             await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
             
@@ -162,8 +168,8 @@ async def manual_screenshot_fn(c, m):
         await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
         c.CURRENT_PROCESSES[chat_id] -= 1
         
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
         
         l = await media_msg.forward(Config.LOG_CHANNEL)

@@ -1,10 +1,13 @@
+import logging
 import traceback
 
-from pyrogram import Filters
+from pyrogram import filters as Filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
+
+log = logging.getLogger(__name__)
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("unban_user") & Filters.user(Config.AUTH_USERS))
@@ -26,17 +29,17 @@ async def unban(c, m):
                 f"Your ban was lifted!"
             )
             unban_log_text += '\n\nUser notified successfully!'
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            log.error(e, exc_info=True)
             unban_log_text += f"\n\nUser notification failed! \n\n`{traceback.format_exc()}`"
         await c.db.remove_ban(user_id)
-        print(unban_log_text)
+        log.debug(unban_log_text)
         await m.reply_text(
             unban_log_text,
             quote=True
         )
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await m.reply_text(
             f"Error occoured! Traceback given below\n\n`{traceback.format_exc()}`",
             quote=True

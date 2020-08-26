@@ -1,4 +1,4 @@
-from pyrogram import Filters
+from pyrogram import filters as  Filters
 
 from ..config import Config
 from ..screenshotbot import ScreenShotBot
@@ -6,13 +6,6 @@ from ..screenshotbot import ScreenShotBot
 
 @ScreenShotBot.on_message(Filters.private &  Filters.command("set_watermark"))
 async def _(c, m):
-    
-    if not await c.db.is_user_exist(m.chat.id):
-        await c.db.add_user(m.chat.id)
-        await c.send_message(
-            Config.LOG_CHANNEL,
-            f"New User [{m.from_user.first_name}](tg://user?id={m.chat.id}) started."
-        )
     
     if len(m.command) == 1:
         await m.reply_text(

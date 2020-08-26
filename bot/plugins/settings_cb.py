@@ -1,11 +1,11 @@
-from pyrogram import Filters
+from pyrogram import filters as  Filters
 
 from ..screenshotbot import ScreenShotBot
 from ..utils import display_settings
 from ..config import Config
 
 
-@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('set')))
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('set')))
 async def settings_cb(c, m):
     try:
         _, typ, action = m.data.split('+') # Reverse compatibility.
@@ -65,6 +65,6 @@ async def settings_cb(c, m):
     
 
 
-@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('rj')))
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('rj')))
 async def _(c, m):
     await m.answer('😂')

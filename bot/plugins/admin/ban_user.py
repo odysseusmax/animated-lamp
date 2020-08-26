@@ -1,9 +1,13 @@
+import logging
 import traceback
 
-from pyrogram import Filters
+from pyrogram import filters as Filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
+
+
+log = logging.getLogger(__name__)
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("ban_user") & Filters.user(Config.AUTH_USERS))
@@ -28,17 +32,17 @@ async def ban(c, m):
                 f"You are banned to use this bot for **{ban_duration}** day(s) for the reason __{ban_reason}__ \n\n**Message from the admin**"
             )
             ban_log_text += '\n\nUser notified successfully!'
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            log.error(e, exc_info=True)
             ban_log_text += f"\n\nUser notification failed! \n\n`{traceback.format_exc()}`"
         await c.db.ban_user(user_id, ban_duration, ban_reason)
-        print(ban_log_text)
+        log.debug(ban_log_text)
         await m.reply_text(
             ban_log_text,
             quote=True
         )
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await m.reply_text(
             f"Error occoured! Traceback given below\n\n`{traceback.format_exc()}`",
             quote=True

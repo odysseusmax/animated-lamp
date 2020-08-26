@@ -2,12 +2,15 @@ import os
 import uuid
 import time
 import shlex
-import asyncio
+import logging
 import datetime
 import traceback
 
 from ..config import Config
 from .utils import generate_stream_link, get_duration, fix_subtitle_codec, generate_thumbnail_file, run_subprocess
+
+
+log = logging.getLogger(__name__)
 
 
 async def trim_fn(c, m):
@@ -88,12 +91,14 @@ async def trim_fn(c, m):
             c.CURRENT_PROCESSES[chat_id] -= 1
             return
         
+        log.info(f"Trimming video (duration {request_duration}s from {start}) from location: {file_link} for {chat_id}")
+        
         sample_file = output_folder.joinpath(f'trim_video.mkv')
         subtitle_option = await fix_subtitle_codec(file_link)
         
         ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
-        #print(output[1].decode())
+        log.debug(output)
         
         if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
             await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
@@ -121,8 +126,8 @@ async def trim_fn(c, m):
         await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
         c.CURRENT_PROCESSES[chat_id] -= 1
         
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await snt.edit_text('😟 Sorry! Video trimming failed possibly due to some infrastructure failure 😥.')
         
         l = await media_msg.forward(Config.LOG_CHANNEL)

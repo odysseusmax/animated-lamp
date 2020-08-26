@@ -4,13 +4,17 @@ import time
 import math
 import shlex
 import asyncio
+import logging
 import datetime
 import traceback
 
-from pyrogram import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto
 
 from ..config import Config
 from .utils import edit_message_text, generate_stream_link, get_duration, get_random_start_at, get_dimentions, run_subprocess
+
+
+log = logging.getLogger(__name__)
 
 
 async def screenshot_fn(c, m):
@@ -26,7 +30,6 @@ async def screenshot_fn(c, m):
     _, num_screenshots = m.data.split('+')
     num_screenshots = int(num_screenshots)
     media_msg = m.message.reply_to_message
-    #print(media_msg)
     if media_msg.empty:
         await edit_message_text(m, text='Why did you delete the file 😠, Now i cannot help you 😒.')
         c.CURRENT_PROCESSES[chat_id] -= 1
@@ -66,7 +69,7 @@ async def screenshot_fn(c, m):
             return
 
         reduced_sec = duration - int(duration*2 / 100)
-        print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
+        log.info(f"Generating {num_screenshots} screenshots from location: {file_link} for {chat_id}")
         screenshots = []
         watermark = await c.db.get_watermark_text(chat_id)
         watermark_color_code = await c.db.get_watermark_color(chat_id)
@@ -89,6 +92,7 @@ async def screenshot_fn(c, m):
             #print(sec)
             ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x=20:y=H-th-10:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
             output = await run_subprocess(ffmpeg_cmd)
+            log.debug(output)
             await edit_message_text(m, text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
             if thumbnail_template.exists():
                 if as_file:
@@ -106,7 +110,6 @@ async def screenshot_fn(c, m):
                 continue
             ffmpeg_errors += output[0].decode() + '\n' + output[1].decode() + '\n\n'
         
-        #print(screenshots)
         if not screenshots:
             await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
             
@@ -135,8 +138,8 @@ async def screenshot_fn(c, m):
         await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206),')
         c.CURRENT_PROCESSES[chat_id] -= 1
         
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await edit_message_text(m, text='😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
         
         l = await media_msg.forward(Config.LOG_CHANNEL)

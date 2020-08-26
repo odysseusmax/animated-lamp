@@ -2,12 +2,15 @@ import os
 import uuid
 import time
 import shlex
-import asyncio
+import logging
 import datetime
 import traceback
 
 from ..config import Config
 from .utils import edit_message_text, generate_stream_link, get_duration, fix_subtitle_codec, generate_thumbnail_file, run_subprocess, get_random_start_at
+
+
+log = logging.getLogger(__name__)
 
 
 async def sample_fn(c, m):
@@ -59,7 +62,6 @@ async def sample_fn(c, m):
             return
         
         reduced_sec = duration - int(duration*10 / 100)
-        print(f"Total seconds: {duration}, Reduced seconds: {reduced_sec}")
         sample_duration = await c.db.get_sample_duration(chat_id)
         
         start_at = get_random_start_at(reduced_sec, sample_duration)
@@ -67,9 +69,11 @@ async def sample_fn(c, m):
         sample_file = output_folder.joinpath(f'sample_video.mkv')
         subtitle_option = await fix_subtitle_codec(file_link)
         
+        log.info(f"Generating sample video (duration {sample_duration}s from {start_at}) from location: {file_link} for {chat_id}")
+        
         ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start_at} -i {shlex.quote(file_link)} -t {sample_duration} -map 0 -c copy {subtitle_option} {sample_file}"
         output = await run_subprocess(ffmpeg_cmd)
-        #print(output[1].decode())
+        log.debug(output)
         
         if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
             await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
@@ -97,8 +101,8 @@ async def sample_fn(c, m):
         await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
         c.CURRENT_PROCESSES[chat_id] -= 1
         
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        log.error(e, exc_info=True)
         await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
         
         l = await media_msg.forward(Config.LOG_CHANNEL)

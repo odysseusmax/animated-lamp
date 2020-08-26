@@ -5,7 +5,8 @@ import string
 import random
 import time
 
-from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import filters as Filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 import aiofiles
 import aiofiles.os
@@ -66,10 +67,10 @@ async def broadcast_(c, m):
         failed = failed,
         success = success
     )
-    
-    async with aiofiles.open('broadcast.txt', 'w') as broadcast_log_file:
+    log_file = f'broadcast_{broadcast_id}.txt'
+    async with aiofiles.open(, 'w') as broadcast_log_file:
         async for user in all_users:
-            
+            await asyncio.sleep(1)
             sts, msg = await send_msg(
                 user_id = int(user['id']),
                 message = broadcast_msg
@@ -111,9 +112,9 @@ async def broadcast_(c, m):
         )
     else:
         await m.reply_document(
-            document='broadcast.txt',
+            document=log_file,
             caption=f"broadcast completed in `{completed_in}`\n\nTotal users {total_users}.\nTotal done {done}, {success} success and {failed} failed.",
             quote=True
         )
     
-    await aiofiles.os.remove('broadcast.txt')
+    await aiofiles.os.remove(log_file)

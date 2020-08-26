@@ -1,13 +1,11 @@
-import asyncio
+from pyrogram import filters as  Filters
+from pyrogram.types import ForceReply
 
-from pyrogram import Filters, ForceReply
-
-from ..utils import sample_fn
 from ..screenshotbot import ScreenShotBot
 from ..config import Config
 
 
-@ScreenShotBot.on_callback_query(Filters.create(lambda _, query: query.data.startswith('trim')))
+@ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('trim')))
 async def _(c, m):
     dur = m.message.text.markdown.split('\n')[-1]
     await m.message.delete(True)
