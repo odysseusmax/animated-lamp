@@ -7,6 +7,7 @@ from ..config import Config
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('trim')))
 async def _(c, m):
+    await m.answer()
     dur = m.message.text.markdown.split('\n')[-1]
     await m.message.delete(True)
     await c.send_message(
