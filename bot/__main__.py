@@ -1,3 +1,5 @@
+import logging
+
 from .screenshotbot import ScreenShotBot
 from .config import Config
 
