@@ -130,7 +130,7 @@ async def trim_fn(c, m):
             await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
             c.CURRENT_PROCESSES[chat_id] -= 1
     except (asyncio.TimeoutError, asyncio.CancelledError):
-        await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled', True)
+        await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
         c.CURRENT_PROCESSES[chat_id] -= 1
     except Exception as e:
         log.error(e, exc_info=True)
