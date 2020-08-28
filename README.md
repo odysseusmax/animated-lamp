@@ -39,13 +39,14 @@ Properly setup the environment variables or populate `config.py` with the values
 * `BOT_TOKEN`(required) - Obtain your bot token from [Bot Father](https://t.me/BotFather "Bot Father").
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
-* `AUTH_USERS`(required) - Admin(s) of the bot. User's telegram id separated by space.
+* `AUTH_USERS`(required) - Admin(s) of the bot. User's telegram id separated by space. Atleast one id should be specified.
 * `HOST`(required) - Public URL of file streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
 * `SESSION_NAME`(optional) - Name you want to call your bot's session, Eg: bot's username.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
-* `MAX_TRIM_DURATION`(optional) - Maximum allowed trim duration in seconds. Defaults to 600s.
+* `MAX_TRIM_DURATION`(optional) - Maximum allowed video trim duration in seconds. Defaults to 600s.
 * `TRACK_CHANNEL`(optional) - User activity tracking channel's id. Only needed if you want to track and block any user. Disabled by default.
-* `SLOW_SPEED_DELAY`(optional) - Delay required between each request from users in seconds. Defaults to 15s.
+* `SLOW_SPEED_DELAY`(optional) - Delay required between each interaction from users in seconds. Defaults to 5s.
+* `TIMEOUT` (optional) - Maximum time alloted to each process in seconds, after which process will be cancelled. Defaults to 1800s(30 mins).
 * `DEBUG` (optional) - Set some value to use DEBUG logging level. INFO by default.
 
 ### Run bot
