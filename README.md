@@ -5,8 +5,12 @@
 
 An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot").
 
-## Installation Guide
+### You can also tap the Deploy To Heroku button below to deploy straight to Heroku!
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/odysseusmax/animated-lamp)
+
+
+## Installation Guide 
 ### Prerequisites
 * FFmpeg.
 * Python3 (3.6 or higher).
