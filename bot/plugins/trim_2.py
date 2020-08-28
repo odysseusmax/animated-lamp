@@ -1,5 +1,3 @@
-import asyncio
-
 from pyrogram import filters as  Filters
 from pyrogram.types import ForceReply
 
@@ -18,6 +16,6 @@ async def _(c, m):
         return
     
     if m.reply_to_message.text.startswith('#trim_video'):
-        c.loop.create_task(asyncio.wait_for(trim_fn(c, m)), timeout=Config.TIMEOUT)
+        c.loop.create_task(trim_fn(c, m))
     else:
-        c.loop.create_task(asyncio.wait_for(manual_screenshot_fn(c, m)), timeout=Config.TIMEOUT)
+        c.loop.create_task(manual_screenshot_fn(c, m))
