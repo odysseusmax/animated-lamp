@@ -73,67 +73,63 @@ async def trim_fn(c, m):
     
     try:
         async with timeout(Config.TIMEOUT) as cm:
-            try:
-                start_time = time.time()
+            start_time = time.time()
             
-                if typ == 2:
-                    file_link = media_msg.text
-                else:
-                    file_link = generate_stream_link(media_msg)
-                
-                await snt.edit_text('😀 Trimming Your Video! This might take some time.')
-                
-                duration = await get_duration(file_link)
-                if isinstance(duration, str):
-                    await snt.edit_text("😟 Sorry! I cannot open the file.")
-                    l = await media_msg.forward(Config.LOG_CHANNEL)
-                    await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}', True)
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    return
-                
-                if (start>=duration) or (end>=duration):
-                    await snt.edit_text("😟 Sorry! The requested range is out of the video's duration!.")
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    return
-                
-                log.info(f"Trimming video (duration {request_duration}s from {start}) from location: {file_link} for {chat_id}")
-                
-                sample_file = output_folder.joinpath(f'trim_video.mkv')
-                subtitle_option = await fix_subtitle_codec(file_link)
-                
-                ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} {sample_file}"
-                output = await run_subprocess(ffmpeg_cmd)
-                log.debug(output)
-                
-                if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
-                    await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
-                    ffmpeg_output = output[0].decode() + '\n' + output[1].decode()
-                    l = await media_msg.forward(Config.LOG_CHANNEL)
-                    await l.reply_text(f'stream link : {file_link}\n\nVideo trimm failed. **{start}:{end}**\n\n{ffmpeg_output}', True)
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    return
-                
-                thumb = await generate_thumbnail_file(sample_file, uid)
-                
-                await snt.edit_text('🤓 Video trimmed successfully!, Now starting to upload!')
-                
-                await m.reply_chat_action("upload_video")
-                
-                await m.reply_video(
-                    video=str(sample_file), 
-                    quote=True,
-                    caption=f"Trimmed video from {datetime.timedelta(seconds=start)} to {datetime.timedelta(seconds=end)}",
-                    duration=request_duration,
-                    thumb=thumb,
-                    supports_streaming=True
-                )
-                
-                await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
+            if typ == 2:
+                file_link = media_msg.text
+            else:
+                file_link = generate_stream_link(media_msg)
+            
+            await snt.edit_text('😀 Trimming Your Video! This might take some time.')
+            
+            duration = await get_duration(file_link)
+            if isinstance(duration, str):
+                await snt.edit_text("😟 Sorry! I cannot open the file.")
+                l = await media_msg.forward(Config.LOG_CHANNEL)
+                await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}', True)
                 c.CURRENT_PROCESSES[chat_id] -= 1
-            except asyncio.CancelledError:
-                pass
-                
-    except asyncio.TimeoutError:
+                return
+            
+            if (start>=duration) or (end>=duration):
+                await snt.edit_text("😟 Sorry! The requested range is out of the video's duration!.")
+                c.CURRENT_PROCESSES[chat_id] -= 1
+                return
+            
+            log.info(f"Trimming video (duration {request_duration}s from {start}) from location: {file_link} for {chat_id}")
+            
+            sample_file = output_folder.joinpath(f'trim_video.mkv')
+            subtitle_option = await fix_subtitle_codec(file_link)
+            
+            ffmpeg_cmd = f"ffmpeg -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} {sample_file}"
+            output = await run_subprocess(ffmpeg_cmd)
+            log.debug(output)
+            
+            if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
+                await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
+                ffmpeg_output = output[0].decode() + '\n' + output[1].decode()
+                l = await media_msg.forward(Config.LOG_CHANNEL)
+                await l.reply_text(f'stream link : {file_link}\n\nVideo trimm failed. **{start}:{end}**\n\n{ffmpeg_output}', True)
+                c.CURRENT_PROCESSES[chat_id] -= 1
+                return
+            
+            thumb = await generate_thumbnail_file(sample_file, uid)
+            
+            await snt.edit_text('🤓 Video trimmed successfully!, Now starting to upload!')
+            
+            await m.reply_chat_action("upload_video")
+            
+            await m.reply_video(
+                video=str(sample_file), 
+                quote=True,
+                caption=f"Trimmed video from {datetime.timedelta(seconds=start)} to {datetime.timedelta(seconds=end)}",
+                duration=request_duration,
+                thumb=thumb,
+                supports_streaming=True
+            )
+            
+            await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
+            c.CURRENT_PROCESSES[chat_id] -= 1
+    except (asyncio.TimeoutError, asyncio.CancelledError):
         await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled', True)
         c.CURRENT_PROCESSES[chat_id] -= 1
     except Exception as e:
