@@ -23,3 +23,4 @@ class Config:
     COLORS = ['white', 'black', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'brown', 'gold', 'silver', 'pink']
     FONT_SIZES_NAME = ['Small', 'Medium', 'Large']
     FONT_SIZES = [30, 40, 50]
+    TIMEOUT = 30
