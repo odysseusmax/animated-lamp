@@ -6,7 +6,7 @@ import logging
 import datetime
 import traceback
 
-from async_time import timeout
+from async_timeout import timeout
 
 from ..config import Config
 from .utils import edit_message_text, generate_stream_link, get_duration, fix_subtitle_codec, generate_thumbnail_file, run_subprocess, get_random_start_at
@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 async def sample_fn(c, m):
-    async with timeout(Config.TIMEOUT):
+    async with timeout(Config.TIMEOUT) as cm:
         chat_id = m.from_user.id
         if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
             await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', show_alert=True)
@@ -112,3 +112,4 @@ async def sample_fn(c, m):
             l = await media_msg.forward(Config.LOG_CHANNEL)
             await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
             c.CURRENT_PROCESSES[chat_id] -= 1
+    log.debug(cm.expired)

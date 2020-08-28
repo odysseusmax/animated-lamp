@@ -9,7 +9,7 @@ import datetime
 import traceback
 
 from pyrogram.types import InputMediaPhoto
-from async_time import timeout
+from async_timeout import timeout
 
 from ..config import Config
 from .utils import generate_stream_link, get_duration, get_random_start_at, get_dimentions, run_subprocess
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 async def manual_screenshot_fn(c, m):
-    async with timeout(Config.TIMEOUT):
+    async with timeout(Config.TIMEOUT) as cm:
         
         chat_id = m.chat.id
         if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
@@ -177,3 +177,4 @@ async def manual_screenshot_fn(c, m):
             l = await media_msg.forward(Config.LOG_CHANNEL)
             await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\n\n{traceback.format_exc()}', True)
             c.CURRENT_PROCESSES[chat_id] -= 1
+    log.debug(cm.expired)
