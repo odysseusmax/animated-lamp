@@ -3,6 +3,7 @@ from pyrogram.types import ForceReply
 
 from ..utils import trim_fn, manual_screenshot_fn
 from ..screenshotbot import ScreenShotBot
+from ..config import Config
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.reply)
