@@ -105,7 +105,7 @@ async def sample_fn(c, m):
             
             await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
             c.CURRENT_PROCESSES[chat_id] -= 1
-    except asyncio.TimeoutError
+    except asyncio.TimeoutError:
         await edit_message_text(m, text='😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled', True)
         c.CURRENT_PROCESSES[chat_id] -= 1
     except Exception as e:
