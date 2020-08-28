@@ -2,6 +2,7 @@ import os
 import uuid
 import time
 import shlex
+import asyncio
 import logging
 import datetime
 import traceback
@@ -16,47 +17,47 @@ log = logging.getLogger(__name__)
 
 
 async def sample_fn(c, m):
-    async with timeout(Config.TIMEOUT) as cm:
-        chat_id = m.from_user.id
-        if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
-            await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', show_alert=True)
-            return
-        await m.answer()
-        if not c.CURRENT_PROCESSES.get(chat_id):
-            c.CURRENT_PROCESSES[chat_id] = 0
-        c.CURRENT_PROCESSES[chat_id] += 1
-        
-        media_msg = m.message.reply_to_message
-        if media_msg.empty:
-            await edit_message_text(m, text='Why did you delete the file 😠, Now i cannot help you 😒.')
-            c.CURRENT_PROCESSES[chat_id] -= 1
-            return
-        
-        uid = str(uuid.uuid4())
-        output_folder = Config.SMPL_OP_FLDR.joinpath(uid)
-        os.makedirs(output_folder, exist_ok=True)
-        
-        if Config.TRACK_CHANNEL:
-            tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-            await tr_msg.reply_text(f"User id: `{chat_id}`")
-        
-        if media_msg.media:
-            typ = 1
-        else:
-            typ = 2
-        
-        try:
-            start_time = time.time()
-            
-            await edit_message_text(m, text='Processing your request, Please wait! 😴')
-            
-            if typ == 2:
-                file_link = media_msg.text
-            else:
-                file_link = generate_stream_link(media_msg)
-            
-            await edit_message_text(m, text='😀 Generating Sample Video! This might take some time.')
-            
+    chat_id = m.from_user.id
+    if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
+        await m.answer('You have reached the maximum parallel processes! Try again after one of them finishes.', show_alert=True)
+        return
+    await m.answer()
+    if not c.CURRENT_PROCESSES.get(chat_id):
+        c.CURRENT_PROCESSES[chat_id] = 0
+    c.CURRENT_PROCESSES[chat_id] += 1
+    
+    media_msg = m.message.reply_to_message
+    if media_msg.empty:
+        await edit_message_text(m, text='Why did you delete the file 😠, Now i cannot help you 😒.')
+        c.CURRENT_PROCESSES[chat_id] -= 1
+        return
+    
+    uid = str(uuid.uuid4())
+    output_folder = Config.SMPL_OP_FLDR.joinpath(uid)
+    os.makedirs(output_folder, exist_ok=True)
+    
+    if Config.TRACK_CHANNEL:
+        tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
+        await tr_msg.reply_text(f"User id: `{chat_id}`")
+    
+    if media_msg.media:
+        typ = 1
+    else:
+        typ = 2
+    
+    start_time = time.time()
+    
+    await edit_message_text(m, text='Processing your request, Please wait! 😴')
+    
+    if typ == 2:
+        file_link = media_msg.text
+    else:
+        file_link = generate_stream_link(media_msg)
+    
+    await edit_message_text(m, text='😀 Generating Sample Video! This might take some time.')
+    
+    try:
+        async with timeout(Config.TIMEOUT):
             duration = await get_duration(file_link)
             if isinstance(duration, str):
                 await edit_message_text(m, text="😟 Sorry! I cannot open the file.")
@@ -104,12 +105,13 @@ async def sample_fn(c, m):
             
             await edit_message_text(m, text=f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
             c.CURRENT_PROCESSES[chat_id] -= 1
-            
-        except Exception as e:
-            log.error(e, exc_info=True)
-            await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
-            
-            l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-    log.debug(cm.expired)
+    except asyncio.TimeoutError
+        await edit_message_text(m, text='😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled', True)
+        c.CURRENT_PROCESSES[chat_id] -= 1
+    except Exception as e:
+        log.error(e, exc_info=True)
+        await edit_message_text(m, text='😟 Sorry! Sample video generation failed possibly due to some infrastructure failure 😥.')
+        
+        l = await media_msg.forward(Config.LOG_CHANNEL)
+        await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
+        c.CURRENT_PROCESSES[chat_id] -= 1

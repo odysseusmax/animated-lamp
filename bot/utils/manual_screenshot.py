@@ -19,51 +19,51 @@ log = logging.getLogger(__name__)
 
 
 async def manual_screenshot_fn(c, m):
-    async with timeout(Config.TIMEOUT) as cm:
-        
-        chat_id = m.chat.id
-        if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
-            await m.reply_text('You have reached the maximum parallel processes! Try again after one of them finishes.', True)
-            return
-        if not c.CURRENT_PROCESSES.get(chat_id):
-            c.CURRENT_PROCESSES[chat_id] = 0
-        c.CURRENT_PROCESSES[chat_id] += 1
-        
-        message = await c.get_messages(
-            chat_id,
-            m.reply_to_message.message_id
-        )
-        await m.reply_to_message.delete()
-        media_msg = message.reply_to_message
-        
-        if media_msg.empty:
-            await m.reply_text('Why did you delete the file 😠, Now i cannot help you 😒.', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-            return
-        
-        try:
-            raw_user_input = [int(i.strip()) for i in m.text.split(',')]
-        except:
-            await m.reply_text('Please follow the specified format', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-            return
-        
-        uid = str(uuid.uuid4())
-        output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
-        os.makedirs(output_folder, exist_ok=True)
-        
-        if Config.TRACK_CHANNEL:
-            tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-            await tr_msg.reply_text(f"User id: `{chat_id}`")
-        
-        if media_msg.media:
-            typ = 1
-        else:
-            typ = 2
-        
-        snt = await m.reply_text('Processing your request, Please wait! 😴', True)
-        
-        try:
+
+    chat_id = m.chat.id
+    if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
+        await m.reply_text('You have reached the maximum parallel processes! Try again after one of them finishes.', True)
+        return
+    if not c.CURRENT_PROCESSES.get(chat_id):
+        c.CURRENT_PROCESSES[chat_id] = 0
+    c.CURRENT_PROCESSES[chat_id] += 1
+    
+    message = await c.get_messages(
+        chat_id,
+        m.reply_to_message.message_id
+    )
+    await m.reply_to_message.delete()
+    media_msg = message.reply_to_message
+    
+    if media_msg.empty:
+        await m.reply_text('Why did you delete the file 😠, Now i cannot help you 😒.', True)
+        c.CURRENT_PROCESSES[chat_id] -= 1
+        return
+    
+    try:
+        raw_user_input = [int(i.strip()) for i in m.text.split(',')]
+    except:
+        await m.reply_text('Please follow the specified format', True)
+        c.CURRENT_PROCESSES[chat_id] -= 1
+        return
+    
+    uid = str(uuid.uuid4())
+    output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
+    os.makedirs(output_folder, exist_ok=True)
+    
+    if Config.TRACK_CHANNEL:
+        tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
+        await tr_msg.reply_text(f"User id: `{chat_id}`")
+    
+    if media_msg.media:
+        typ = 1
+    else:
+        typ = 2
+    
+    snt = await m.reply_text('Processing your request, Please wait! 😴', True)
+    
+    try:
+        async with timeout(Config.TIMEOUT) as cm:
             start_time = time.time()
             
             if typ == 2:
@@ -169,12 +169,13 @@ async def manual_screenshot_fn(c, m):
             
             await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
             c.CURRENT_PROCESSES[chat_id] -= 1
-            
-        except Exception as e:
-            log.error(e, exc_info=True)
-            await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
-            
-            l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\n\n{traceback.format_exc()}', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-    log.debug(cm.expired)
+    except asyncio.TimeoutError:
+        await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
+        c.CURRENT_PROCESSES[chat_id] -= 1
+    except Exception as e:
+        log.error(e, exc_info=True)
+        await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
+        
+        l = await media_msg.forward(Config.LOG_CHANNEL)
+        await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\\n{traceback.format_exc()}', True)
+        c.CURRENT_PROCESSES[chat_id] -= 1
