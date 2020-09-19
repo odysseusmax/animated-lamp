@@ -1,6 +1,7 @@
 import io
 import os
 import json
+import logging
 
 from pyrogram import filters as  Filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -11,6 +12,9 @@ from ..config import Config
 from ..utils import get_media_info, generate_stream_link
 
 
+logger = logging.getLogger(__name__)
+
+
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('mi')))
 async def _(c, m):
     await m.answer()
@@ -19,16 +23,17 @@ async def _(c, m):
         await m.edit_message_text(text='Why did you delete the file 😠, Now i cannot help you 😒.')
         return
 
+    await m.edit_message_text(text='Your media info will be send here shortly!')
     if media_msg.media:
         file_link = generate_stream_link(media_msg)
     else:
         file_link = media_msg.text
 
+    logger.info(f"Generating mediainfo from {file_link} for {m.from_user.id}")
     media_info = await get_media_info(file_link)
     media_info_file = io.BytesIO()
     media_info_file.name = "mediainfo.json"
     media_info_file.write(media_info)
-    await m.edit_message_text(text='Your media info will be send here shortly!')
     await c.send_document(chat_id=m.from_user.id, document=media_info_file,
                           reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('Get Web URL', 'webmi')]]))
 

@@ -2,6 +2,7 @@ import os
 import uuid
 import time
 import shlex
+import shutil
 import asyncio
 import logging
 import datetime
@@ -21,6 +22,7 @@ async def trim_fn(c, m):
     if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
         await m.reply_text('You have reached the maximum parallel processes! Try again after one of them finishes.', True)
         return
+
     if not c.CURRENT_PROCESSES.get(chat_id):
         c.CURRENT_PROCESSES[chat_id] = 0
     c.CURRENT_PROCESSES[chat_id] += 1
@@ -64,21 +66,16 @@ async def trim_fn(c, m):
         tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
         await tr_msg.reply_text(f"User id: `{chat_id}`")
 
-    if media_msg.media:
-        typ = 1
-    else:
-        typ = 2
-
     snt = await m.reply_text('Processing your request, Please wait! 😴', True)
 
     try:
         async with timeout(Config.TIMEOUT) as cm:
             start_time = time.time()
 
-            if typ == 2:
-                file_link = media_msg.text
-            else:
+            if media_msg.media:
                 file_link = generate_stream_link(media_msg)
+            else:
+                file_link = media_msg.text
 
             await snt.edit_text('😀 Trimming Your Video! This might take some time.')
 
@@ -86,13 +83,15 @@ async def trim_fn(c, m):
             if isinstance(duration, str):
                 await snt.edit_text("😟 Sorry! I cannot open the file.")
                 l = await media_msg.forward(Config.LOG_CHANNEL)
-                await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}', True)
+                await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}\n\n{duration}', True)
                 c.CURRENT_PROCESSES[chat_id] -= 1
+                shutil.rmtree(output_folder)
                 return
 
             if (start>=duration) or (end>=duration):
                 await snt.edit_text("😟 Sorry! The requested range is out of the video's duration!.")
                 c.CURRENT_PROCESSES[chat_id] -= 1
+                shutil.rmtree(output_folder)
                 return
 
             log.info(f"Trimming video (duration {request_duration}s from {start}) from location: {file_link} for {chat_id}")
@@ -108,8 +107,9 @@ async def trim_fn(c, m):
                 await snt.edit_text('😟 Sorry! video trimming failed possibly due to some infrastructure failure 😥.')
                 ffmpeg_output = output[0].decode() + '\n' + output[1].decode()
                 l = await media_msg.forward(Config.LOG_CHANNEL)
-                await l.reply_text(f'stream link : {file_link}\n\nVideo trimm failed. **{start}:{end}**\n\n{ffmpeg_output}', True)
+                await l.reply_text(f'stream link : {file_link}\n\nVideo trim failed.\n\n{start}:{end}\n\n{ffmpeg_output}', True)
                 c.CURRENT_PROCESSES[chat_id] -= 1
+                shutil.rmtree(output_folder)
                 return
 
             thumb = await generate_thumbnail_file(sample_file, uid)
@@ -128,14 +128,14 @@ async def trim_fn(c, m):
             )
 
             await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
-            c.CURRENT_PROCESSES[chat_id] -= 1
+
     except (asyncio.TimeoutError, asyncio.CancelledError):
         await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
-        c.CURRENT_PROCESSES[chat_id] -= 1
     except Exception as e:
         log.error(e, exc_info=True)
         await snt.edit_text('😟 Sorry! Video trimming failed possibly due to some infrastructure failure 😥.')
-
         l = await media_msg.forward(Config.LOG_CHANNEL)
-        await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
+        await l.reply_text(f'trim video requested and some error occoured\n\n{traceback.format_exc()}', True)
+    finally:
         c.CURRENT_PROCESSES[chat_id] -= 1
+        shutil.rmtree(output_folder)

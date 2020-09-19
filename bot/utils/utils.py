@@ -123,16 +123,6 @@ async def fix_subtitle_codec(file_link):
     return fix_cmd
 
 
-async def edit_message_text(m, **kwargs):
-    while True:
-        try:
-            return await m.edit_message_text(**kwargs)
-        except FloodWait as e:
-            await asyncio.sleep(e.x)
-        except:
-            break
-
-
 async def display_settings(c, m, cb=False):
     chat_id = m.from_user.id if cb else m.chat.id
 
