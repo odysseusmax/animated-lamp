@@ -1,11 +1,13 @@
 import os
 import re
+import json
 import shlex
 import random
 import asyncio
 import logging
 import datetime
 import traceback
+from pathlib import Path
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
@@ -71,23 +73,10 @@ def generate_stream_link(media_msg):
     return f"{Config.HOST}/stream/{file_id}"
 
 
-async def get_media_info(c, chat_id, message_id):
-    media_info_dir = Path(f"mediainfo")
-    os.makedirs(media_info_dir, exist_ok=True)
-    media_info_file = media_info_dir.joinpath(f'{chat_id}-{message_id}.txt')
-    if media_info_file.exists():
-        return json.load(open(media_info_file, 'r'))
-
-    message = await c.get_message(chat_id, message_id)
-    if m.media:
-        file_link = generate_stream_link(m)
-    else:
-        file_link = m.text
-
+async def get_media_info(file_link):
     ffprobe_cmd = f"ffprobe -v quiet -print_format json -show_format -show_streams {shlex.quote(file_link)}"
     data, err = await run_subprocess(ffprobe_cmd)
     media_info = json.loads(data.decode().rstrip())
-    json.dump(media_info, open(media_info_file, 'w'))
     return media_info
 
 
@@ -103,14 +92,17 @@ async def get_dimentions(input_file_link):
     return width, height
 
 
-async def get_duration(media_info):
-    frmt = media_info.get('format')
-    if frmt is None:
-        return 'No duration!'
-    dur = frmt.get('duration')
-    if dur is None:
-        return 'No duration!'
-    return round(float(dur))
+async def get_duration(input_file_link):
+    ffmpeg_dur_cmd = f"ffprobe -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+    out, err = await run_subprocess(ffmpeg_dur_cmd)
+    log.debug(f"{out} \n {err}")
+    out = out.decode().strip()
+    if not out:
+        return err.decode()
+    duration = round(float(out))
+    if duration:
+        return duration
+    return 'No duration!'
 
 
 async def fix_subtitle_codec(file_link):

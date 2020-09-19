@@ -3,7 +3,7 @@ import datetime
 from pyrogram import filters as  Filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from ..utils import is_url, is_valid_file, get_duration, gen_ik_buttons, generate_stream_link, get_media_info
+from ..utils import is_url, is_valid_file, get_duration, gen_ik_buttons, generate_stream_link
 from ..screenshotbot import ScreenShotBot
 from ..config import Config
 
@@ -20,8 +20,12 @@ async def _(c, m):
 
     snt = await m.reply_text("Hi there, Please wait while I'm getting everything ready to process your request!", quote=True)
 
-    media_info = await get_media_info(c, m.chat.id, m.message_id)
-    duration = get_duration(media_info)
+    if m.media:
+        file_link = generate_stream_link(m)
+    else:
+        file_link = m.text
+
+    duration = await get_duration(file_link)
     if isinstance(duration, str):
         await snt.edit_text("😟 Sorry! I cannot open the file.")
         l = await m.forward(Config.LOG_CHANNEL)

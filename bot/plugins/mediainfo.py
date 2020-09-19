@@ -5,7 +5,7 @@ from pyrogram import filters as  Filters
 
 from ..screenshotbot import ScreenShotBot
 from ..config import Config
-from ..utils import get_media_info
+from ..utils import get_media_info, generate_stream_link
 
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('mi')))
@@ -15,7 +15,12 @@ async def _(c, m):
         await m.edit_message_text(text='Why did you delete the file 😠, Now i cannot help you 😒.')
         return
 
-    media_info = await get_media_info(c, m.from_user.id, media_msg.message_id)
+    if media_msg.media:
+        file_link = generate_stream_link(media_msg)
+    else:
+        file_link = media_msg.text
+
+    media_info = await get_media_info(file_link)
     media_info_file = io.BytesIO()
     json.dump(media_info, media_info_file)
     await m.edit_message_text(text='Your media info will be send here shortly')
