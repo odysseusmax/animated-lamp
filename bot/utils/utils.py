@@ -74,7 +74,7 @@ def generate_stream_link(media_msg):
 async def get_media_info(c, chat_id, message_id):
     media_info_dir = Path(f"mediainfo")
     os.makedirs(media_info_dir, exist_ok=True)
-    media_info_file = media_info_dir.joinpath(f'{}-{}.txt')
+    media_info_file = media_info_dir.joinpath(f'{chat_id}-{message_id}.txt')
     if media_info_file.exists():
         return json.load(open(media_info_file, 'r'))
 
