@@ -22,6 +22,7 @@ async def _(c, m):
 
     media_info = await get_media_info(file_link)
     media_info_file = io.BytesIO()
-    json.dump(media_info, media_info_file)
-    await m.edit_message_text(text='Your media info will be send here shortly')
-    await c.send_document(m.from_user.id, media_info_file)
+    media_info_file.name = "mediainfo.json"
+    media_info_file.write(json.dumps(media_info).encode())
+    await m.edit_message_text(text='Your media info will be send here shortly!')
+    await c.send_document(chat_id=m.from_user.id, document=media_info_file)
