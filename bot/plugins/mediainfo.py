@@ -13,6 +13,7 @@ from ..utils import get_media_info, generate_stream_link
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('mi')))
 async def _(c, m):
+    await m.answer()
     media_msg = m.message.reply_to_message
     if media_msg.empty:
         await m.edit_message_text(text='Why did you delete the file 😠, Now i cannot help you 😒.')
@@ -26,7 +27,7 @@ async def _(c, m):
     media_info = await get_media_info(file_link)
     media_info_file = io.BytesIO()
     media_info_file.name = "mediainfo.json"
-    media_info_file.write(json.dumps(media_info, indent=4).encode())
+    media_info_file.write(media_info)
     await m.edit_message_text(text='Your media info will be send here shortly!')
     await c.send_document(chat_id=m.from_user.id, document=media_info_file,
                           reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('Get Web URL', 'webmi')]]))
@@ -35,7 +36,7 @@ async def _(c, m):
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('webmi')))
 async def __(c, m):
     # https://github.com/eyaadh/megadlbot_oss/blob/306fb21dbdbdc8dc17294a6cb7b7cdafb11e44da/mega/helpers/media_info.py#L30
-
+    await m.answer()
     media_info = await m.message.download()
     neko_endpoint = "https://nekobin.com/api/documents"
     async with aiohttp.ClientSession() as nekoSession:

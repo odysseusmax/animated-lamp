@@ -1,6 +1,5 @@
 import os
 import re
-import json
 import shlex
 import random
 import asyncio
@@ -74,10 +73,9 @@ def generate_stream_link(media_msg):
 
 
 async def get_media_info(file_link):
-    ffprobe_cmd = f"ffprobe -v quiet -print_format json -show_format -show_streams {shlex.quote(file_link)}"
+    ffprobe_cmd = f"ffprobe -v quiet -of json -show_streams -show_format {shlex.quote(file_link)}"
     data, err = await run_subprocess(ffprobe_cmd)
-    media_info = json.loads(data.decode().rstrip())
-    return media_info
+    return data
 
 
 async def get_dimentions(input_file_link):
