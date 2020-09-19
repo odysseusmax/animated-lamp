@@ -75,7 +75,7 @@ async def get_media_info(c, chat_id, message_id):
     media_info_dir = Path(f"mediainfo")
     os.makedirs(media_info_dir, exist_ok=True)
     media_info_file = media_info_dir.joinpath(f'{}-{}.txt')
-    if media_info_file,exists():
+    if media_info_file.exists():
         return json.load(open(media_info_file, 'r'))
 
     message = await c.get_message(chat_id, message_id)
