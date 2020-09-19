@@ -73,7 +73,7 @@ def generate_stream_link(media_msg):
 
 
 async def get_media_info(file_link):
-    ffprobe_cmd = f"ffprobe -v quiet -of json -show_streams -show_format {shlex.quote(file_link)}"
+    ffprobe_cmd = f"ffprobe -v quiet -of json -show_streams -show_format -show_chapters -show_programs  -show_entries format=duration,format_name,nb_streams,format_long_name,size,bit_rate,tags {shlex.quote(file_link)}"
     data, err = await run_subprocess(ffprobe_cmd)
     return data
 
