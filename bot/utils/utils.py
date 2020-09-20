@@ -53,7 +53,7 @@ class CommonUtils:
 
         thumb_file = output_folder.joinpath('thumb.jpg')
         ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 -vf \"scale=320:-1\" -y '{thumb_file}'"
-        output = await Utilities.run_subprocess(ffmpeg_cmd)
+        output = await CommonUtils.run_subprocess(ffmpeg_cmd)
         if not thumb_file.exists():
             return None
         return thumb_file
@@ -71,19 +71,19 @@ class CommonUtils:
 
     @staticmethod
     def generate_stream_link(media_msg):
-        file_id = Utilities.pack_id(media_msg)
+        file_id = CommonUtils.pack_id(media_msg)
         return f"{Config.HOST}/stream/{file_id}"
 
     @staticmethod
     async def get_media_info(file_link):
         ffprobe_cmd = f"ffprobe -v quiet -of json -show_streams -show_format -show_chapters -show_programs  -show_entries format=duration,format_name,nb_streams,format_long_name,size,bit_rate,tags {shlex.quote(file_link)}"
-        data, err = await Utilities.run_subprocess(ffprobe_cmd)
+        data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
     async def get_dimentions(input_file_link):
         ffprobe_cmd = f"ffprobe -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
-        output = await Utilities.run_subprocess(ffprobe_cmd)
+        output = await CommonUtils.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
             width, height = [int(i.strip()) for i in output[0].decode().split('x')]
@@ -95,7 +95,7 @@ class CommonUtils:
     @staticmethod
     async def get_duration(input_file_link):
         ffmpeg_dur_cmd = f"ffprobe -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
-        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
@@ -111,7 +111,7 @@ class CommonUtils:
 
         ffmpeg_dur_cmd = f"ffprobe -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1  {shlex.quote(file_link)}"
 
-        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
