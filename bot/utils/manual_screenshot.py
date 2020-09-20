@@ -14,13 +14,12 @@ from pyrogram.types import InputMediaPhoto
 from async_timeout import timeout
 
 from ..config import Config
-from .base import BaseUtils
 
 
 log = logging.getLogger(__name__)
 
 
-class ManualScreenshot(BaseUtils):
+class ManualScreenshot:
     async def manual_screenshot_fn(self, c, m):
 
         chat_id = m.chat.id

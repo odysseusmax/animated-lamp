@@ -17,7 +17,7 @@ from .base import BaseUtils
 log = logging.getLogger(__name__)
 
 
-class Trim(BaseUtils):
+class Trim:
     async def trim_fn(self, c, m):
         chat_id = m.chat.id
         if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:

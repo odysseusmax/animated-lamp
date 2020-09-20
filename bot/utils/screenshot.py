@@ -20,7 +20,7 @@ from .base import BaseUtils
 log = logging.getLogger(__name__)
 
 
-class Screenshot(BaseUtils):
+class Screenshot:
     async def screenshot_fn(self, c, m):
         chat_id = m.from_user.id
         if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:

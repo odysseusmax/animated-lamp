@@ -11,13 +11,12 @@ import traceback
 from async_timeout import timeout
 
 from ..config import Config
-from .base import BaseUtils
 
 
 log = logging.getLogger(__name__)
 
 
-class Sample(BaseUtils):
+class Sample:
     async def sample_fn(self, c, m):
         chat_id = m.from_user.id
         if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
