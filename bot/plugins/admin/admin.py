@@ -8,7 +8,8 @@ from bot.screenshotbot import ScreenShotBot
 async def admin(c, m):
 
     text = 'Current admins of the bot:\n\n'
-    async for admn in c.get_users(Config.AUTH_USERS):
+    admins = await c.get_users(Config.AUTH_USERS)
+    for admn in admins:
         text += f'\t- {admn.mention}\n'
 
     text += "\nAvailable admin commands are:\n"
