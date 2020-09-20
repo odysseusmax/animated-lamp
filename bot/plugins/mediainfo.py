@@ -9,7 +9,7 @@ import aiohttp
 
 from ..screenshotbot import ScreenShotBot
 from ..config import Config
-from ..utils import get_media_info, generate_stream_link
+from ..utils import Utilities
 
 
 logger = logging.getLogger(__name__)
@@ -25,12 +25,12 @@ async def _(c, m):
 
     await m.edit_message_text(text='Your media info will be send here shortly!')
     if media_msg.media:
-        file_link = generate_stream_link(media_msg)
+        file_link = Utilities.generate_stream_link(media_msg)
     else:
         file_link = media_msg.text
 
     logger.info(f"Generating mediainfo from {file_link} for {m.from_user.id}")
-    media_info = await get_media_info(file_link)
+    media_info = await Utilities.get_media_info(file_link)
     media_info_file = io.BytesIO()
     media_info_file.name = "mediainfo.json"
     media_info_file.write(media_info)
