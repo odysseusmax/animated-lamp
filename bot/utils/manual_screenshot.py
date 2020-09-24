@@ -145,9 +145,9 @@ class ManualScreenshot:
                     await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     if ffmpeg_errors:
-                        error_file = io.StringIO()
+                        error_file = io.BytesIO()
                         error_file.name = f"{uid}-errors.txt"
-                        error_file.write(ffmpeg_errors)
+                        error_file.write(ffmpeg_errors.encode())
                         await l.reply_document(error_file, caption=f"stream link : {file_link}\n\nmanual screenshots {raw_user_input}.")
                     else:
                         await l.reply_text(f'stream link : {file_link}\n\nmanual screenshots {raw_user_input}.', True)

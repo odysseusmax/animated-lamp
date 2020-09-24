@@ -140,9 +140,9 @@ class CommonUtils:
         if pos == 0:
             return x_pad, y_pad
         elif pos == 1:
-            return '(w-text_w)/2', f'y={y_pad}'
+            return '(w-text_w)/2', f'{y_pad}'
         elif pos == 2:
-            return f'w-tw-{x_pad}', f'y={y_pad}'
+            return f'w-tw-{x_pad}', f'{y_pad}'
         elif pos == 3:
             return '(w-text_w)/2', '(h-text_h)/2'
         elif pos == 4:
