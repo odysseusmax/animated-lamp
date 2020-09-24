@@ -126,6 +126,34 @@ class CommonUtils:
         return fix_cmd
 
     @staticmethod
+    def get_watermark_coordinates(pos, width, height):
+        def ratio(x, y):
+            gcd = lambda m,n: m if not n else gcd(n,m%n)
+            d = gcd(x, y)
+            return x/d, y/d
+
+        a_ratio = ratio(width, height)
+        x_fact = 2
+        x_pad = round((width*x_fact) / 100)
+        y_pad = round((x_pad * a_ratio[1])/a_ratio[0])
+
+        if pos == 0:
+            return x_pad, y_pad
+        elif pos == 1:
+            return '(w-text_w)/2', f'y={y_pad}'
+        elif pos == 2:
+            return f'w-tw-{x_pad}', f'y={y_pad}'
+        elif pos == 3:
+            return '(w-text_w)/2', '(h-text_h)/2'
+        elif pos == 4:
+            return x_pad, f'h-th-{y_pad}'
+        elif pos == 5:
+            return '(w-text_w)/2', f'h-th-{y_pad}'
+        else:
+            return f'w-tw-{x_pad}', f'h-th-{y_pad}'
+
+
+    @staticmethod
     async def display_settings(c, m, cb=False):
         chat_id = m.from_user.id if cb else m.chat.id
 
@@ -134,6 +162,7 @@ class CommonUtils:
         watermark_text = await c.db.get_watermark_text(chat_id)
         sample_duration = await c.db.get_sample_duration(chat_id)
         watermark_color_code = await c.db.get_watermark_color(chat_id)
+        watermark_position = await c.db.get_watermark_position(chat_id)
         screenshot_mode = await c.db.get_screenshot_mode(chat_id)
         font_size = await c.db.get_font_size(chat_id)
 
@@ -148,6 +177,10 @@ class CommonUtils:
         fs_btn = [
             InlineKeyboardButton("Watermark Font Size", 'rj'),
             InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", 'set+fs')
+        ]
+        wp_btn = [
+            InlineKeyboardButton("Watermark Position", 'rj'),
+            InlineKeyboardButton(f"{Config.POSITIONS[watermark_position]}", 'set+wp')
         ]
         as_file_btn = [InlineKeyboardButton("Upload Mode", 'rj')]
         wm_btn = [InlineKeyboardButton("Watermark", 'rj')]
@@ -169,7 +202,7 @@ class CommonUtils:
         else:
             sm_btn.append(InlineKeyboardButton("Random screenshots", 'set+sm'))
 
-        settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, sv_btn, sm_btn]
+        settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, wp_btn, sv_btn, sm_btn]
 
         if cb:
             try:

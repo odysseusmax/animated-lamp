@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 class Config:
-    
+
     API_ID = int(os.environ.get('API_ID'))
     API_HASH = os.environ.get('API_HASH')
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -17,10 +17,11 @@ class Config:
     HOST = os.environ.get('HOST', '')
     TIMEOUT = int(os.environ.get('TIMEOUT', 60 * 30))
     DEBUG = bool(os.environ.get('DEBUG'))
-    
+
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')
     THUMB_OP_FLDR = Path('thumbnails/')
     COLORS = ['white', 'black', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'brown', 'gold', 'silver', 'pink']
     FONT_SIZES_NAME = ['Small', 'Medium', 'Large']
     FONT_SIZES = [30, 40, 50]
+    POSITIONS = ['Top Left', 'Top Center', 'Top Right', 'Center', 'Bottom Left', 'Bottom Center', 'Bottom Right']

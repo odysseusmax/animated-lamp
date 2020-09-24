@@ -60,11 +60,6 @@ class ManualScreenshot:
         snt = await m.reply_text('Processing your request, Please wait! 😴', True)
 
         try:
-            def ratio(x, y):
-                gcd = lambda m,n: m if not n else gcd(n,m%n)
-                d = gcd(x, y)
-                return x/d, y/d
-
             async with timeout(Config.TIMEOUT) as cm:
                 start_time = time.time()
 
@@ -120,16 +115,13 @@ class ManualScreenshot:
 
                 width, height = await self.get_dimentions(file_link)
                 fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
-                a_ratio = ratio(width, height)
-                x_fact = 2
-                x_pos = round((width*x_fact) / 100)
-                y_pos = round((x_pos * a_ratio[1])/a_ratio[0])
+                x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
 
                 log.info(f"Generating screenshots at positions {valid_positions} from location: {file_link} for {chat_id}")
 
                 for i, sec in enumerate(valid_positions):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y=H-th-{y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+                    ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')

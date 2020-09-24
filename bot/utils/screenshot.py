@@ -49,11 +49,6 @@ class Screenshot:
             await tr_msg.reply_text(f"User id: `{chat_id}`")
 
         try:
-            def ratio(x, y):
-                gcd = lambda m,n: m if not n else gcd(n,m%n)
-                d = gcd(x, y)
-                return x/d, y/d
-
             async with timeout(Config.TIMEOUT) as cm:
                 start_time = time.time()
 
@@ -82,6 +77,7 @@ class Screenshot:
                 watermark = await c.db.get_watermark_text(chat_id)
                 watermark_color_code = await c.db.get_watermark_color(chat_id)
                 watermark_color = Config.COLORS[watermark_color_code]
+                watermark_position = await c.db.get_watermark_position(chat_id)
                 as_file = await c.db.is_as_file(chat_id)
                 screenshot_mode = await c.db.get_screenshot_mode(chat_id)
                 font_size = await c.db.get_font_size(chat_id)
@@ -94,14 +90,12 @@ class Screenshot:
 
                 width, height = await self.get_dimentions(file_link)
                 fontsize = round((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
-                a_ratio = ratio(width, height)
-                x_fact = 2
-                x_pos = round((width*x_fact) / 100)
-                y_pos = round((x_pos * a_ratio[1])/a_ratio[0])
+                x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
+
 
                 for i, sec in enumerate(screenshot_secs):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y=H-th-{y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+                    ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await m.edit_message_text(text=f'😀 `{i+1}` of `{num_screenshots}` generated!')

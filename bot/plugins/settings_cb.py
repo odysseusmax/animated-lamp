@@ -58,6 +58,13 @@ async def settings_cb(c, m):
         font_size += 1
         await c.db.update_font_size(chat_id, font_size)
         alert_text = f'Successfully changed font size to {Config.FONT_SIZES_NAME[font_size]}'
+    elif typ == 'wp':
+        current_pos = await c.db.get_watermark_position(chat_id)
+        if current_pos == len(Config.POSITIONS)-1:
+            current_pos = -1
+        current_pos += 1
+        await c.db.update_watermark_position(chat_id, current_pos)
+        alert_text = f'Successfully changed watermark position to {Config.POSITIONS[current_pos]}'
 
     await m.answer(alert_text, show_alert=True)
 
