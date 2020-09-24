@@ -125,7 +125,7 @@ class Database:
 
     async def get_watermark_position(self, id):
         user = await self.col.find_one({'id':int(id)})
-        return user.get('watermark_position', 4)
+        return user.get('watermark_position', 6)
 
 
     async def get_screenshot_mode(self, id):
