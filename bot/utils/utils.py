@@ -127,6 +127,7 @@ class CommonUtils:
 
     @staticmethod
     def get_watermark_coordinates(pos, width, height):
+
         def ratio(x, y):
             gcd = lambda m,n: m if not n else gcd(n,m%n)
             d = gcd(x, y)
@@ -137,20 +138,26 @@ class CommonUtils:
         x_pad = round((width*x_fact) / 100)
         y_pad = round((x_pad * a_ratio[1])/a_ratio[0])
 
+        # https://superuser.com/questions/939357/how-to-position-drawtext-text
+
         if pos == 0:
-            return x_pad, y_pad
+            return x_pad, y_pad # top left
         elif pos == 1:
-            return '(w-text_w)/2', f'{y_pad}'
+            return '(w-text_w)/2', f'{y_pad}' # top center
         elif pos == 2:
-            return f'w-tw-{x_pad}', f'{y_pad}'
+            return f'w-tw-{x_pad}', f'{y_pad}' # top right
         elif pos == 3:
-            return '(w-text_w)/2', '(h-text_h)/2'
+            return x_pad, '(h-text_h)/2' # center left
         elif pos == 4:
-            return x_pad, f'h-th-{y_pad}'
+            return '(w-text_w)/2', '(h-text_h)/2' # centered
         elif pos == 5:
-            return '(w-text_w)/2', f'h-th-{y_pad}'
+            return f'w-tw-{x_pad}', '(h-text_h)/2' # center right
+        elif pos == 6:
+            return x_pad, f'h-th-{y_pad}' # bottom left
+        elif pos == 7:
+            return '(w-text_w)/2', f'h-th-{y_pad}' # bottom center
         else:
-            return f'w-tw-{x_pad}', f'h-th-{y_pad}'
+            return f'w-tw-{x_pad}', f'h-th-{y_pad}' # bottom right
 
 
     @staticmethod
