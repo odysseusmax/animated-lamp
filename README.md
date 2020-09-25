@@ -48,6 +48,7 @@ Properly setup the environment variables or populate `config.py` with the values
 * `SLOW_SPEED_DELAY`(optional) - Delay required between each interaction from users in seconds. Defaults to 5s.
 * `TIMEOUT` (optional) - Maximum time alloted to each process in seconds, after which process will be cancelled. Defaults to 1800s(30 mins).
 * `DEBUG` (optional) - Set some value to use DEBUG logging level. INFO by default.
+* `IAM_HEADER` (optional) - Authentication token for streaming service. Defaults to `''`.
 
 ### Run bot
 `$ python3 -m bot`
