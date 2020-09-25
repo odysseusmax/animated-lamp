@@ -120,7 +120,7 @@ class CommonUtils:
             if any(fixable_codec in codec for fixable_codec in fixable_codecs):
                 fix_cmd += f'-c:s:{indx} srt '
 
-        return fix_cmd
+        return fix_cmd.strip()
 
     @staticmethod
     def get_watermark_coordinates(pos, width, height):
