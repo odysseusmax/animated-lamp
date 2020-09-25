@@ -56,6 +56,7 @@ class CommonUtils:
         ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-ss', '0', '-i', file_path, '-vframes', '1', '-vf', 'scale=320:-1',
                       '-y', str(thumb_file)]
         output = await CommonUtils.run_subprocess(ffmpeg_cmd)
+        log.debug(output)
         if not thumb_file.exists():
             return None
         return thumb_file
