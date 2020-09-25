@@ -99,7 +99,8 @@ class Trim:
                 sample_file = output_folder.joinpath(f'trim_video.mkv')
                 subtitle_option = await self.fix_subtitle_codec(file_link)
 
-                ffmpeg_cmd = f"ffmpeg -headers 'IAM:{Config.IAM_HEADER}' -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} {sample_file}"
+                ffmpeg_cmd = f"ffmpeg -headers 'IAM:{Config.IAM_HEADER}' -hide_banner -ss {start} -i {shlex.quote(file_link)} -t {request_duration} -map 0 -c copy {subtitle_option} '{sample_file}'"
+                log.debug(ffmpeg_cmd)
                 output = await self.run_subprocess(ffmpeg_cmd)
                 log.debug(output)
 

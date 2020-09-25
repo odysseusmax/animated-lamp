@@ -123,6 +123,7 @@ class ManualScreenshot:
                 for i, sec in enumerate(valid_positions):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
                     ffmpeg_cmd = f"ffmpeg -headers 'IAM:{Config.IAM_HEADER}' -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+                    log.debug(ffmpeg_cmd)
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')

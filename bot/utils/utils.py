@@ -67,7 +67,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_media_info(file_link):
-        ffprobe_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v quiet -of json -show_streams -show_format -show_chapters -show_programs  -show_entries format=duration,format_name,nb_streams,format_long_name,size,bit_rate,tags {shlex.quote(file_link)}"
+        ffprobe_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v quiet -of json -show_streams -show_format -show_chapters -show_programs {shlex.quote(file_link)}"
         data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
@@ -100,7 +100,7 @@ class CommonUtils:
     async def fix_subtitle_codec(file_link):
         fixable_codecs = ['mov_text']
 
-        ffmpeg_dur_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1  {shlex.quote(file_link)}"
+        ffmpeg_dur_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 {shlex.quote(file_link)}"
 
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
