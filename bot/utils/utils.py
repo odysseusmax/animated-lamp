@@ -112,15 +112,15 @@ class CommonUtils:
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
-            return ''
+            return []
 
-        fix_cmd = ''
+        fix_cmd = []
         codecs = [i.strip() for i in out.split('\n')]
         for indx, codec in enumerate(codecs):
             if any(fixable_codec in codec for fixable_codec in fixable_codecs):
-                fix_cmd += f'-c:s:{indx} srt '
+                fix_cmd += [f'-c:s:{indx}', 'srt']
 
-        return fix_cmd.strip()
+        return fix_cmd
 
     @staticmethod
     def get_watermark_coordinates(pos, width, height):

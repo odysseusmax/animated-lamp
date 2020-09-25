@@ -73,7 +73,7 @@ class Sample:
                 ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(start_at), '-i', file_link, '-t',
                               str(sample_duration), '-map', '0', '-c', 'copy']
                 if subtitle_option:
-                    ffmpeg_cmd.append(subtitle_option)
+                    ffmpeg_cmd += subtitle_option
                 ffmpeg_cmd.append(str(sample_file))
 
                 log.debug(ffmpeg_cmd)
