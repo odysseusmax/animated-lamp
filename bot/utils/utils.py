@@ -53,7 +53,7 @@ class CommonUtils:
         os.makedirs(output_folder, exist_ok=True)
 
         thumb_file = output_folder.joinpath('thumb.jpg')
-        ffmpeg_cmd = ["ffmpeg", '-headers', f'IAM:{Config.IAM_HEADER}', "-ss", "0", "-i", file_path, "-vframes", "1", "-vf", '"scale=320:-1"',  '-y', thumb_file]
+        ffmpeg_cmd = ["ffmpeg", '-headers', f'IAM:{Config.IAM_HEADER}', "-ss", "0", "-i", f"'{file_link}'", "-vframes", "1", "-vf", '"scale=320:-1"',  '-y', thumb_file]
         output = await CommonUtils.run_subprocess(ffmpeg_cmd)
         if not thumb_file.exists():
             return None
@@ -67,13 +67,13 @@ class CommonUtils:
 
     @staticmethod
     async def get_media_info(file_link):
-        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'quiet', '-of', 'json', '-show_streams', '-show_format', '-show_chapters', '-show_programs', file_link]
+        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'quiet', '-of', 'json', '-show_streams', '-show_format', '-show_chapters', '-show_programs', f"'{file_link}'"]
         data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
-    async def get_dimentions(input_file_link):
-        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', input_file_link]
+    async def get_dimentions(file_link):
+        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', f"'{file_link}'"]
         output = await CommonUtils.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
@@ -84,8 +84,8 @@ class CommonUtils:
         return width, height
 
     @staticmethod
-    async def get_duration(input_file_link):
-        ffmpeg_dur_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', input_file_link]
+    async def get_duration(file_link):
+        ffmpeg_dur_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', f"'{file_link}'"]
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
@@ -100,7 +100,7 @@ class CommonUtils:
     async def fix_subtitle_codec(file_link):
         fixable_codecs = ['mov_text']
 
-        ffmpeg_dur_cmd = ["ffprobe", '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-select_streams', 's', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file_link]
+        ffmpeg_dur_cmd = ["ffprobe", '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-select_streams', 's', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', f"'{file_link}'"]
 
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
