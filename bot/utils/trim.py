@@ -11,7 +11,6 @@ import traceback
 from async_timeout import timeout
 
 from ..config import Config
-from .base import BaseUtils
 
 
 log = logging.getLogger(__name__)
