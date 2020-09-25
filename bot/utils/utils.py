@@ -6,6 +6,7 @@ import asyncio
 import logging
 import datetime
 import traceback
+from urllib.parse import urljoin
 from pathlib import Path
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -63,7 +64,7 @@ class CommonUtils:
     def generate_stream_link(media_msg):
         file_id = media_msg.message_id
         chat_id = media_msg.chat.id
-        return f"{Config.HOST}/file/{chat_id}/{file_id}"
+        return urljoin(Config.HOST, f"file/{chat_id}/{file_id}"
 
     @staticmethod
     async def get_media_info(file_link):
