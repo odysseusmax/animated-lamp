@@ -17,6 +17,7 @@ class Config:
     HOST = os.environ.get('HOST', '')
     TIMEOUT = int(os.environ.get('TIMEOUT', 60 * 30))
     DEBUG = bool(os.environ.get('DEBUG'))
+    IAM_HEADER = os.environ.get('IAM_HEADER', '')
 
     SCRST_OP_FLDR = Path('screenshots/')
     SMPL_OP_FLDR = Path('samples/')

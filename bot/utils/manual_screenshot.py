@@ -109,6 +109,7 @@ class ManualScreenshot:
                 watermark = await c.db.get_watermark_text(chat_id)
                 watermark_color_code = await c.db.get_watermark_color(chat_id)
                 watermark_color = Config.COLORS[watermark_color_code]
+                watermark_position = await c.db.get_watermark_position(chat_id)
                 as_file = await c.db.is_as_file(chat_id)
                 font_size = await c.db.get_font_size(chat_id)
                 ffmpeg_errors = ''
@@ -121,7 +122,7 @@ class ManualScreenshot:
 
                 for i, sec in enumerate(valid_positions):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = f"ffmpeg -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+                    ffmpeg_cmd = ["ffmpeg", "-hide_banner", "-ss", sec, '-i', shlex.quote(file_link), '-vf', f'"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text=\'{shlex.quote(watermark)}\', scale=1280:-1"', '-y', '-vframes', 1, thumbnail_template]
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')

@@ -39,8 +39,9 @@ class CommonUtils:
 
     @staticmethod
     async def run_subprocess(cmd):
+        cmd.append(['-headers', f'IAM:{Config.IAM_HEADER}'])
         process = await asyncio.create_subprocess_shell(
-            cmd,
+            *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -52,37 +53,27 @@ class CommonUtils:
         os.makedirs(output_folder, exist_ok=True)
 
         thumb_file = output_folder.joinpath('thumb.jpg')
-        ffmpeg_cmd = f"ffmpeg -ss 0 -i '{file_path}' -vframes 1 -vf \"scale=320:-1\" -y '{thumb_file}'"
+        ffmpeg_cmd = ["ffmpeg", "-ss". "0", "-i", file_path, "-vframes", "1", "-vf", '"scale=320:-1"',  '-y', thumb_file]
         output = await CommonUtils.run_subprocess(ffmpeg_cmd)
         if not thumb_file.exists():
             return None
         return thumb_file
 
     @staticmethod
-    def pack_id(msg):
-        file_id = 0
-        chat_id_offset = 2
-        pack_bits = 32
-        msg_id_offset = pack_bits + chat_id_offset
-
-        file_id |= msg.chat.id << chat_id_offset
-        file_id |= msg.message_id << msg_id_offset
-        return file_id
-
-    @staticmethod
     def generate_stream_link(media_msg):
-        file_id = CommonUtils.pack_id(media_msg)
-        return f"{Config.HOST}/stream/{file_id}"
+        file_id = media_msg.message_id
+        chat_id = media_msg.chat.id
+        return f"{Config.HOST}/file/{chat_id}/{file_id}"
 
     @staticmethod
     async def get_media_info(file_link):
-        ffprobe_cmd = f"ffprobe -v quiet -of json -show_streams -show_format -show_chapters -show_programs  -show_entries format=duration,format_name,nb_streams,format_long_name,size,bit_rate,tags {shlex.quote(file_link)}"
+        ffprobe_cmd = ['ffprobe', '-v', 'quiet', '-of', 'json', '-show_streams' '-show_format', '-show_chapters', '-show_programs', shlex.quote(file_link)]
         data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
     async def get_dimentions(input_file_link):
-        ffprobe_cmd = f"ffprobe -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+        ffprobe_cmd = ['ffprobe', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', shlex.quote(input_file_link)]
         output = await CommonUtils.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
@@ -94,7 +85,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_duration(input_file_link):
-        ffmpeg_dur_cmd = f"ffprobe -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+        ffmpeg_dur_cmd = ['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', shlex.quote(input_file_link)]
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
@@ -109,7 +100,7 @@ class CommonUtils:
     async def fix_subtitle_codec(file_link):
         fixable_codecs = ['mov_text']
 
-        ffmpeg_dur_cmd = f"ffprobe -v error -select_streams s -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1  {shlex.quote(file_link)}"
+        ffmpeg_dur_cmd = ["ffprobe", '-v', 'error', '-select_streams', 's', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', shlex.quote(file_link)]
 
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
