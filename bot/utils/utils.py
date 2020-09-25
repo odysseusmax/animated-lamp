@@ -73,7 +73,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_dimentions(file_link):
-        ffprobe_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+        ffprobe_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -show_entries stream=width,height -of csv=p=0:s=x -select_streams v:0 {shlex.quote(file_link)}"
         output = await CommonUtils.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
@@ -85,7 +85,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_duration(file_link):
-        ffmpeg_dur_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(input_file_link)}"
+        ffmpeg_dur_cmd = f"ffprobe -headers 'IAM:{Config.IAM_HEADER}' -v error -show_entries format=duration -of csv=p=0:s=x -select_streams v:0 {shlex.quote(file_link)}"
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
