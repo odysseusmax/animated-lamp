@@ -67,13 +67,13 @@ class CommonUtils:
 
     @staticmethod
     async def get_media_info(file_link):
-        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'quiet', '-of', 'json', '-show_streams', '-show_format', '-show_chapters', '-show_programs', shlex.quote(file_link)]
+        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'quiet', '-of', 'json', '-show_streams', '-show_format', '-show_chapters', '-show_programs', file_link]
         data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
     async def get_dimentions(input_file_link):
-        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', shlex.quote(input_file_link)]
+        ffprobe_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', input_file_link]
         output = await CommonUtils.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
@@ -85,7 +85,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_duration(input_file_link):
-        ffmpeg_dur_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', shlex.quote(input_file_link)]
+        ffmpeg_dur_cmd = ['ffprobe', '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0:s=x', '-select_streams', 'v:0', input_file_link]
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
@@ -100,7 +100,7 @@ class CommonUtils:
     async def fix_subtitle_codec(file_link):
         fixable_codecs = ['mov_text']
 
-        ffmpeg_dur_cmd = ["ffprobe", '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-select_streams', 's', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', shlex.quote(file_link)]
+        ffmpeg_dur_cmd = ["ffprobe", '-headers', f'IAM:{Config.IAM_HEADER}', '-v', 'error', '-select_streams', 's', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file_link]
 
         out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")

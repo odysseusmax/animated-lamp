@@ -49,6 +49,7 @@ async def __(c, m):
         async with nekoSession.post(neko_endpoint, data=payload) as resp:
             resp = await resp.json()
             neko_link = f"https://nekobin.com/{resp['result']['key']}"
+    logger.debug(neko_link)
     await m.edit_message_reply_markup(InlineKeyboardMarkup([[InlineKeyboardButton('Web URL', url=neko_link)]]))
     try:
         os.remove(media_info)
