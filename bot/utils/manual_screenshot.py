@@ -122,7 +122,62 @@ class ManualScreenshot:
 
                 for i, sec in enumerate(valid_positions):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = ["ffmpeg", '-headers', f'IAM:{Config.IAM_HEADER}', "-hide_banner", "-ss", str(sec), '-i', f"'{file_link}'", '-vf', f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={shlex.quote(watermark)}, scale=1280:-1', '-y', '-vframes', '1', str(thumbnail_template)]
+                    ffmpeg_cmd = f"ffmpeg -headers 'IAM:{Config.IAM_HEADER}' -hide_banner -ss {sec} -i {shlex.quote(file_link)} -vf \"drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text='{shlex.quote(watermark)}', scale=1280:-1\" -y  -vframes 1 '{thumbnail_template}'"
+                    output = await self.run_subprocess(ffmpeg_cmd)
+                    log.debug(output)
+                    await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')
+                    if thumbnail_template.exists():
+                        if as_file:
+                            screenshots.append({
+                                'document':str(thumbnail_template),
+                                'caption':f"ScreenShot at {datetime.timedelta(seconds=sec)}"
+                            })
+                        else:
+                            screenshots.append(
+                                InputMediaPhoto(
+                                    str(thumbnail_template),
+                                    caption=f"ScreenShot at {datetime.timedelta(seconds=sec)}"
+                                )
+                            )
+                        continue
+                    ffmpeg_errors += output[0].decode() + '\n' + output[1].decode() + '\n\n'
+
+                if not screenshots:
+                    await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
+                    l = await media_msg.forward(Config.LOG_CHANNEL)
+                    if ffmpeg_errors:
+                        error_file = io.BytesIO()
+                        error_file.name = f"{uid}-errors.txt"
+                        error_file.write(ffmpeg_errors.encode())
+                        await l.reply_document(error_file, caption=f"stream link : {file_link}\n\nmanual screenshots {raw_user_input}.")
+                    else:
+                        await l.reply_text(f'stream link : {file_link}\n\nmanual screenshots {raw_user_input}.', True)
+                    c.CURRENT_PROCESSES[chat_id] -= 1
+                    shutil.rmtree(output_folder)
+                    return
+
+                await snt.edit_text(text=f'🤓 You requested {len(valid_positions)} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
+
+                await media_msg.reply_chat_action("upload_photo")
+
+                if as_file:
+                    aws = [media_msg.reply_document(quote=True, **photo) for photo in screenshots]
+                    await asyncio.gather(*aws)
+                else:
+                    await media_msg.reply_media_group(screenshots, True)
+
+                await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
+        except (asyncio.TimeoutError, asyncio.CancelledError):
+            await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
+        except Exception as e:
+            log.error(e, exc_info=True)
+            await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
+            l = await media_msg.forward(Config.LOG_CHANNEL)
+            await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\\n{traceback.format_exc()}', True)
+        finally:
+            c.CURRENT_PROCESSES[chat_id] -= 1
+            shutil.rmtree(output_folder)
+
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')
