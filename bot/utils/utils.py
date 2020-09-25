@@ -40,7 +40,7 @@ class CommonUtils:
 
     @staticmethod
     async def run_subprocess(cmd):
-        cmd.append += ['-headers', f'IAM:{Config.IAM_HEADER}']
+        cmd += ['-headers', f'IAM:{Config.IAM_HEADER}']
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
