@@ -106,27 +106,31 @@ class ManualScreenshot:
                 await snt.edit_text(txt)
 
                 screenshots = []
-                watermark = await c.db.get_watermark_text(chat_id)
-                watermark_color_code = await c.db.get_watermark_color(chat_id)
-                watermark_color = Config.COLORS[watermark_color_code]
-                watermark_position = await c.db.get_watermark_position(chat_id)
-                as_file = await c.db.is_as_file(chat_id)
-                font_size = await c.db.get_font_size(chat_id)
                 ffmpeg_errors = ''
-
-                width, height = await self.get_dimentions(file_link)
-                fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
-                x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
+                as_file = await c.db.is_as_file(chat_id)
+                watermark = await c.db.get_watermark_text(chat_id)
+                if watermark:
+                    watermark_color_code = await c.db.get_watermark_color(chat_id)
+                    watermark_color = Config.COLORS[watermark_color_code]
+                    watermark_position = await c.db.get_watermark_position(chat_id)
+                    font_size = await c.db.get_font_size(chat_id)
+                    width, height = await self.get_dimentions(file_link)
+                    fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
+                    x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
+                    watermark_options = f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={watermark}, scale=1280:-1'
 
                 log.info(f"Generating screenshots at positions {valid_positions} from location: {file_link} for {chat_id}")
 
                 for i, sec in enumerate(valid_positions):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(sec), '-i', file_link, '-vf',
-                            f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={watermark}, scale=1280:-1',
-                            '-y', '-vframes', '1', str(thumbnail_template)]
+                    ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(sec), '-i', file_link,'-vf']
+                    if watermark:
+                        ffmpeg_cmd.append(watermark_options)
+                    else:
+                        ffmpeg_cmd.append('scale=1280:-1')
+                    ffmpeg_cmd += ['-y', '-vframes', '1', str(thumbnail_template)]
 
-                    log.debug(*ffmpeg_cmd)
+                    log.debug(ffmpeg_cmd)
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await snt.edit_text(f'😀 `{i+1}` of `{len(valid_positions)}` generated!')

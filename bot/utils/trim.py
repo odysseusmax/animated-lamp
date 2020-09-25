@@ -100,9 +100,12 @@ class Trim:
                 subtitle_option = await self.fix_subtitle_codec(file_link)
 
                 ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(start), '-i', file_link, '-t',
-                              str(request_duration), '-map', '0', '-c', 'copy', subtitle_option, str(sample_file)]
+                              str(request_duration), '-map', '0', '-c', 'copy']
+                if subtitle_option:
+                    ffmpeg_cmd.append(subtitle_option)
+                ffmpeg_cmd.append(str(sample_file))
 
-                log.debug(*ffmpeg_cmd)
+                log.debug(ffmpeg_cmd)
                 output = await self.run_subprocess(ffmpeg_cmd)
                 log.debug(output)
 

@@ -74,31 +74,34 @@ class Screenshot:
                 reduced_sec = duration - int(duration*2 / 100)
                 screenshots = []
                 watermark = await c.db.get_watermark_text(chat_id)
-                watermark_color_code = await c.db.get_watermark_color(chat_id)
-                watermark_color = Config.COLORS[watermark_color_code]
-                watermark_position = await c.db.get_watermark_position(chat_id)
                 as_file = await c.db.is_as_file(chat_id)
                 screenshot_mode = await c.db.get_screenshot_mode(chat_id)
-                font_size = await c.db.get_font_size(chat_id)
                 ffmpeg_errors = ''
+                if watermark:
+                    watermark_color_code = await c.db.get_watermark_color(chat_id)
+                    watermark_color = Config.COLORS[watermark_color_code]
+                    watermark_position = await c.db.get_watermark_position(chat_id)
+                    font_size = await c.db.get_font_size(chat_id)
+                    width, height = await self.get_dimentions(file_link)
+                    fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
+                    x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
+                    watermark_options = f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={watermark}, scale=1280:-1'
 
                 if screenshot_mode == 0:
                     screenshot_secs = [int(reduced_sec/num_screenshots)*i for i in range(1, 1+num_screenshots)]
                 else:
                     screenshot_secs = [self.get_random_start_at(reduced_sec) for i in range(1, 1+num_screenshots)]
 
-                width, height = await self.get_dimentions(file_link)
-                fontsize = round((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
-                x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
-
-
                 for i, sec in enumerate(screenshot_secs):
                     thumbnail_template = output_folder.joinpath(f'{i+1}.png')
-                    ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(sec), '-i', file_link, '-vf',
-                            f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={watermark}, scale=1280:-1',
-                            '-y', '-vframes', '1', str(thumbnail_template)]
+                    ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(sec), '-i', file_link, '-vf']
+                    if watermark:
+                        ffmpeg_cmd.append(watermark_options)
+                    else:
+                        ffmpeg_cmd.append('scale=1280:-1')
+                    ffmpeg_cmd += ['-y', '-vframes', '1', str(thumbnail_template)]
 
-                    log.debug(*ffmpeg_cmd)
+                    log.debug(ffmpeg_cmd)
                     output = await self.run_subprocess(ffmpeg_cmd)
                     log.debug(output)
                     await m.edit_message_text(text=f'😀 `{i+1}` of `{num_screenshots}` generated!')
