@@ -70,7 +70,7 @@ class Sample:
 
                 log.info(f"Generating sample video (duration {sample_duration}s from {start_at}) from location: {file_link} for {chat_id}")
 
-                ffmpeg_cmd = ["ffmpeg", '-hide_banner', '-ss', start_at, '-i', shlex.quote(file_link), '-t', sample_duration, '-map', 0 '-c', 'copy', subtitle_option, sample_file]
+                ffmpeg_cmd = ["ffmpeg", '-hide_banner', '-ss', start_at, '-i', shlex.quote(file_link), '-t', sample_duration, '-map', 0, '-c', 'copy', subtitle_option, sample_file]
                 output = await self.run_subprocess(ffmpeg_cmd)
                 log.debug(output)
 

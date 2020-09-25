@@ -53,7 +53,7 @@ class CommonUtils:
         os.makedirs(output_folder, exist_ok=True)
 
         thumb_file = output_folder.joinpath('thumb.jpg')
-        ffmpeg_cmd = ["ffmpeg", "-ss". "0", "-i", file_path, "-vframes", "1", "-vf", '"scale=320:-1"',  '-y', thumb_file]
+        ffmpeg_cmd = ["ffmpeg", "-ss", "0", "-i", file_path, "-vframes", "1", "-vf", '"scale=320:-1"',  '-y', thumb_file]
         output = await CommonUtils.run_subprocess(ffmpeg_cmd)
         if not thumb_file.exists():
             return None
@@ -67,7 +67,7 @@ class CommonUtils:
 
     @staticmethod
     async def get_media_info(file_link):
-        ffprobe_cmd = ['ffprobe', '-v', 'quiet', '-of', 'json', '-show_streams' '-show_format', '-show_chapters', '-show_programs', shlex.quote(file_link)]
+        ffprobe_cmd = ['ffprobe', '-v', 'quiet', '-of', 'json', '-show_streams', '-show_format', '-show_chapters', '-show_programs', shlex.quote(file_link)]
         data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
         return data
 
