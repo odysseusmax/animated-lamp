@@ -70,8 +70,8 @@ class Sample:
 
                 log.info(f"Generating sample video (duration {sample_duration}s from {start_at}) from location: {file_link} for {chat_id}")
 
-                ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(start_at), '-t',
-                              str(sample_duration), '-i', file_link, '-map', '0', '-c', 'copy']
+                ffmpeg_cmd = ['ffmpeg', '-headers', f'IAM:{Config.IAM_HEADER}', '-hide_banner', '-ss', str(start_at), '-i', file_link, '-t',
+                              str(sample_duration), '-map', '0', '-c', 'copy']
                 if subtitle_option:
                     ffmpeg_cmd.append(subtitle_option)
                 ffmpeg_cmd.append(str(sample_file))
