@@ -9,7 +9,7 @@ from ..config import Config
 @ScreenShotBot.on_callback_query()
 async def __(c, m):
     chat_id = m.from_user.id
-    await foo(c, m, chat_id)
+    await foo(c, m, chat_id, cb=True)
 
 
 @ScreenShotBot.on_message(Filters.private)
@@ -18,11 +18,13 @@ async def _(c, m):
     await foo(c, m, chat_id)
 
 
-async def foo(c, m, chat_id):
+async def foo(c, m, chat_id, cb=False):
     if not c.CHAT_FLOOD.get(chat_id):
         c.CHAT_FLOOD[chat_id] = int(time.time()) - Config.SLOW_SPEED_DELAY-1
 
     if int(time.time()) - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
+        if cb:
+            await m.answer()
         return
 
     c.CHAT_FLOOD[chat_id] = int(time.time())
