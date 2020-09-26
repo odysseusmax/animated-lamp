@@ -1,5 +1,5 @@
 import traceback
-import os
+import io
 
 from pyrogram import filters as Filters
 
@@ -22,9 +22,9 @@ async def _banned_usrs(c, m):
         text += f"> **user_id**: `{user_id}`, **Ban Duration**: `{ban_duration}`, **Banned on**: `{banned_on}`, **Reason**: `{ban_reason}`\n\n"
     reply_text = f"Total banned user(s): `{banned_usr_count}`\n\n{text}"
     if len(reply_text) > 4096:
-        with open('banned-users.txt', 'w') as f:
-            f.write(reply_text)
-        await m.reply_document('banned-users.txt', True)
-        os.remove('banned-users.txt')
+        banned_usrs = io.BytesIO()
+        banned_usrs.name = 'banned-users.txt'
+        banned_usrs.write(reply_text.encode())
+        await m.reply_document(banned_usrs, True)
         return
     await m.reply_text(reply_text, True)

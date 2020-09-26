@@ -5,7 +5,7 @@ from ..screenshotbot import ScreenShotBot
 
 
 HELP_TEXT = """
-Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate
+Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate:
 
     1. Screenshots.
     2. Sample Video.
@@ -14,6 +14,9 @@ Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate
 👉 I support any kind of **telegram video file** (streaming video or document video files) provided it --has proper mime-type-- and --is not corrupted--.
 👉 I also support **Streaming URLs**. The URL should be a --streaming URL--, --non IP specific--, and --should return proper response codes--.
 Just send me the telegram file or the streaming URL.
+
+See /settings to configure bot's behavior.
+Use /set_watermark to set custom watermarks to your screenshots.
 
 **General FAQ.**
 

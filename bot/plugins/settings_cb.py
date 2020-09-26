@@ -74,4 +74,4 @@ async def settings_cb(c, m):
 
 @ScreenShotBot.on_callback_query(Filters.create(lambda _, __, query: query.data.startswith('rj')))
 async def _(c, m):
-    await m.answer('😂')
+    await m.answer('😂 press the other button 😂')

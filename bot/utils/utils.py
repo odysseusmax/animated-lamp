@@ -218,7 +218,7 @@ class CommonUtils:
             return
 
         await m.reply_text(
-            text = f"Here You can configure my behavior.",
+            text = f"Here You can configure my behavior.\n\nPress the button to change the settings.",
             quote=True,
             reply_markup=InlineKeyboardMarkup(settings_btn)
         )

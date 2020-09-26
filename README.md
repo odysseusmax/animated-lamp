@@ -12,6 +12,9 @@ An attempt to implement the screenshot generation of telegram files without down
 * Python3 (3.6 or higher).
 
 ### Local setup
+
+> The setup given here is for a linux environment (Debian/Ubuntu).
+
 * Clone to local machine.
 ```
 $ git clone https://github.com/odysseusmax/animated-lamp.git
@@ -20,8 +23,7 @@ $ cd animated-lamp
 
 * Create and activate virtual environment.
 ```
-$ pip3 install virtualenv
-$ virtualenv venv
+$ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
@@ -32,7 +34,7 @@ $ pip3 install -U -r requirements.txt
 
 ### Environment Variables
 
-Properly setup the environment variables or populate `config.py` with the values (some of the values are sensitive data, so keep them safe).
+Properly setup the environment variables or populate `config.py` with the values. Setting up environment variables is advised as some of the values are sensitive data, and should be kept secret.
 
 * `API_ID`(required) - Get your telegram API_ID from [https://my.telegram.org/](https://my.telegram.org/).
 * `API_HASH`(required) - Get your telegram API_HASH from [https://my.telegram.org/](https://my.telegram.org/).
@@ -40,7 +42,7 @@ Properly setup the environment variables or populate `config.py` with the values
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Admin(s) of the bot. User's telegram id separated by space. Atleast one id should be specified.
-* `HOST`(required) - Public URL of file streaming service ([Source](https://github.com/tulir/tgfilestream "TgFileStream")).
+* `HOST`(required) - Public URL of file streaming service ([See Setting up Streaming Service](#setting-up-streaming-service)).
 * `SESSION_NAME`(optional) - Name you want to call your bot's session, Eg: bot's username.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed video trim duration in seconds. Defaults to 600s.
@@ -53,7 +55,11 @@ Properly setup the environment variables or populate `config.py` with the values
 ### Run bot
 `$ python3 -m bot`
 
-Now go to your bot and do a `/start`.
+Now go and `/start` the bot. If everything went right, bot will respond with welcome message.
+
+## Setting up Streaming Service
+
+The streaming service can be a custom version of [TgFileStream](https://github.com/tulir/tgfilestream), modded to work with this setup. The mod basicaly is adding a type of header based authentication and changing the endpoints. The authentication part is optional and the endpoint used here is `/file/:chat_id/:message_id`. Make sure to note these changes when deploying your own instance. The streaming service used for [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot") is not related to [TgFileStream](https://github.com/tulir/tgfilestream) and I do not plan to make it OSS.
 
 ## Supported commands and functions
 
@@ -101,6 +107,16 @@ You can contact me [@odysseusmax](https://tx.me/odysseusmax).
 Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
 Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.
+
+## Dependencies
+* pyrogram
+* tgcrypto
+* motor
+* dnspython
+* aiofiles
+* async-timeout
+* aiohttp
+
 
 ## License
 Code released under [The GNU General Public License](LICENSE).

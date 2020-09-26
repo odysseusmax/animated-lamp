@@ -2,6 +2,5 @@ pyrogram
 tgcrypto
 motor
 dnspython
-https://github.com/Tinche/aiofiles/archive/master.zip
 async-timeout
 aiohttp
