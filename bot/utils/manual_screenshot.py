@@ -74,7 +74,7 @@ class ManualScreenshot:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\nRequested manual screenshots\n\n{duration}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 valid_positions = []
@@ -88,13 +88,13 @@ class ManualScreenshot:
                 if not valid_positions:
                     await snt.edit_text("😟 Sorry! None of the given positions where valid!")
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 if len(valid_positions) > 10:
                     await snt.edit_text(f"😟 Sorry! Only 10 screenshots can be generated. Found {len(valid_positions)} valid positions in your request")
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 if invalid_positions:
@@ -161,7 +161,7 @@ class ManualScreenshot:
                     else:
                         await l.reply_text(f'stream link : {file_link}\n\nmanual screenshots {raw_user_input}.', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 await snt.edit_text(text=f'🤓 You requested {len(valid_positions)} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
@@ -184,5 +184,5 @@ class ManualScreenshot:
             await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\\n{traceback.format_exc()}', True)
         finally:
             c.CURRENT_PROCESSES[chat_id] -= 1
-            shutil.rmtree(output_folder)
+            shutil.rmtree(output_folder, ignore_errors=True)
 

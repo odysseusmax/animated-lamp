@@ -57,7 +57,7 @@ class Sample:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\nSample video requested\n\n{duration}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 reduced_sec = duration - int(duration*10 / 100)
@@ -86,7 +86,7 @@ class Sample:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\n duration {sample_duration} sample video generation failed\n\n{ffmpeg_output}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 thumb = await self.generate_thumbnail_file(sample_file, uid)
@@ -115,4 +115,4 @@ class Sample:
             await l.reply_text(f'sample video requested and some error occoured\n\n{traceback.format_exc()}', True)
         finally:
             c.CURRENT_PROCESSES[chat_id] -= 1
-            shutil.rmtree(output_folder)
+            shutil.rmtree(output_folder, ignore_errors=True)

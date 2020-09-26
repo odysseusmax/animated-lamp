@@ -85,13 +85,13 @@ class Trim:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\ntrim video requested\n\n{start}:{end}\n\n{duration}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 if (start>=duration) or (end>=duration):
                     await snt.edit_text("😟 Sorry! The requested range is out of the video's duration!.")
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 log.info(f"Trimming video (duration {request_duration}s from {start}) from location: {file_link} for {chat_id}")
@@ -115,7 +115,7 @@ class Trim:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\nVideo trim failed.\n\n{start}:{end}\n\n{ffmpeg_output}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 thumb = await self.generate_thumbnail_file(sample_file, uid)
@@ -144,4 +144,4 @@ class Trim:
             await l.reply_text(f'trim video requested and some error occoured\n\n{traceback.format_exc()}', True)
         finally:
             c.CURRENT_PROCESSES[chat_id] -= 1
-            shutil.rmtree(output_folder)
+            shutil.rmtree(output_folder, ignore_errors=True)

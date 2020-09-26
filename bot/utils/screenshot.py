@@ -66,7 +66,7 @@ class Screenshot:
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\nRequested screenshots: {num_screenshots}.\n\n{duration}', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 log.info(f"Generating {num_screenshots} screenshots from location: {file_link} for {chat_id}")
@@ -132,7 +132,7 @@ class Screenshot:
                     else:
                         await l.reply_text(f'stream link : {file_link}\n\n{num_screenshots} screenshots where requested and Screen shots where not generated.', True)
                     c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder)
+                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 await m.edit_message_text(text=f'🤓 You requested {num_screenshots} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
@@ -155,4 +155,4 @@ class Screenshot:
             await l.reply_text(f'{num_screenshots} screenshots where requested and some error occoured\n\n{traceback.format_exc()}', True)
         finally:
             c.CURRENT_PROCESSES[chat_id] -= 1
-            shutil.rmtree(output_folder)
+            shutil.rmtree(output_folder, ignore_errors=True)
