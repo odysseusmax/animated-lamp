@@ -1,4 +1,5 @@
 import time
+import datetime
 
 from pyrogram import filters as  Filters
 
@@ -8,20 +9,16 @@ from ..config import Config
 
 @ScreenShotBot.on_callback_query()
 async def __(c, m):
-    chat_id = m.from_user.id
-    await foo(c, m, chat_id, cb=True)
+    await foo(c, m, cb=True)
 
 
 @ScreenShotBot.on_message(Filters.private)
 async def _(c, m):
-    chat_id = m.chat.id
-    await foo(c, m, chat_id)
+    await foo(c, m)
 
 
-async def foo(c, m, chat_id, cb=False):
-    if not c.CHAT_FLOOD.get(chat_id):
-        c.CHAT_FLOOD[chat_id] = int(time.time()) - Config.SLOW_SPEED_DELAY-1
-
+async def foo(c, m, cb=False):
+    chat_id = m.from_user.id
     if int(time.time()) - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
         if cb:
             await m.answer()
@@ -42,5 +39,9 @@ async def foo(c, m, chat_id, cb=False):
             await c.db.remove_ban(chat_id)
         else:
             return
+
+    last_used_on = await c.db.get_last_used_on(chat_id)
+    if last_used_on != datetime.date.today().isoformat():
+        await c.db.update_last_used_on(chat_id)
 
     await m.continue_propagation()

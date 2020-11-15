@@ -27,7 +27,7 @@ __If issues persists contact my father.__"""
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("help"))
-async def help(c, m):
+async def help_(c, m):
 
     await m.reply_text(
         text=HELP_TEXT.format(m.from_user.mention),
