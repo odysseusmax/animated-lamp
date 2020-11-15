@@ -3,7 +3,6 @@ import io
 import uuid
 import time
 import math
-import shlex
 import shutil
 import asyncio
 import logging
@@ -14,6 +13,7 @@ from pyrogram.types import InputMediaPhoto
 from async_timeout import timeout
 
 from ..config import Config
+from .utils import ProcessCounter
 
 
 log = logging.getLogger(__name__)
@@ -23,44 +23,39 @@ class ManualScreenshot:
     async def manual_screenshot_fn(self, c, m):
 
         chat_id = m.chat.id
-        if c.CURRENT_PROCESSES.get(chat_id, 0) == Config.MAX_PROCESSES_PER_USER:
+        if c.CURRENT_PROCESSES[chat_id] >= Config.MAX_PROCESSES_PER_USER:
             await m.reply_text('You have reached the maximum parallel processes! Try again after one of them finishes.', True)
             return
-        if not c.CURRENT_PROCESSES.get(chat_id):
-            c.CURRENT_PROCESSES[chat_id] = 0
-        c.CURRENT_PROCESSES[chat_id] += 1
-
-        message = await c.get_messages(
-            chat_id,
-            m.reply_to_message.message_id
-        )
-        await m.reply_to_message.delete()
-        media_msg = message.reply_to_message
-
-        if media_msg.empty:
-            await m.reply_text('Why did you delete the file 😠, Now i cannot help you 😒.', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-            return
 
         try:
-            raw_user_input = [int(i.strip()) for i in m.text.split(',')]
-        except:
-            await m.reply_text('Please follow the specified format', True)
-            c.CURRENT_PROCESSES[chat_id] -= 1
-            return
+            async with timeout(Config.TIMEOUT) as cm, ProcessCounter(c.CURRENT_PROCESSES, chat_id):
+                uid = str(uuid.uuid4())
+                output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
+                os.makedirs(output_folder, exist_ok=True)
 
-        uid = str(uuid.uuid4())
-        output_folder = Config.SCRST_OP_FLDR.joinpath(uid)
-        os.makedirs(output_folder, exist_ok=True)
+                message = await c.get_messages(
+                    chat_id,
+                    m.reply_to_message.message_id
+                )
+                await m.reply_to_message.delete()
+                media_msg = message.reply_to_message
 
-        if Config.TRACK_CHANNEL:
-            tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
-            await tr_msg.reply_text(f"User id: `{chat_id}`")
+                if media_msg.empty:
+                    await m.reply_text('Why did you delete the file 😠, Now i cannot help you 😒.', True)
+                    return
 
-        snt = await m.reply_text('Processing your request, Please wait! 😴', True)
+                try:
+                    raw_user_input = [int(i.strip()) for i in m.text.split(',')]
+                except:
+                    await m.reply_text('Please follow the specified format', True)
+                    return
 
-        try:
-            async with timeout(Config.TIMEOUT) as cm:
+                if Config.TRACK_CHANNEL:
+                    tr_msg = await media_msg.forward(Config.TRACK_CHANNEL)
+                    await tr_msg.reply_text(f"User id: `{chat_id}`")
+
+                snt = await m.reply_text('Processing your request, Please wait! 😴', True)
+
                 start_time = time.time()
 
                 if media_msg.media:
@@ -73,8 +68,6 @@ class ManualScreenshot:
                     await snt.edit_text("😟 Sorry! I cannot open the file.")
                     l = await media_msg.forward(Config.LOG_CHANNEL)
                     await l.reply_text(f'stream link : {file_link}\n\nRequested manual screenshots\n\n{duration}', True)
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 valid_positions = []
@@ -87,19 +80,17 @@ class ManualScreenshot:
 
                 if not valid_positions:
                     await snt.edit_text("😟 Sorry! None of the given positions where valid!")
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
                 if len(valid_positions) > 10:
-                    await snt.edit_text(f"😟 Sorry! Only 10 screenshots can be generated. Found {len(valid_positions)} valid positions in your request")
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder, ignore_errors=True)
+                    await snt.edit_text(
+                        f"😟 Sorry! Only 10 screenshots can be generated. Found {len(valid_positions)} valid positions in your request")
                     return
 
                 if invalid_positions:
                     invalid_position_str = ', '.join(invalid_positions)
-                    txt = f"Found {len(invalid_positions)} invalid positions ({invalid_position_str}).\n\n😀 Generating screenshots after ignoring these!."
+                    txt = f"Found {len(invalid_positions)} invalid positions ({invalid_position_str}).\n\n"\
+                           "😀 Generating screenshots after ignoring these!."
                 else:
                     txt = '😀 Generating screenshots!.'
 
@@ -117,7 +108,8 @@ class ManualScreenshot:
                     width, height = await self.get_dimentions(file_link)
                     fontsize = int((math.sqrt( width**2 + height**2 ) / 1388.0) * Config.FONT_SIZES[font_size])
                     x_pos, y_pos = self.get_watermark_coordinates(watermark_position, width, height)
-                    watermark_options = f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:y={y_pos}:text={watermark}, scale=1280:-1'
+                    watermark_options = f'drawtext=fontcolor={watermark_color}:fontsize={fontsize}:x={x_pos}:'\
+                                        f'y={y_pos}:text={watermark}, scale=1280:-1'
 
                 log.info(f"Generating screenshots at positions {valid_positions} from location: {file_link} for {chat_id}")
 
@@ -160,11 +152,11 @@ class ManualScreenshot:
                         await l.reply_document(error_file, caption=f"stream link : {file_link}\n\nmanual screenshots {raw_user_input}.")
                     else:
                         await l.reply_text(f'stream link : {file_link}\n\nmanual screenshots {raw_user_input}.', True)
-                    c.CURRENT_PROCESSES[chat_id] -= 1
-                    shutil.rmtree(output_folder, ignore_errors=True)
                     return
 
-                await snt.edit_text(text=f'🤓 You requested {len(valid_positions)} screenshots and {len(screenshots)} screenshots generated, Now starting to upload!')
+                await snt.edit_text(
+                    text=f'🤓 You requested {len(valid_positions)} screenshots and {len(screenshots)} screenshots generated, '\
+                          'Now starting to upload!')
 
                 await media_msg.reply_chat_action("upload_photo")
 
@@ -174,15 +166,18 @@ class ManualScreenshot:
                 else:
                     await media_msg.reply_media_group(screenshots, True)
 
-                await snt.edit_text(f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\nIf You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
+                await snt.edit_text(
+                    f'Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\n'\
+                    'If You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206).')
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            await snt.edit_text('😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
+            await snt.edit_text(
+                '😟 Sorry! Video trimming failed due to timeout. Your process was taking too long to complete, hence cancelled')
         except Exception as e:
             log.error(e, exc_info=True)
             await snt.edit_text('😟 Sorry! Screenshot generation failed possibly due to some infrastructure failure 😥.')
             l = await media_msg.forward(Config.LOG_CHANNEL)
-            await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\\n{traceback.format_exc()}', True)
+            await l.reply_text(f'manual screenshots ({raw_user_input}) where requested and some error occoured\\n{traceback.format_exc()}',
+                               True)
         finally:
-            c.CURRENT_PROCESSES[chat_id] -= 1
             shutil.rmtree(output_folder, ignore_errors=True)
 

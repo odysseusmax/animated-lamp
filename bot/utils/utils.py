@@ -1,21 +1,33 @@
 import os
-import re
-import shlex
 import random
 import asyncio
 import logging
-import datetime
-import traceback
 from urllib.parse import urljoin
-from pathlib import Path
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import FloodWait
 
 from ..config import Config
 
 
 log = logging.getLogger(__name__)
+
+
+class ProcessCounter:
+    def __init__(self, store, item):
+        self.store = store
+        self.item = item
+
+    def __enter__(self):
+        self.store[self.item] += 1
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.store[self.item] -= 1
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        self.__exit__(exc_type, exc_value, traceback)
+
+    async def __aenter__(self):
+        self.__enter__()
 
 
 class CommonUtils:
@@ -229,11 +241,7 @@ class CommonUtils:
         i_keyboard = []
         for i in range(2, 11):
             i_keyboard.append(
-                InlineKeyboardButton(
-                    f"{i}",
-                    f"scht+{i}"
-                )
-            )
+                InlineKeyboardButton(f"{i}", f"scht+{i}"))
             if (i>2) and (i%2) == 1:
                 btns.append(i_keyboard)
                 i_keyboard = []

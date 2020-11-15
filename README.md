@@ -113,7 +113,6 @@ Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFil
 * tgcrypto
 * motor
 * dnspython
-* aiofiles
 * async-timeout
 * aiohttp
 

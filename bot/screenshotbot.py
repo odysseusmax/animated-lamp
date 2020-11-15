@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from pyrogram import Client
 
 from .config import Config
@@ -19,7 +21,7 @@ class ScreenShotBot(Client):
         )
 
         self.db = Database(Config.DATABASE_URL, Config.SESSION_NAME)
-        self.CURRENT_PROCESSES = {}
+        self.CURRENT_PROCESSES = defaultdict(lambda : 0)
         self.CHAT_FLOOD = {}
         self.broadcast_ids = {}
 
