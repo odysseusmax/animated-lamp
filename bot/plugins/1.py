@@ -19,7 +19,7 @@ async def _(c, m):
 
 async def foo(c, m, cb=False):
     chat_id = m.from_user.id
-    if int(time.time()) - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
+    if int(time.time()) - c.CHAT_FLOOD[chat_id] < Config.SLOW_SPEED_DELAY:
         if cb:
             await m.answer()
         return
