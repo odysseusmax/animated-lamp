@@ -9,7 +9,7 @@ import logging
 import datetime
 import traceback
 
-from pyrogram.types import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto, InputMediaDocument
 from async_timeout import timeout
 
 from ..config import Config
@@ -141,10 +141,10 @@ class Screenshot:
                     if thumbnail_template.exists():
                         if as_file:
                             screenshots.append(
-                                {
-                                    "document": str(thumbnail_template),
-                                    "caption": f"ScreenShot at {datetime.timedelta(seconds=sec)}",
-                                }
+                                InputMediaDocument(
+                                    str(thumbnail_template),
+                                    caption=f"ScreenShot at {datetime.timedelta(seconds=sec)}",
+                                )
                             )
                         else:
                             screenshots.append(
@@ -187,14 +187,8 @@ class Screenshot:
 
                 await media_msg.reply_chat_action("upload_photo")
 
-                if as_file:
-                    aws = [
-                        media_msg.reply_document(quote=True, **photo)
-                        for photo in screenshots
-                    ]
-                    await asyncio.gather(*aws)
-                else:
-                    await media_msg.reply_media_group(screenshots, True)
+                await media_msg.reply_media_group(screenshots, True)
+
                 await m.edit_message_text(
                     text=f"Successfully completed process in {datetime.timedelta(seconds=int(time.time()-start_time))}\n\n"
                     "If You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)."
