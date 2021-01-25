@@ -9,16 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.8.9
         with:
-          ruby-version: 2.6
-      
-      - name: Install dpl
-        run: gem install dpl
-      
-      - name: Push to heroku
-        run: dpl --provider=heroku --app=${{secrets.HEROKU_APP_NAME}} --api-key=${{secrets.HEROKU_API_KEY}}
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
