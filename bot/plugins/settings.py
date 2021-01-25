@@ -1,4 +1,4 @@
-from pyrogram import filters as  Filters
+from pyrogram import filters as Filters
 
 from ..screenshotbot import ScreenShotBot
 from ..utils import Utilities

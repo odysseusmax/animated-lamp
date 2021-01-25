@@ -1,5 +1,4 @@
-from pyrogram import filters as  Filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import filters as Filters
 
 from ..screenshotbot import ScreenShotBot
 
@@ -29,7 +28,4 @@ __If issues persists contact my father.__"""
 @ScreenShotBot.on_message(Filters.private & Filters.command("help"))
 async def help_(c, m):
 
-    await m.reply_text(
-        text=HELP_TEXT.format(m.from_user.mention),
-        quote=True
-    )
+    await m.reply_text(text=HELP_TEXT.format(m.from_user.mention), quote=True)
