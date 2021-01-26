@@ -6,8 +6,8 @@ from pyrogram import filters as Filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import aiohttp
 
-from ..screenshotbot import ScreenShotBot
-from ..utils import Utilities
+from bot.screenshotbot import ScreenShotBot
+from bot.utils import Utilities
 
 
 logger = logging.getLogger(__name__)

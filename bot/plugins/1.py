@@ -3,8 +3,8 @@ import datetime
 
 from pyrogram import filters as Filters
 
-from ..screenshotbot import ScreenShotBot
-from ..config import Config
+from bot.screenshotbot import ScreenShotBot
+from bot.config import Config
 
 
 @ScreenShotBot.on_callback_query()

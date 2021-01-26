@@ -6,31 +6,20 @@ from urllib.parse import urljoin
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from ..config import Config
+from bot.config import Config
 
 
 log = logging.getLogger(__name__)
 
 
-class ProcessCounter:
-    def __init__(self, store, item):
-        self.store = store
-        self.item = item
-
-    def __enter__(self):
-        self.store[self.item] += 1
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.store[self.item] -= 1
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        self.__exit__(exc_type, exc_value, traceback)
-
-    async def __aenter__(self):
-        self.__enter__()
+class ProcessTypes:
+    SAMPLE_VIDEO = 1
+    TRIM_VIDEO = 2
+    MANNUAL_SCREENSHOTS = 3
+    SCREENSHOTS = 4
 
 
-class CommonUtils:
+class Utilities:
     @staticmethod
     def is_valid_file(msg):
         if not msg.media:
@@ -78,7 +67,7 @@ class CommonUtils:
             "-y",
             str(thumb_file),
         ]
-        output = await CommonUtils.run_subprocess(ffmpeg_cmd)
+        output = await Utilities.run_subprocess(ffmpeg_cmd)
         log.debug(output)
         if not thumb_file.exists():
             return None
@@ -107,7 +96,7 @@ class CommonUtils:
             "-show_chapters",
             "-show_programs",
         ]
-        data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
+        data, err = await Utilities.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
@@ -128,7 +117,7 @@ class CommonUtils:
             "v:0",
         ]
 
-        output = await CommonUtils.run_subprocess(ffprobe_cmd)
+        output = await Utilities.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
             width, height = [int(i.strip()) for i in output[0].decode().split("x")]
@@ -154,7 +143,7 @@ class CommonUtils:
             "-select_streams",
             "v:0",
         ]
-        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
@@ -184,7 +173,7 @@ class CommonUtils:
             "default=noprint_wrappers=1:nokey=1",
         ]
 
-        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
@@ -200,8 +189,10 @@ class CommonUtils:
 
     @staticmethod
     def get_watermark_coordinates(pos, width, height):
+        def gcd(m, n):
+            return m if not n else gcd(n, m % n)
+
         def ratio(x, y):
-            gcd = lambda m, n: m if not n else gcd(n, m % n)
             d = gcd(x, y)
             return x / d, y / d
 
