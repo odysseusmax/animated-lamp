@@ -1,6 +1,6 @@
 from pyrogram import filters as Filters
 
-from ..screenshotbot import ScreenShotBot
+from bot.screenshotbot import ScreenShotBot
 
 
 HELP_TEXT = """

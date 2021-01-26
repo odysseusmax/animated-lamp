@@ -18,10 +18,11 @@ class Config:
     HOST = os.environ.get("HOST", "")
     TIMEOUT = int(os.environ.get("TIMEOUT", 60 * 30))
     DEBUG = bool(os.environ.get("DEBUG"))
+    WORKER_COUNT = int(os.environ.get("WORKER_COUNT", 20))
     IAM_HEADER = os.environ.get("IAM_HEADER", "")
 
-    SCRST_OP_FLDR = Path("screenshots/")
-    SMPL_OP_FLDR = Path("samples/")
+    SCREENSHOTS_FOLDER = Path("screenshots/")
+    VIDEOS_FOLDER = Path("videos/")
     THUMB_OP_FLDR = Path("thumbnails/")
     COLORS = [
         "white",

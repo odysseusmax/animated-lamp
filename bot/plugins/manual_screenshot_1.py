@@ -1,7 +1,7 @@
 from pyrogram import filters as Filters
 from pyrogram.types import ForceReply
 
-from ..screenshotbot import ScreenShotBot
+from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_callback_query(

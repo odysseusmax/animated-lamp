@@ -5,9 +5,11 @@ from pyrogram import filters as Filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
+from bot.database import Database
 
 
 log = logging.getLogger(__name__)
+db = Database()
 
 
 @ScreenShotBot.on_message(
@@ -42,7 +44,7 @@ async def ban(c, m):
             ban_log_text += (
                 f"\n\nUser notification failed! \n\n`{traceback.format_exc()}`"
             )
-        await c.db.ban_user(user_id, ban_duration, ban_reason)
+        await db.ban_user(user_id, ban_duration, ban_reason)
         log.debug(ban_log_text)
         await m.reply_text(ban_log_text, quote=True)
     except Exception as e:

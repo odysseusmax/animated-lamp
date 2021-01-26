@@ -1,4 +1,5 @@
 # [Screenshotit_bot](https://tx.me/screenshotit_bot)
+
 > Telegram Bot For Screenshot Generation.
 
 ## Description
@@ -8,6 +9,7 @@ An attempt to implement the screenshot generation of telegram files without down
 ## Installation Guide
 
 ### Prerequisites
+
 * FFmpeg.
 * Python3 (3.6 or higher).
 
@@ -16,18 +18,21 @@ An attempt to implement the screenshot generation of telegram files without down
 > The setup given here is for a linux environment (Debian/Ubuntu).
 
 * Clone to local machine.
-```
+
+``` bash
 $ git clone https://github.com/odysseusmax/animated-lamp.git
 $ cd animated-lamp
 ````
 
 * Create and activate virtual environment.
+
 ```
 $ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
 * Install dependencies.
+
 ```
 $ pip3 install -U -r requirements.txt
 ```
@@ -51,8 +56,10 @@ Properly setup the environment variables or populate `config.py` with the values
 * `TIMEOUT` (optional) - Maximum time alloted to each process in seconds, after which process will be cancelled. Defaults to 1800s(30 mins).
 * `DEBUG` (optional) - Set some value to use DEBUG logging level. INFO by default.
 * `IAM_HEADER` (optional) - Authentication token for streaming service. Defaults to `''`.
+* `WORKER_COUNT` (optional) - Number of process to be handled at a time. Defaults to `20`.
 
 ### Run bot
+
 `$ python3 -m bot`
 
 Now go and `/start` the bot. If everything went right, bot will respond with welcome message.

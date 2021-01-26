@@ -2,11 +2,23 @@ import datetime
 
 import motor.motor_asyncio
 
+from bot.config import Config
 
-class Database:
-    def __init__(self, uri, database_name):
-        self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
-        self.db = self._client[database_name]
+
+class Singleton(type):
+    __instances__ = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls.__instances__:
+            cls.__instances__[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+
+        return cls.__instances__[cls]
+
+
+class Database(metaclass=Singleton):
+    def __init__(self):
+        self._client = motor.motor_asyncio.AsyncIOMotorClient(Config.DATABASE_URL)
+        self.db = self._client[Config.SESSION_NAME]
         self.col = self.db.users
 
         self.cache = {}

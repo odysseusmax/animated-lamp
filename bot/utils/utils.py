@@ -6,31 +6,20 @@ from urllib.parse import urljoin
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from ..config import Config
+from bot.config import Config
 
 
 log = logging.getLogger(__name__)
 
 
-class ProcessCounter:
-    def __init__(self, store, item):
-        self.store = store
-        self.item = item
-
-    def __enter__(self):
-        self.store[self.item] += 1
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.store[self.item] -= 1
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        self.__exit__(exc_type, exc_value, traceback)
-
-    async def __aenter__(self):
-        self.__enter__()
+class ProcessTypes:
+    SAMPLE_VIDEO = 1
+    TRIM_VIDEO = 2
+    MANNUAL_SCREENSHOTS = 3
+    SCREENSHOTS = 4
 
 
-class CommonUtils:
+class Utilities:
     @staticmethod
     def is_valid_file(msg):
         if not msg.media:
@@ -60,10 +49,8 @@ class CommonUtils:
         return await process.communicate()
 
     @staticmethod
-    async def generate_thumbnail_file(file_path, uid):
-        output_folder = Config.THUMB_OP_FLDR.joinpath(uid)
+    async def generate_thumbnail_file(file_path, output_folder):
         os.makedirs(output_folder, exist_ok=True)
-
         thumb_file = output_folder.joinpath("thumb.jpg")
         ffmpeg_cmd = [
             "ffmpeg",
@@ -78,7 +65,7 @@ class CommonUtils:
             "-y",
             str(thumb_file),
         ]
-        output = await CommonUtils.run_subprocess(ffmpeg_cmd)
+        output = await Utilities.run_subprocess(ffmpeg_cmd)
         log.debug(output)
         if not thumb_file.exists():
             return None
@@ -107,7 +94,7 @@ class CommonUtils:
             "-show_chapters",
             "-show_programs",
         ]
-        data, err = await CommonUtils.run_subprocess(ffprobe_cmd)
+        data, err = await Utilities.run_subprocess(ffprobe_cmd)
         return data
 
     @staticmethod
@@ -128,7 +115,7 @@ class CommonUtils:
             "v:0",
         ]
 
-        output = await CommonUtils.run_subprocess(ffprobe_cmd)
+        output = await Utilities.run_subprocess(ffprobe_cmd)
         log.debug(output)
         try:
             width, height = [int(i.strip()) for i in output[0].decode().split("x")]
@@ -154,7 +141,7 @@ class CommonUtils:
             "-select_streams",
             "v:0",
         ]
-        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
@@ -184,7 +171,7 @@ class CommonUtils:
             "default=noprint_wrappers=1:nokey=1",
         ]
 
-        out, err = await CommonUtils.run_subprocess(ffmpeg_dur_cmd)
+        out, err = await Utilities.run_subprocess(ffmpeg_dur_cmd)
         log.debug(f"{out} \n {err}")
         out = out.decode().strip()
         if not out:
@@ -200,8 +187,10 @@ class CommonUtils:
 
     @staticmethod
     def get_watermark_coordinates(pos, width, height):
+        def gcd(m, n):
+            return m if not n else gcd(n, m % n)
+
         def ratio(x, y):
-            gcd = lambda m, n: m if not n else gcd(n, m % n)
             d = gcd(x, y)
             return x / d, y / d
 
@@ -232,16 +221,16 @@ class CommonUtils:
             return f"w-tw-{x_pad}", f"h-th-{y_pad}"  # bottom right
 
     @staticmethod
-    async def display_settings(c, m, cb=False):
+    async def display_settings(c, m, db, cb=False):
         chat_id = m.from_user.id if cb else m.chat.id
 
-        as_file = await c.db.is_as_file(chat_id)
-        watermark_text = await c.db.get_watermark_text(chat_id)
-        sample_duration = await c.db.get_sample_duration(chat_id)
-        watermark_color_code = await c.db.get_watermark_color(chat_id)
-        watermark_position = await c.db.get_watermark_position(chat_id)
-        screenshot_mode = await c.db.get_screenshot_mode(chat_id)
-        font_size = await c.db.get_font_size(chat_id)
+        as_file = await db.is_as_file(chat_id)
+        watermark_text = await db.get_watermark_text(chat_id)
+        sample_duration = await db.get_sample_duration(chat_id)
+        watermark_color_code = await db.get_watermark_color(chat_id)
+        watermark_position = await db.get_watermark_position(chat_id)
+        screenshot_mode = await db.get_screenshot_mode(chat_id)
+        font_size = await db.get_font_size(chat_id)
 
         sv_btn = [
             InlineKeyboardButton("Sample Video Duration", "rj"),

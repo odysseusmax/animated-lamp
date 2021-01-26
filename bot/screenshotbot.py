@@ -3,8 +3,8 @@ import time
 
 from pyrogram import Client
 
-from .config import Config
-from .database import Database
+from bot.config import Config
+from bot.workers import Worker
 
 
 class ScreenShotBot(Client):
@@ -14,12 +14,9 @@ class ScreenShotBot(Client):
             bot_token=Config.BOT_TOKEN,
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
-            workers=20,
             plugins=dict(root="bot/plugins"),
         )
-
-        self.db = Database(Config.DATABASE_URL, Config.SESSION_NAME)
-        self.CURRENT_PROCESSES = defaultdict(lambda: 0)
+        self.process_pool = Worker()
         self.CHAT_FLOOD = defaultdict(
             lambda: int(time.time()) - Config.SLOW_SPEED_DELAY - 1
         )
@@ -27,9 +24,11 @@ class ScreenShotBot(Client):
 
     async def start(self):
         await super().start()
+        await self.process_pool.start()
         me = await self.get_me()
         print(f"New session started for {me.first_name}({me.username})")
 
     async def stop(self):
+        await self.process_pool.stop()
         await super().stop()
         print("Session stopped. Bye!!")
