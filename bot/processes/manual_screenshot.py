@@ -3,11 +3,10 @@ import io
 import time
 import math
 import shutil
-import asyncio
 import logging
 import datetime
 
-from pyrogram.types import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto, InputMediaDocument
 
 from bot.config import Config
 from bot.utils import Utilities
@@ -167,12 +166,12 @@ class ManualScreenshotsProcess(BaseProcess):
                 if thumbnail_template.exists():
                     if as_file:
                         screenshots.append(
-                            {
-                                "document": str(thumbnail_template),
-                                "caption": ms.SCREENSHOT_AT.format(
+                            InputMediaDocument(
+                                str(thumbnail_template),
+                                caption=ms.SCREENSHOT_AT.format(
                                     time=datetime.timedelta(seconds=sec)
                                 ),
-                            }
+                            )
                         )
                     else:
                         screenshots.append(
@@ -207,15 +206,7 @@ class ManualScreenshotsProcess(BaseProcess):
                 )
             )
             await self.media_msg.reply_chat_action("upload_photo")
-            if as_file:
-                aws = [
-                    self.media_msg.reply_document(quote=True, **photo)
-                    for photo in screenshots
-                ]
-                await asyncio.gather(*aws)
-            else:
-                await self.media_msg.reply_media_group(screenshots, True)
-
+            await self.media_msg.reply_media_group(screenshots, True)
             await self.reply_message.edit_text(
                 ms.PROCESS_UPLOAD_CONFIRM.format(
                     total_process_duration=datetime.timedelta(
