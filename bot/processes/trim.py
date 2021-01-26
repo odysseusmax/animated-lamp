@@ -7,16 +7,15 @@ import datetime
 from bot.config import Config
 from bot.utils import Utilities
 from bot.messages import Messages as ms
+from .exception import BaseException
 from .base import BaseProcess
 
 
 log = logging.getLogger(__name__)
 
 
-class TrimVideoProcessFailure(Exception):
-    def __init__(self, for_user, for_admin):
-        self.for_user = for_user
-        self.for_admin = for_admin
+class TrimVideoProcessFailure(BaseException):
+    pass
 
 
 class TrimVideoProcess(BaseProcess):
@@ -24,19 +23,27 @@ class TrimVideoProcess(BaseProcess):
         super().__init__(client, input_message)
         self.reply_message = reply_message
 
-    async def _get_media_message(self):
+    async def cancelled(self):
+        await self.reply_message.edit_text(ms.PROCESS_TIMEOUT)
+
+    async def set_media_message(self):
         message = await self.client.get_messages(
             self.chat_id, self.input_message.reply_to_message.message_id
         )
         await self.input_message.reply_to_message.delete()
-        return message.reply_to_message
+        self.media_message = message.reply_to_message
 
     async def process(self):
+        async def upload_notify(*args):
+            await self.client.send_chat_action(self.chat_id, "upload_video")
+
+        await self.set_media_message()
         output_folder = Config.VIDEOS_FOLDER.joinpath(self.process_id)
+        thumbnail_folder = Config.THUMB_OP_FLDR.joinpath(self.process_id)
         os.makedirs(output_folder, exist_ok=True)
-        await self.reply_message.edit_text(ms.PROCESSING_REQUEST, quote=True)
+        await self.reply_message.edit_text(ms.PROCESSING_REQUEST)
         try:
-            if self.media_msg.empty:
+            if self.media_message.empty:
                 raise TrimVideoProcessFailure(
                     for_user=ms.MEDIA_MESSAGE_DELETED,
                     for_admin=ms.MEDIA_MESSAGE_DELETED,
@@ -50,7 +57,7 @@ class TrimVideoProcess(BaseProcess):
                     for_admin=ms.WRONG_FORMAT,
                 )
 
-            if (start >= end) or (start < 0):
+            if 0 > start > end:
                 raise TrimVideoProcessFailure(
                     for_user=ms.TRIM_VIDEO_INVALID_RANGE,
                     for_admin=ms.TRIM_VIDEO_INVALID_RANGE,
@@ -123,7 +130,9 @@ class TrimVideoProcess(BaseProcess):
 
             log.debug(ffmpeg_cmd)
             output = await Utilities.run_subprocess(ffmpeg_cmd)
-            log.debug(output)
+            log.debug(
+                "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
+            )
 
             if (not trim_video_file.exists()) or (
                 os.path.getsize(trim_video_file) == 0
@@ -140,19 +149,23 @@ class TrimVideoProcess(BaseProcess):
                 )
 
             thumb = await Utilities.generate_thumbnail_file(
-                trim_video_file, self.process_id
+                trim_video_file, thumbnail_folder
             )
-            await self.input_message.edit_text(ms.TRIM_VIDEO_PROCESS_SUCCESS)
-            await self.media_msg.reply_chat_action("upload_video")
-            await self.media_msg.reply_video(
+            width, height = await Utilities.get_dimentions(trim_video_file)
+            await self.reply_message.edit_text(ms.TRIM_VIDEO_PROCESS_SUCCESS)
+            await upload_notify()
+            await self.media_message.reply_video(
                 video=str(trim_video_file),
                 quote=True,
                 caption=ms.VIDEO_PROCESS_CAPTION.format(
                     duration=request_duration, start=datetime.timedelta(seconds=start)
                 ),
                 duration=request_duration,
+                width=width,
+                height=height,
                 thumb=thumb,
                 supports_streaming=True,
+                progress=upload_notify,
             )
 
             await self.reply_message.edit_text(
@@ -162,13 +175,14 @@ class TrimVideoProcess(BaseProcess):
                     )
                 )
             )
-        except Exception as e:
+        except TrimVideoProcessFailure as e:
             log.error(e)
-            await self.input_message.edit_message_text(text=e.for_user)
-            log_msg = await self.media_msg.forward(Config.LOG_CHANNEL)
+            await self.reply_message.edit_text(text=e.for_user)
+            log_msg = await self.media_message.forward(Config.LOG_CHANNEL)
             await log_msg.reply_text(
                 e.for_admin,
                 quote=True,
             )
         finally:
             shutil.rmtree(output_folder, ignore_errors=True)
+            shutil.rmtree(thumbnail_folder, ignore_errors=True)

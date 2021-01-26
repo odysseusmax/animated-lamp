@@ -17,10 +17,12 @@ from pyrogram.errors import (
 )
 
 from bot.config import Config
+from bot.database import Database
 from bot.screenshotbot import ScreenShotBot
 
 
 log = logging.getLogger(__name__)
+db = Database()
 
 
 async def send_msg(user_id, message):
@@ -51,7 +53,7 @@ async def send_msg(user_id, message):
     & Filters.reply
 )
 async def broadcast_(c, m):
-    all_users = await c.db.get_all_users()
+    all_users = await db.get_all_users()
 
     broadcast_msg = m.reply_to_message
 
@@ -77,7 +79,7 @@ async def broadcast_(c, m):
         ),
     )
     start_time = time.time()
-    total_users = await c.db.total_users_count()
+    total_users = await db.total_users_count()
     done = 0
     failed = 0
     success = 0
@@ -100,7 +102,7 @@ async def broadcast_(c, m):
             failed += 1
 
         if sts == 400:
-            await c.db.delete_user(user["id"])
+            await db.delete_user(user["id"])
 
         done += 1
         if c.broadcast_ids.get(broadcast_id) is None:

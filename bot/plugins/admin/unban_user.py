@@ -4,10 +4,12 @@ import traceback
 from pyrogram import filters as Filters
 
 from bot.config import Config
+from bot.database import Database
 from bot.screenshotbot import ScreenShotBot
 
 
 log = logging.getLogger(__name__)
+db = Database()
 
 
 @ScreenShotBot.on_message(
@@ -34,7 +36,7 @@ async def unban(c, m):
             unban_log_text += (
                 f"\n\nUser notification failed! \n\n`{traceback.format_exc()}`"
             )
-        await c.db.remove_ban(user_id)
+        await db.remove_ban(user_id)
         log.debug(unban_log_text)
         await m.reply_text(unban_log_text, quote=True)
     except Exception as e:

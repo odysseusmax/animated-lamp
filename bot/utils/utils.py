@@ -49,10 +49,8 @@ class Utilities:
         return await process.communicate()
 
     @staticmethod
-    async def generate_thumbnail_file(file_path, uid):
-        output_folder = Config.THUMB_OP_FLDR.joinpath(uid)
+    async def generate_thumbnail_file(file_path, output_folder):
         os.makedirs(output_folder, exist_ok=True)
-
         thumb_file = output_folder.joinpath("thumb.jpg")
         ffmpeg_cmd = [
             "ffmpeg",
@@ -223,16 +221,16 @@ class Utilities:
             return f"w-tw-{x_pad}", f"h-th-{y_pad}"  # bottom right
 
     @staticmethod
-    async def display_settings(c, m, cb=False):
+    async def display_settings(c, m, db, cb=False):
         chat_id = m.from_user.id if cb else m.chat.id
 
-        as_file = await c.db.is_as_file(chat_id)
-        watermark_text = await c.db.get_watermark_text(chat_id)
-        sample_duration = await c.db.get_sample_duration(chat_id)
-        watermark_color_code = await c.db.get_watermark_color(chat_id)
-        watermark_position = await c.db.get_watermark_position(chat_id)
-        screenshot_mode = await c.db.get_screenshot_mode(chat_id)
-        font_size = await c.db.get_font_size(chat_id)
+        as_file = await db.is_as_file(chat_id)
+        watermark_text = await db.get_watermark_text(chat_id)
+        sample_duration = await db.get_sample_duration(chat_id)
+        watermark_color_code = await db.get_watermark_color(chat_id)
+        watermark_position = await db.get_watermark_position(chat_id)
+        screenshot_mode = await db.get_screenshot_mode(chat_id)
+        font_size = await db.get_font_size(chat_id)
 
         sv_btn = [
             InlineKeyboardButton("Sample Video Duration", "rj"),

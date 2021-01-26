@@ -5,6 +5,7 @@ from bot.utils import ProcessTypes
 from bot.processes import ProcessFactory
 from bot.screenshotbot import ScreenShotBot
 from bot.messages import Messages as ms
+from bot.config import Config
 
 
 reply_markup_filter = Filters.create(
@@ -15,7 +16,10 @@ reply_markup_filter = Filters.create(
 
 @ScreenShotBot.on_message(Filters.private & Filters.reply & reply_markup_filter)
 async def _(c, m):
-    reply_message = await m.reply_text(ms.ADDED_TO_QUEUE, quote=True)
+    reply_message = await m.reply_text(
+        ms.ADDED_TO_QUEUE.format(per_user_process_count=Config.MAX_PROCESSES_PER_USER),
+        quote=True,
+    )
     if m.reply_to_message.text.startswith("#trim_video"):
         process_type = ProcessTypes.TRIM_VIDEO
     else:

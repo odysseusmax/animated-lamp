@@ -14,7 +14,6 @@ class ScreenShotBot(Client):
             bot_token=Config.BOT_TOKEN,
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
-            workers=20,
             plugins=dict(root="bot/plugins"),
         )
         self.process_pool = Worker()
@@ -30,6 +29,6 @@ class ScreenShotBot(Client):
         print(f"New session started for {me.first_name}({me.username})")
 
     async def stop(self):
-        await self.process_pool.start()
+        await self.process_pool.stop()
         await super().stop()
         print("Session stopped. Bye!!")

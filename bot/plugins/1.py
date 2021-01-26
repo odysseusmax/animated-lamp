@@ -5,6 +5,10 @@ from pyrogram import filters as Filters
 
 from bot.screenshotbot import ScreenShotBot
 from bot.config import Config
+from bot.database import Database
+
+
+db = Database()
 
 
 @ScreenShotBot.on_callback_query()
@@ -21,26 +25,29 @@ async def foo(c, m, cb=False):
     chat_id = m.from_user.id
     if int(time.time()) - c.CHAT_FLOOD[chat_id] < Config.SLOW_SPEED_DELAY:
         if cb:
-            await m.answer()
+            try:
+                await m.answer()
+            except Exception:
+                pass
         return
 
     c.CHAT_FLOOD[chat_id] = int(time.time())
 
-    if not await c.db.is_user_exist(chat_id):
-        await c.db.add_user(chat_id)
+    if not await db.is_user_exist(chat_id):
+        await db.add_user(chat_id)
         await c.send_message(Config.LOG_CHANNEL, f"New User {m.from_user.mention}.")
 
-    ban_status = await c.db.get_ban_status(chat_id)
+    ban_status = await db.get_ban_status(chat_id)
     if ban_status["is_banned"]:
         if (
             datetime.date.today() - datetime.date.fromisoformat(ban_status["banned_on"])
         ).days > ban_status["ban_duration"]:
-            await c.db.remove_ban(chat_id)
+            await db.remove_ban(chat_id)
         else:
             return
 
-    last_used_on = await c.db.get_last_used_on(chat_id)
+    last_used_on = await db.get_last_used_on(chat_id)
     if last_used_on != datetime.date.today().isoformat():
-        await c.db.update_last_used_on(chat_id)
+        await db.update_last_used_on(chat_id)
 
     await m.continue_propagation()

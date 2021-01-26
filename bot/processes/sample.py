@@ -8,6 +8,7 @@ from bot.config import Config
 from bot.utils import Utilities
 from bot.messages import Messages as ms
 from bot.database import Database
+from .exception import BaseException
 from .base import BaseProcess
 
 
@@ -15,21 +16,28 @@ log = logging.getLogger(__name__)
 db = Database()
 
 
-class SampleVideoProcessFailure(Exception):
-    def __init__(self, for_user, for_admin):
-        self.for_user = for_user
-        self.for_admin = for_admin
+class SampleVideoProcessFailure(BaseException):
+    pass
 
 
 class SampleVideoProcess(BaseProcess):
-    async def _get_media_message(self):
-        return self.input_message.message.reply_to_message
+    async def set_media_message(self):
+        self.media_message = self.input_message.message.reply_to_message
+
+    async def cancelled(self):
+        await self.input_message.edit_message_text(ms.PROCESS_TIMEOUT)
 
     async def process(self):
+        async def upload_notify(*args):
+            await self.client.send_chat_action(self.chat_id, "upload_video")
+
+        await self.set_media_message()
         output_folder = Config.VIDEOS_FOLDER.joinpath(self.process_id)
+        thumbnail_folder = Config.THUMB_OP_FLDR.joinpath(self.process_id)
         os.makedirs(output_folder, exist_ok=True)
+        await self.input_message.edit_message_text(ms.PROCESSING_REQUEST)
         try:
-            if self.media_msg.empty:
+            if self.media_message.empty:
                 raise SampleVideoProcessFailure(
                     for_user=ms.MEDIA_MESSAGE_DELETED,
                     for_admin=ms.MEDIA_MESSAGE_DELETED,
@@ -84,7 +92,9 @@ class SampleVideoProcess(BaseProcess):
 
             log.debug(ffmpeg_cmd)
             output = await Utilities.run_subprocess(ffmpeg_cmd)
-            log.debug(output)
+            log.debug(
+                "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
+            )
             if (not sample_file.exists()) or (os.path.getsize(sample_file) == 0):
                 ffmpeg_output = output[0].decode() + "\n" + output[1].decode()
                 log_msg = ms.SAMPLE_VIDEO_PROCESS_FAILED_GENERATION.format(
@@ -97,22 +107,26 @@ class SampleVideoProcess(BaseProcess):
                 )
 
             thumb = await Utilities.generate_thumbnail_file(
-                sample_file, self.process_id
+                sample_file, thumbnail_folder
             )
+            width, height = await Utilities.get_dimentions(sample_file)
             await self.input_message.edit_message_text(
                 text=ms.SAMPLE_VIDEO_PROCESS_SUCCESS
             )
-            await self.media_msg.reply_chat_action("upload_video")
-            await self.media_msg.reply_video(
+            await upload_notify()
+            await self.media_message.reply_video(
                 video=str(sample_file),
                 quote=True,
                 caption=ms.VIDEO_PROCESS_CAPTION.format(
-                    sample_duration=sample_duration,
+                    duration=sample_duration,
                     start=datetime.timedelta(seconds=start_at),
                 ),
                 duration=sample_duration,
                 thumb=thumb,
+                width=width,
+                height=height,
                 supports_streaming=True,
+                progress=upload_notify,
             )
 
             await self.input_message.edit_message_text(
@@ -125,10 +139,11 @@ class SampleVideoProcess(BaseProcess):
         except SampleVideoProcessFailure as e:
             log.error(e)
             await self.input_message.edit_message_text(text=e.for_user)
-            log_msg = await self.media_msg.forward(Config.LOG_CHANNEL)
+            log_msg = await self.media_message.forward(Config.LOG_CHANNEL)
             await log_msg.reply_text(
                 e.for_admin,
                 quote=True,
             )
         finally:
             shutil.rmtree(output_folder, ignore_errors=True)
+            shutil.rmtree(thumbnail_folder, ignore_errors=True)
