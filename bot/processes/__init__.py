@@ -3,6 +3,7 @@ from .sample import SampleVideoProcess
 from .manual_screenshot import ManualScreenshotsProcess
 from .trim import TrimVideoProcess
 from .screenshot import ScreenshotsProcess
+from .mediainfo import MediaInfoProcess
 
 
 class ProcessFactory:
@@ -26,5 +27,7 @@ class ProcessFactory:
             return TrimVideoProcess(self.client, self.input_message, self.reply_message)
         elif self.process_type == ProcessTypes.SCREENSHOTS:
             return ScreenshotsProcess(self.client, self.input_message)
+        elif self.process_type == ProcessTypes.MEDIAINFO:
+            return MediaInfoProcess(self.client, self.input_message)
         else:
             raise NotImplementedError

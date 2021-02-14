@@ -1,7 +1,7 @@
 import time
 import datetime
 
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.screenshotbot import ScreenShotBot
 from bot.config import Config
@@ -16,7 +16,7 @@ async def __(c, m):
     await foo(c, m, cb=True)
 
 
-@ScreenShotBot.on_message(Filters.private)
+@ScreenShotBot.on_message(filters.private)
 async def _(c, m):
     await foo(c, m)
 

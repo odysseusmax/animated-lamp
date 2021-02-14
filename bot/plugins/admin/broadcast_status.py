@@ -1,12 +1,12 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("sts_bdct"))
-    & Filters.user(Config.AUTH_USERS)
+    filters.create(lambda _, __, query: query.data.startswith("sts_bdct"))
+    & filters.user(Config.AUTH_USERS)
 )
 async def sts_broadcast_(c, cb):
 
@@ -19,7 +19,9 @@ async def sts_broadcast_(c, cb):
         return
 
     sts_txt = ""
-    for key, value in c.broadcast_ids[broadcast_id].items():
+    broadcast_handler = c.broadcast_ids[broadcast_id]
+    broadcast_progress = broadcast_handler.get_progress()
+    for key, value in broadcast_progress.items():
         sts_txt += f"{key} = {value}\n"
 
     await cb.answer(

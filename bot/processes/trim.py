@@ -1,6 +1,6 @@
 import os
 import time
-import shutil
+import tempfile
 import logging
 import datetime
 
@@ -38,9 +38,6 @@ class TrimVideoProcess(BaseProcess):
             await self.client.send_chat_action(self.chat_id, "upload_video")
 
         await self.set_media_message()
-        output_folder = Config.VIDEOS_FOLDER.joinpath(self.process_id)
-        thumbnail_folder = Config.THUMB_OP_FLDR.joinpath(self.process_id)
-        os.makedirs(output_folder, exist_ok=True)
         await self.reply_message.edit_text(ms.PROCESSING_REQUEST)
         try:
             if self.media_message.empty:
@@ -105,76 +102,80 @@ class TrimVideoProcess(BaseProcess):
                 self.chat_id,
             )
 
-            trim_video_file = output_folder.joinpath("trim_video.mkv")
-            subtitle_option = await Utilities.fix_subtitle_codec(self.file_link)
+            temp_output_folder = tempfile.TemporaryDirectory()
+            temp_thumbnail_folder = tempfile.TemporaryDirectory()
+            with temp_output_folder as output_folder, temp_thumbnail_folder as thumbnail_folder:
+                trim_video_file = os.path.join(output_folder, "trim_video.mkv")
+                subtitle_option = await Utilities.fix_subtitle_codec(self.file_link)
 
-            ffmpeg_cmd = [
-                "ffmpeg",
-                "-headers",
-                f"IAM:{Config.IAM_HEADER}",
-                "-hide_banner",
-                "-ss",
-                str(start),
-                "-i",
-                self.file_link,
-                "-t",
-                str(request_duration),
-                "-map",
-                "0",
-                "-c",
-                "copy",
-                str(trim_video_file),
-            ]
-            for option in subtitle_option:
-                ffmpeg_cmd.insert(-1, option)
+                ffmpeg_cmd = [
+                    "ffmpeg",
+                    "-headers",
+                    f"IAM:{Config.IAM_HEADER}",
+                    "-hide_banner",
+                    "-ss",
+                    str(start),
+                    "-i",
+                    self.file_link,
+                    "-t",
+                    str(request_duration),
+                    "-map",
+                    "0",
+                    "-c",
+                    "copy",
+                    trim_video_file,
+                ]
+                for option in subtitle_option:
+                    ffmpeg_cmd.insert(-1, option)
 
-            log.debug(ffmpeg_cmd)
-            output = await Utilities.run_subprocess(ffmpeg_cmd)
-            log.debug(
-                "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
-            )
-
-            if (not trim_video_file.exists()) or (
-                os.path.getsize(trim_video_file) == 0
-            ):
-                ffmpeg_output = output[0].decode() + "\n" + output[1].decode()
-                raise TrimVideoProcessFailure(
-                    for_user=ms.TRIM_VIDEO_PROCESS_FAILED,
-                    for_admin=ms.TRIM_VIDEO_PROCESS_FAILED_GENERATION.format(
-                        file_link=self.file_link,
-                        start=start,
-                        end=end,
-                        ffmpeg_output=ffmpeg_output,
-                    ),
+                log.debug(ffmpeg_cmd)
+                output = await Utilities.run_subprocess(ffmpeg_cmd)
+                log.debug(
+                    "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
                 )
 
-            thumb = await Utilities.generate_thumbnail_file(
-                trim_video_file, thumbnail_folder
-            )
-            width, height = await Utilities.get_dimentions(trim_video_file)
-            await self.reply_message.edit_text(ms.TRIM_VIDEO_PROCESS_SUCCESS)
-            await upload_notify()
-            await self.media_message.reply_video(
-                video=str(trim_video_file),
-                quote=True,
-                caption=ms.VIDEO_PROCESS_CAPTION.format(
-                    duration=request_duration, start=datetime.timedelta(seconds=start)
-                ),
-                duration=request_duration,
-                width=width,
-                height=height,
-                thumb=thumb,
-                supports_streaming=True,
-                progress=upload_notify,
-            )
+                if (not os.path.exists(trim_video_file)) or (
+                    os.path.getsize(trim_video_file) == 0
+                ):
+                    ffmpeg_output = output[0].decode() + "\n" + output[1].decode()
+                    raise TrimVideoProcessFailure(
+                        for_user=ms.TRIM_VIDEO_PROCESS_FAILED,
+                        for_admin=ms.TRIM_VIDEO_PROCESS_FAILED_GENERATION.format(
+                            file_link=self.file_link,
+                            start=start,
+                            end=end,
+                            ffmpeg_output=ffmpeg_output,
+                        ),
+                    )
 
-            await self.reply_message.edit_text(
-                ms.PROCESS_UPLOAD_CONFIRM.format(
-                    total_process_duration=datetime.timedelta(
-                        seconds=int(time.time() - start_time)
+                thumb = await Utilities.generate_thumbnail_file(
+                    trim_video_file, thumbnail_folder
+                )
+                width, height = await Utilities.get_dimentions(trim_video_file)
+                await self.reply_message.edit_text(ms.TRIM_VIDEO_PROCESS_SUCCESS)
+                await upload_notify()
+                await self.media_message.reply_video(
+                    video=str(trim_video_file),
+                    quote=True,
+                    caption=ms.VIDEO_PROCESS_CAPTION.format(
+                        duration=request_duration,
+                        start=datetime.timedelta(seconds=start),
+                    ),
+                    duration=request_duration,
+                    width=width,
+                    height=height,
+                    thumb=thumb,
+                    supports_streaming=True,
+                    progress=upload_notify,
+                )
+
+                await self.reply_message.edit_text(
+                    ms.PROCESS_UPLOAD_CONFIRM.format(
+                        total_process_duration=datetime.timedelta(
+                            seconds=int(time.time() - start_time)
+                        )
                     )
                 )
-            )
         except TrimVideoProcessFailure as e:
             log.error(e)
             await self.reply_message.edit_text(text=e.for_user)
@@ -183,6 +184,3 @@ class TrimVideoProcess(BaseProcess):
                 e.for_admin,
                 quote=True,
             )
-        finally:
-            shutil.rmtree(output_folder, ignore_errors=True)
-            shutil.rmtree(thumbnail_folder, ignore_errors=True)

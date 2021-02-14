@@ -1,6 +1,6 @@
 import io
 
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.database import Database
@@ -11,7 +11,7 @@ db = Database()
 
 
 @ScreenShotBot.on_message(
-    Filters.private & Filters.command("banned_users") & Filters.user(Config.AUTH_USERS)
+    filters.private & filters.command("banned_users") & filters.user(Config.AUTH_USERS)
 )
 async def _banned_usrs(c, m):
     all_banned_users = await db.get_all_banned_users()

@@ -1,4 +1,4 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.screenshotbot import ScreenShotBot
 from bot.database import Database
@@ -7,7 +7,7 @@ from bot.database import Database
 db = Database()
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.command("set_watermark"))
+@ScreenShotBot.on_message(filters.private & filters.command("set_watermark"))
 async def _(c, m):
 
     if len(m.command) == 1:

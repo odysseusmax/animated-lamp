@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from uuid import uuid4
 
 from bot.config import Config
 from bot.messages import Messages as ms
@@ -14,7 +13,6 @@ class BaseProcess(ABC):
 
         self._file_link = None
         self._media_message = None
-        self.process_id = str(uuid4())
 
     @property
     def file_link(self):

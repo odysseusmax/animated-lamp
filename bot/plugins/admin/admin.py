@@ -1,11 +1,11 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_message(
-    Filters.private & Filters.command("admin") & Filters.user(Config.AUTH_USERS)
+    filters.private & filters.command("admin") & filters.user(Config.AUTH_USERS)
 )
 async def admin(c, m):
 

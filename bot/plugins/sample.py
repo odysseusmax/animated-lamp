@@ -1,4 +1,4 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.utils import ProcessTypes
 from bot.screenshotbot import ScreenShotBot
@@ -8,7 +8,7 @@ from bot.config import Config
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("smpl"))
+    filters.create(lambda _, __, query: query.data.startswith("smpl"))
 )
 async def _(c, m):
     # c.process_pool.new_task(Utilities().sample_fn(c, m))

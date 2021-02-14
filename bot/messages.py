@@ -81,3 +81,5 @@ class Messages:
         "stream link : {file_link}\n\n{num_screenshots} screenshots where requested "
         "and Screen shots where not generated."
     )
+
+    MEDIAINFO_START = "Finding the media info, media info will be send here shortly!"

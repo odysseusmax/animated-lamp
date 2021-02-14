@@ -1,11 +1,11 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 from pyrogram.types import ForceReply
 
 from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("mscht"))
+    filters.create(lambda _, __, query: query.data.startswith("mscht"))
 )
 async def _(c, m):
     await m.answer()

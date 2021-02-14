@@ -1,4 +1,4 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.screenshotbot import ScreenShotBot
 from bot.utils import Utilities
@@ -10,7 +10,7 @@ db = Database()
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("set"))
+    filters.create(lambda _, __, query: query.data.startswith("set"))
 )
 async def settings_cb(c, m):
     try:
@@ -81,7 +81,7 @@ async def settings_cb(c, m):
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("rj"))
+    filters.create(lambda _, __, query: query.data.startswith("rj"))
 )
 async def _(c, m):
     await m.answer("😂 press the other button 😂")
