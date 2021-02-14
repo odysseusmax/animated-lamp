@@ -1,12 +1,12 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
 
 
 @ScreenShotBot.on_callback_query(
-    Filters.create(lambda _, __, query: query.data.startswith("cncl_bdct"))
-    & Filters.user(Config.AUTH_USERS)
+    filters.create(lambda _, __, query: query.data.startswith("cncl_bdct"))
+    & filters.user(Config.AUTH_USERS)
 )
 async def cncl_broadcast_(c, cb):
 
@@ -18,6 +18,7 @@ async def cncl_broadcast_(c, cb):
         )
         return
 
-    c.broadcast_ids.pop(broadcast_id)
+    broadcast_handler = c.broadcast_ids[broadcast_id]
+    broadcast_handler.cancel()
 
     await cb.answer(text="Broadcast will be canceled soon.", show_alert=True)

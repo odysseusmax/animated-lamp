@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.screenshotbot import ScreenShotBot
@@ -13,7 +13,7 @@ db = Database()
 
 
 @ScreenShotBot.on_message(
-    Filters.private & Filters.command("ban_user") & Filters.user(Config.AUTH_USERS)
+    filters.private & filters.command("ban_user") & filters.user(Config.AUTH_USERS)
 )
 async def ban(c, m):
 
@@ -30,7 +30,7 @@ async def ban(c, m):
         user_id = int(m.command[1])
         ban_duration = int(m.command[2])
         ban_reason = " ".join(m.command[3:])
-        ban_log_text = f"Banning user {user_id} for {ban_duration} days for the reason {ban_reason}."
+        ban_log_text = f"Banning user {user_id} for {ban_duration} day(s) for the reason {ban_reason}."
 
         try:
             await c.send_message(

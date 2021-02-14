@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 
 class Config:
@@ -21,9 +20,6 @@ class Config:
     WORKER_COUNT = int(os.environ.get("WORKER_COUNT", 20))
     IAM_HEADER = os.environ.get("IAM_HEADER", "")
 
-    SCREENSHOTS_FOLDER = Path("screenshots/")
-    VIDEOS_FOLDER = Path("videos/")
-    THUMB_OP_FLDR = Path("thumbnails/")
     COLORS = [
         "white",
         "black",

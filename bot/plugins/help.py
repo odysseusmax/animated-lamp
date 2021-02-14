@@ -1,10 +1,11 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.screenshotbot import ScreenShotBot
+from bot.config import Config
 
 
 HELP_TEXT = """
-Hi {}. Welcome to Screenshot Generator Bot. You can use me to generate:
+Hi {mention}. Welcome to Screenshot Generator Bot. You can use me to generate:
 
     1. Screenshots.
     2. Sample Video.
@@ -22,10 +23,24 @@ Use /set_watermark to set custom watermarks to your screenshots.
 👉 If the bot dosen't respond to telegram files you forward, first check /start and --confirm bot is alive--. Then make sure the file is a **video file** which satisfies above mentioned conditions.
 👉 If bot replies __😟 Sorry! I cannot open the file.__, the file might be --currupted-- or --is malformatted--.
 
-__If issues persists contact my father.__"""
+__If issues persists contact my father.__
+
+{admin_notification}
+"""
+ADMIN_NOTIFICATION_TEXT = (
+    "Since you are one of the admins, you can check /admin to view the admin commands."
+)
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.command("help"))
+@ScreenShotBot.on_message(filters.private & filters.command("help"))
 async def help_(c, m):
 
-    await m.reply_text(text=HELP_TEXT.format(m.from_user.mention), quote=True)
+    await m.reply_text(
+        text=HELP_TEXT.format(
+            mention=m.from_user.mention,
+            admin_notification=ADMIN_NOTIFICATION_TEXT
+            if m.from_user.id in Config.AUTH_USERS
+            else "",
+        ),
+        quote=True,
+    )

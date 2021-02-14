@@ -1,9 +1,9 @@
-import os
 import io
+import os
 import time
 import math
-import shutil
 import logging
+import tempfile
 import datetime
 
 from pyrogram.types import InputMediaPhoto, InputMediaDocument
@@ -41,8 +41,6 @@ class ManualScreenshotsProcess(BaseProcess):
 
     async def process(self):
         await self.set_media_message()
-        output_folder = Config.SCREENSHOTS_FOLDER.joinpath(self.process_id)
-        os.makedirs(output_folder, exist_ok=True)
         await self.reply_message.edit_text(ms.PROCESSING_REQUEST)
         try:
             if self.media_message.empty:
@@ -153,65 +151,70 @@ class ManualScreenshotsProcess(BaseProcess):
                 self.chat_id,
             )
 
-            for i, sec in enumerate(valid_positions):
-                thumbnail_template = output_folder.joinpath(f"{i+1}.png")
-                ffmpeg_cmd[5] = str(sec)
-                ffmpeg_cmd[-1] = str(thumbnail_template)
-                log.debug(ffmpeg_cmd)
-                output = await Utilities.run_subprocess(ffmpeg_cmd)
-                log.debug(
-                    "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
-                )
-                await self.reply_message.edit_text(
-                    ms.SCREENSHOTS_PROGRESS.format(
-                        current=i + 1, total=len(valid_positions)
+            with tempfile.TemporaryDirectory() as output_folder:
+                for i, sec in enumerate(valid_positions):
+                    thumbnail_file = os.path.join(output_folder, f"{i+1}.png")
+                    ffmpeg_cmd[5] = str(sec)
+                    ffmpeg_cmd[-1] = thumbnail_file
+                    log.debug(ffmpeg_cmd)
+                    output = await Utilities.run_subprocess(ffmpeg_cmd)
+                    log.debug(
+                        "FFmpeg output\n %s \n %s",
+                        output[0].decode(),
+                        output[1].decode(),
                     )
-                )
-                if thumbnail_template.exists():
-                    if as_file:
-                        InputMedia = InputMediaDocument
-                    else:
-                        InputMedia = InputMediaPhoto
-                    screenshots.append(
-                        InputMedia(
-                            str(thumbnail_template),
-                            caption=ms.SCREENSHOT_AT.format(
-                                time=datetime.timedelta(seconds=sec)
-                            ),
+                    await self.reply_message.edit_text(
+                        ms.SCREENSHOTS_PROGRESS.format(
+                            current=i + 1, total=len(valid_positions)
                         )
                     )
-                    continue
+                    if os.path.exists(thumbnail_file):
+                        if as_file:
+                            InputMedia = InputMediaDocument
+                        else:
+                            InputMedia = InputMediaPhoto
+                        screenshots.append(
+                            InputMedia(
+                                thumbnail_file,
+                                caption=ms.SCREENSHOT_AT.format(
+                                    time=datetime.timedelta(seconds=sec)
+                                ),
+                            )
+                        )
+                        continue
 
-                ffmpeg_errors += output[0].decode() + "\n" + output[1].decode() + "\n\n"
+                    ffmpeg_errors += (
+                        output[0].decode() + "\n" + output[1].decode() + "\n\n"
+                    )
 
-            if not screenshots:
-                error_file = None
-                if ffmpeg_errors:
-                    error_file = io.BytesIO()
-                    error_file.name = f"{self.process_id}-errors.txt"
-                    error_file.write(ffmpeg_errors.encode())
-                raise ManualScreenshotsProcessFailure(
-                    for_user=ms.SCREENSHOT_PROCESS_FAILED,
-                    for_admin=ms.MANUAL_SCREENSHOTS_FAILED_GENERATION.format(
-                        file_link=self.file_link, raw_user_input=raw_user_input
-                    ),
-                    extra_details=error_file,
-                )
+                if not screenshots:
+                    error_file = None
+                    if ffmpeg_errors:
+                        error_file = io.BytesIO()
+                        error_file.name = "errors.txt"
+                        error_file.write(ffmpeg_errors.encode())
+                    raise ManualScreenshotsProcessFailure(
+                        for_user=ms.SCREENSHOT_PROCESS_FAILED,
+                        for_admin=ms.MANUAL_SCREENSHOTS_FAILED_GENERATION.format(
+                            file_link=self.file_link, raw_user_input=raw_user_input
+                        ),
+                        extra_details=error_file,
+                    )
 
-            await self.reply_message.edit_text(
-                text=ms.SCREENSHOT_PROCESS_SUCCESS.format(
-                    count=len(valid_positions), total_count=len(screenshots)
-                )
-            )
-            await self.media_message.reply_chat_action("upload_video")
-            await self.media_message.reply_media_group(screenshots, True)
-            await self.reply_message.edit_text(
-                ms.PROCESS_UPLOAD_CONFIRM.format(
-                    total_process_duration=datetime.timedelta(
-                        seconds=int(time.time() - start_time)
+                await self.reply_message.edit_text(
+                    text=ms.SCREENSHOT_PROCESS_SUCCESS.format(
+                        count=len(valid_positions), total_count=len(screenshots)
                     )
                 )
-            )
+                await self.media_message.reply_chat_action("upload_video")
+                await self.media_message.reply_media_group(screenshots, True)
+                await self.reply_message.edit_text(
+                    ms.PROCESS_UPLOAD_CONFIRM.format(
+                        total_process_duration=datetime.timedelta(
+                            seconds=int(time.time() - start_time)
+                        )
+                    )
+                )
         except ManualScreenshotsProcessFailure as e:
             log.error(e)
             await self.reply_message.edit_text(e.for_user)
@@ -225,5 +228,3 @@ class ManualScreenshotsProcess(BaseProcess):
                     text=e.for_admin,
                     quote=True,
                 )
-        finally:
-            shutil.rmtree(output_folder, ignore_errors=True)

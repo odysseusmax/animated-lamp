@@ -17,6 +17,7 @@ class ProcessTypes:
     TRIM_VIDEO = 2
     MANNUAL_SCREENSHOTS = 3
     SCREENSHOTS = 4
+    MEDIAINFO = 5
 
 
 class Utilities:
@@ -51,7 +52,7 @@ class Utilities:
     @staticmethod
     async def generate_thumbnail_file(file_path, output_folder):
         os.makedirs(output_folder, exist_ok=True)
-        thumb_file = output_folder.joinpath("thumb.jpg")
+        thumb_file = os.path.join(output_folder, "thumb.jpg")
         ffmpeg_cmd = [
             "ffmpeg",
             "-ss",
@@ -67,7 +68,7 @@ class Utilities:
         ]
         output = await Utilities.run_subprocess(ffmpeg_cmd)
         log.debug(output)
-        if not thumb_file.exists():
+        if not os.path.exists(thumb_file):
             return None
         return thumb_file
 

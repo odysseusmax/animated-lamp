@@ -1,4 +1,4 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 from pyrogram.types import ForceReply
 
 from bot.utils import ProcessTypes
@@ -8,13 +8,13 @@ from bot.messages import Messages as ms
 from bot.config import Config
 
 
-reply_markup_filter = Filters.create(
+reply_markup_filter = filters.create(
     lambda _, __, message: message.reply_to_message.reply_markup
     and isinstance(message.reply_to_message.reply_markup, ForceReply)
 )
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.reply & reply_markup_filter)
+@ScreenShotBot.on_message(filters.private & filters.reply & reply_markup_filter)
 async def _(c, m):
     reply_message = await m.reply_text(
         ms.ADDED_TO_QUEUE.format(per_user_process_count=Config.MAX_PROCESSES_PER_USER),

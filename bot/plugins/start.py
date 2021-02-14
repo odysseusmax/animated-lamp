@@ -1,10 +1,10 @@
-from pyrogram import filters as Filters
+from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..screenshotbot import ScreenShotBot
 
 
-@ScreenShotBot.on_message(Filters.private & Filters.command("start"))
+@ScreenShotBot.on_message(filters.private & filters.command("start"))
 async def start(c, m):
 
     await m.reply_text(

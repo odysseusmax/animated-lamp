@@ -11,6 +11,10 @@ from bot.config import Config
 logger = logging.getLogger(__name__)
 
 
+class TooMuchProcess(Exception):
+    pass
+
+
 class Worker:
     def __init__(self):
         self.worker_count = Config.WORKER_COUNT
@@ -34,6 +38,9 @@ class Worker:
 
     @asynccontextmanager
     async def count_user_process(self, chat_id):
+        if self.user_process_count[chat_id] >= Config.MAX_PROCESSES_PER_USER:
+            raise TooMuchProcess
+
         self.user_process_count[chat_id] += 1
         try:
             yield
@@ -48,17 +55,18 @@ class Worker:
                     break
 
                 chat_id, process_factory = task
-                if self.user_process_count[chat_id] >= Config.MAX_PROCESSES_PER_USER:
-                    await asyncio.sleep(10)
-                    self.new_task((chat_id, process_factory))
-                    continue
-
                 handler = process_factory.get_handler()
                 try:
-                    async with self.count_user_process(chat_id), timeout(Config.TIMEOUT):
+                    async with self.count_user_process(chat_id), timeout(
+                        Config.TIMEOUT
+                    ):
                         await handler.process()
                 except (asyncio.TimeoutError, asyncio.CancelledError):
                     await handler.cancelled()
+                except TooMuchProcess:
+                    await asyncio.sleep(10)
+                    self.new_task((chat_id, process_factory))
+
             except Exception as e:
                 logger.error(e, exc_info=True)
             finally:

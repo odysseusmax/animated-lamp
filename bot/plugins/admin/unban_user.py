@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from pyrogram import filters as Filters
+from pyrogram import filters
 
 from bot.config import Config
 from bot.database import Database
@@ -13,7 +13,7 @@ db = Database()
 
 
 @ScreenShotBot.on_message(
-    Filters.private & Filters.command("unban_user") & Filters.user(Config.AUTH_USERS)
+    filters.private & filters.command("unban_user") & filters.user(Config.AUTH_USERS)
 )
 async def unban(c, m):
     if len(m.command) == 1:
