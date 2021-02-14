@@ -1,5 +1,8 @@
 class Messages:
-    ADDED_TO_QUEUE = "Your request has been added to the queue"
+    ADDED_TO_QUEUE = (
+        "Your request has been added to the queue. If you have more than {per_user_process_count} "
+        "ongoing processes, then this process will only start after one of them finishes."
+    )
     MEDIA_MESSAGE_DELETED = "Why did you delete the file 😠, Now i cannot help you 😒."
     CANNOT_OPEN_FILE = "😟 Sorry! I cannot open the file."
     PROCESS_TIMEOUT = (
@@ -20,7 +23,7 @@ class Messages:
         "If You find me helpful, please rate me [here](tg://resolve?domain=botsarchive&post=1206)."
     )
     WRONG_FORMAT = "Please follow the specified format"
-    VIDEO_PROCESS_CAPTION = "Sample video. {sample_duration}s from {start}"
+    VIDEO_PROCESS_CAPTION = "Sample video. {duration}s from {start}"
     SCREENSHOTS_START = "😀 Generating screenshots!."
 
     SAMPLE_VIDEO_PROCESS_START = "😀 Generating Sample Video! This might take some time."

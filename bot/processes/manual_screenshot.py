@@ -13,17 +13,15 @@ from bot.utils import Utilities
 from bot.messages import Messages as ms
 from bot.database import Database
 from .base import BaseProcess
+from .exception import BaseException
 
 
 log = logging.getLogger(__name__)
 db = Database()
 
 
-class ManualScreenshotsProcessFailure(Exception):
-    def __init__(self, for_user, for_admin, extra_details=None):
-        self.for_user = for_user
-        self.for_admin = for_admin
-        self.extra_details = extra_details
+class ManualScreenshotsProcessFailure(BaseException):
+    pass
 
 
 class ManualScreenshotsProcess(BaseProcess):
@@ -31,19 +29,23 @@ class ManualScreenshotsProcess(BaseProcess):
         super().__init__(client, input_message)
         self.reply_message = reply_message
 
-    async def _get_media_message(self):
+    async def set_media_message(self):
         message = await self.client.get_messages(
             self.chat_id, self.input_message.reply_to_message.message_id
         )
         await self.input_message.reply_to_message.delete()
-        return message.reply_to_message
+        self.media_message = message.reply_to_message
+
+    async def cancelled(self):
+        await self.reply_message.edit_text(ms.PROCESS_TIMEOUT)
 
     async def process(self):
+        await self.set_media_message()
         output_folder = Config.SCREENSHOTS_FOLDER.joinpath(self.process_id)
         os.makedirs(output_folder, exist_ok=True)
-        await self.reply_message.edit_text(ms.PROCESSING_REQUEST, quote=True)
+        await self.reply_message.edit_text(ms.PROCESSING_REQUEST)
         try:
-            if self.media_msg.empty:
+            if self.media_message.empty:
                 raise ManualScreenshotsProcessFailure(
                     for_user=ms.MEDIA_MESSAGE_DELETED,
                     for_admin=ms.MEDIA_MESSAGE_DELETED,
@@ -74,7 +76,7 @@ class ManualScreenshotsProcess(BaseProcess):
             valid_positions = []
             invalid_positions = []
             for pos in raw_user_input:
-                if 0 < pos < duration:
+                if 0 > pos > duration:
                     invalid_positions.append(str(pos))
                 else:
                     valid_positions.append(pos)
@@ -157,7 +159,9 @@ class ManualScreenshotsProcess(BaseProcess):
                 ffmpeg_cmd[-1] = str(thumbnail_template)
                 log.debug(ffmpeg_cmd)
                 output = await Utilities.run_subprocess(ffmpeg_cmd)
-                log.debug(output)
+                log.debug(
+                    "FFmpeg output\n %s \n %s", output[0].decode(), output[1].decode()
+                )
                 await self.reply_message.edit_text(
                     ms.SCREENSHOTS_PROGRESS.format(
                         current=i + 1, total=len(valid_positions)
@@ -165,23 +169,17 @@ class ManualScreenshotsProcess(BaseProcess):
                 )
                 if thumbnail_template.exists():
                     if as_file:
-                        screenshots.append(
-                            InputMediaDocument(
-                                str(thumbnail_template),
-                                caption=ms.SCREENSHOT_AT.format(
-                                    time=datetime.timedelta(seconds=sec)
-                                ),
-                            )
-                        )
+                        InputMedia = InputMediaDocument
                     else:
-                        screenshots.append(
-                            InputMediaPhoto(
-                                str(thumbnail_template),
-                                caption=ms.SCREENSHOT_AT.format(
-                                    time=datetime.timedelta(seconds=sec)
-                                ),
-                            )
+                        InputMedia = InputMediaPhoto
+                    screenshots.append(
+                        InputMedia(
+                            str(thumbnail_template),
+                            caption=ms.SCREENSHOT_AT.format(
+                                time=datetime.timedelta(seconds=sec)
+                            ),
                         )
+                    )
                     continue
 
                 ffmpeg_errors += output[0].decode() + "\n" + output[1].decode() + "\n\n"
@@ -205,8 +203,8 @@ class ManualScreenshotsProcess(BaseProcess):
                     count=len(valid_positions), total_count=len(screenshots)
                 )
             )
-            await self.media_msg.reply_chat_action("upload_photo")
-            await self.media_msg.reply_media_group(screenshots, True)
+            await self.media_message.reply_chat_action("upload_video")
+            await self.media_message.reply_media_group(screenshots, True)
             await self.reply_message.edit_text(
                 ms.PROCESS_UPLOAD_CONFIRM.format(
                     total_process_duration=datetime.timedelta(
@@ -217,7 +215,7 @@ class ManualScreenshotsProcess(BaseProcess):
         except ManualScreenshotsProcessFailure as e:
             log.error(e)
             await self.reply_message.edit_text(e.for_user)
-            log_msg = await self.media_msg.forward(Config.LOG_CHANNEL)
+            log_msg = await self.media_message.forward(Config.LOG_CHANNEL)
             if e.extra_details:
                 await log_msg.reply_document(
                     document=e.extra_details, quote=True, caption=e.for_admin

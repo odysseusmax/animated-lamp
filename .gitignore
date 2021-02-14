@@ -3,5 +3,6 @@ __pycache__/
 *.session
 cconfig.py
 screenshots/
-samples/
+videos/
 thumbnails/
+*.sh

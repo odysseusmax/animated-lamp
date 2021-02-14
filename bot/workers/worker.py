@@ -54,8 +54,11 @@ class Worker:
                     continue
 
                 handler = process_factory.get_handler()
-                async with self.count_user_process(chat_id, timeout(Config.TIMEOUT)):
-                    await handler.process()
+                try:
+                    async with self.count_user_process(chat_id), timeout(Config.TIMEOUT):
+                        await handler.process()
+                except (asyncio.TimeoutError, asyncio.CancelledError):
+                    await handler.cancelled()
             except Exception as e:
                 logger.error(e, exc_info=True)
             finally:

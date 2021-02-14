@@ -1,6 +1,10 @@
 from pyrogram import filters as Filters
 
-from ..screenshotbot import ScreenShotBot
+from bot.screenshotbot import ScreenShotBot
+from bot.database import Database
+
+
+db = Database()
 
 
 @ScreenShotBot.on_message(Filters.private & Filters.command("set_watermark"))
@@ -25,7 +29,7 @@ async def _(c, m):
         )
         return
 
-    await c.db.update_watermark_text(m.chat.id, watermark_text)
+    await db.update_watermark_text(m.chat.id, watermark_text)
     await m.reply_text(
         text=f"You have successfully set __{watermark_text}__ as your watermark text. From now on this will "
         "be applied to your screenshots! To remove watermark text see /settings.",
