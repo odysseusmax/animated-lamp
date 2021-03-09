@@ -132,14 +132,14 @@ class Database(metaclass=Singleton):
         await self.col.update_one({"id": id}, {"$set": {"ban_status": ban_status}})
 
     async def ban_user(self, user_id, ban_duration, ban_reason):
-        await self.get_user(id)
+        await self.get_user(user_id)
         ban_status = dict(
             is_banned=True,
             ban_duration=ban_duration,
             banned_on=datetime.date.today().isoformat(),
             ban_reason=ban_reason,
         )
-        self.cache[id]["ban_status"] = ban_status
+        self.cache[user_id]["ban_status"] = ban_status
         await self.col.update_one({"id": user_id}, {"$set": {"ban_status": ban_status}})
 
     async def get_watermark_text(self, id):
