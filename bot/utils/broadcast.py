@@ -100,7 +100,7 @@ class Broadcast:
                 text=update_text,
             )
         else:
-            await self.client.send_message(
+            await self.client.send_document(
                 chat_id=Config.LOG_CHANNEL,
                 document=log_file,
                 caption=update_text,
