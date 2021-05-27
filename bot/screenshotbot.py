@@ -72,7 +72,7 @@ class ScreenShotBot(Client):
                     chat_id=admin_id,
                     text="Broadcast started. Use the buttons to check the progress or to cancel the broadcast.",
                     reply_to_message_id=broadcast_message.message_id,
-                    reply_markup=InlineKeyboardMarkup(
+                    reply_markup=InlineKeyboardMarkup([
                         [
                             InlineKeyboardButton(
                                 text="Check Progress",
@@ -83,7 +83,7 @@ class ScreenShotBot(Client):
                                 callback_data=f"cncl_bdct+{broadcast_id}",
                             ),
                         ]
-                    ),
+                    ]),
                 )
 
                 await broadcast_handler.start()
