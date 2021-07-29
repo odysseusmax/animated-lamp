@@ -22,6 +22,17 @@ class ProcessTypes:
 
 class Utilities:
     @staticmethod
+    def TimeFormatter(seconds: int) -> str:
+        minutes, seconds = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+        formatted_txt = f"{days} days, " if days else ""
+        formatted_txt += f"{hours} hrs, " if hours else ""
+        formatted_txt += f"{minutes} min, " if minutes else ""
+        formatted_txt += f"{seconds} sec, " if seconds else ""
+        return formatted_txt[:-2]
+
+    @staticmethod
     def is_valid_file(msg):
         if not msg.media:
             return False
