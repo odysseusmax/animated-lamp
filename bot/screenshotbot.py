@@ -73,7 +73,7 @@ class ScreenShotBot(Client):
                     text="Broadcast started. Use the buttons to check the progress or to cancel the broadcast.",
                     reply_to_message_id=broadcast_message.message_id,
                     reply_markup=InlineKeyboardMarkup(
-                        [
+                        [[
                             InlineKeyboardButton(
                                 text="Check Progress",
                                 callback_data=f"sts_bdct+{broadcast_id}",
@@ -82,7 +82,7 @@ class ScreenShotBot(Client):
                                 text="Cancel!",
                                 callback_data=f"cncl_bdct+{broadcast_id}",
                             ),
-                        ]
+                        ]]
                     ),
                 )
 
