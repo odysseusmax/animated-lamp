@@ -2,7 +2,7 @@ import time
 import datetime
 
 from pyrogram import filters
-from ..utils.utils import Utilities
+from bot.utils import Utilities
 from bot.screenshotbot import ScreenShotBot
 from bot.config import Config
 from bot.database import Database
