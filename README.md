@@ -13,7 +13,7 @@ Since i had removed host bot will download the entire file and then generate scr
 An attempt to implement the screenshot generation of telegram files. Live version can be found here [@Screenshot_NsBot](https://t.me/Screenshot_NsBot "Screenshot Generator Bot").
 
 ## Installation Guide
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/Ns-AnoNymouS/animated-lamp/tree/Heroku-Support)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/Ns-AnoNymouS/animated-lamp)
 
 ### Prerequisites
 
