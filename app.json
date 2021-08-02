@@ -6,10 +6,9 @@
    "telegram",
    "Screenshot",
    "Sample video",
-   "Trim Video",
-   "without downloading the entire file"
+   "Trim Video"
   ],
-  "repository": "https://github.com/TGExplore/Screenshot-Bot",
+  "repository": "https://github.com/Ns-AnoNymouS/animated-lamp",
   "env": {
     "API_ID": {
       "description": "Your Telegram API ID. Get this value from my.telegram.org!",
@@ -39,10 +38,6 @@
       "description": "Authorised user(s) id separated by space.",
       "value": ""
     },
-    "HOST": {
-      "description": "Public URL of streaming service (https://github.com/TGExplore/musical-waddle)",
-      "value": ""
-    },
     "MAX_PROCESSES_PER_USER": {
       "description": "Number of parallel processes each user can have, defaults to 2.",
       "value": "2",
@@ -58,10 +53,23 @@
       "required": false
     },
     "SLOW_SPEED_DELAY": {
-      "description": "Delay required between each request. Defaults to 15s.",
-      "value": "15",
+      "description": "Delay required between each request. Defaults to 5s.",
+      "value": "5",
       "required": false
-    } 
+    },
+    "TIMEOUT": {
+      "description": "Maximum time alloted to each process in seconds, after which process will be cancelled. Defaults to 1800s(30 mins)",
+      "value": "1800",
+      "required": false
+    },
+    "DEBUG": {
+      "description": "Set some value to use DEBUG logging level. INFO by default",
+      "required": false
+    },
+    "WORKER_COUNT": {
+      "description": "Maximum number of processes should bot handle at a time to control overload on bot default value is 20.",
+      "required": false
+    },
   },
   "addons": [
   ],
