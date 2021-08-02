@@ -49,6 +49,7 @@ async def foo(c, m, cb=False):
             except:
                 pass
 
+
     if not await db.is_user_exist(chat_id):
         await db.add_user(chat_id)
         await c.send_message(Config.LOG_CHANNEL, f"New User {m.from_user.mention}.")
