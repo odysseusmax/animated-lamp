@@ -27,20 +27,27 @@ async def foo(c, m, cb=False):
     if consumed_time < Config.SLOW_SPEED_DELAY:
         wait_time = Config.SLOW_SPEED_DELAY - consumed_time
         text = f"⏱ Please wait {Utilities.TimeFormatter(seconds=wait_time)}, "
-        text += f"there is a delay of {Utilities.TimeFormatter(seconds=Config.SLOW_SPEED_DELAY)} b/w "
+        text += f"there is a delay of {Utilities.TimeFormatter(seconds=Config.SLOW_SPEED_DELAY)} between "
         text += "requests to reduce overload. \n\nSo kindly please cooperate with us."
 
-        if cb:
-            if not m.data.startswisth("set"):
-                try:
-                    c.CHAT_FLOOD[chat_id] = int(time.time())
+    if cb:
+        if not m.data.startswith("set") and m.data not in ['home', 'help', 'close']:
+            try:
+                if consumed_time < Config.SLOW_SPEED_DELAY:
                     return await m.answer(text, show_alert=True)
-                except:
-                    pass
-        else:
-            if not m.text and not m.text.startswith("/"):
-                c.CHAT_FLOOD[chat_id] = int(time.time())
-                return await m.reply_text(text, quote=True)
+                else:
+                    c.CHAT_FLOOD[chat_id] = int(time.time())
+            except:
+                pass
+    else:
+        if (m.text and not m.text.startswith("/")) or (m.caption):
+            try:
+                if consumed_time < Config.SLOW_SPEED_DELAY:
+                    return await m.reply_text(text, quote=True)
+                else:
+                    c.CHAT_FLOOD[chat_id] = int(time.time())
+            except:
+                pass
 
     if not await db.is_user_exist(chat_id):
         await db.add_user(chat_id)
