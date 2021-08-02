@@ -16,7 +16,7 @@ An attempt to implement the screenshot generation of telegram files. Live versio
 > The heroku not accepting this repo directly. So for now follow the below  steps to deploy will find the original method soon.
 1. Press the deploy button and deploy to Heroku.
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/Ns-AnoNymouS/animated-lamp)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/Ns-AnoNymouS/screenshot-bot/tree/Te)
 
 2. Then connect your Heroku with github
 
