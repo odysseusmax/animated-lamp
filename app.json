@@ -2,6 +2,7 @@
  "name": "Screenshot Bot",
  "description": "Screenshot /Sample Video / Trim Video files",
  "logo": "https://telegra.ph/file/a3a32dcceb8201635c1f0.jpg",
+ "stack": "heroku-20", 
  "keywords": [
    "telegram",
    "Screenshot",
