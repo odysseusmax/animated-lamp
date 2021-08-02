@@ -13,8 +13,20 @@ Since i had removed host bot will download the entire file and then generate scr
 An attempt to implement the screenshot generation of telegram files. Live version can be found here [@Screenshot_NsBot](https://t.me/Screenshot_NsBot "Screenshot Generator Bot").
 
 ## Installation Guide
+> The heroku not accepting this repo directly. So for now follow the below  steps to deploy will find the original method soon.
+1. Press the deploy button and deploy to Heroku.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/Ns-AnoNymouS/animated-lamp)
 
+2. Then connect your Heroku with github
+
+[<img src="https://telegra.ph/file/43977c94b73259e451621.jpg">](https://telegra.ph/file/43977c94b73259e451621.jpg)
+
+3. Fork 🍴 this repo 
+
+4. And go back to the heroku
+
+5. Search for animated-lamp and deploy that.
 ### Prerequisites
 
 * FFmpeg.
