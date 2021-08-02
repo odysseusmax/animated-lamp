@@ -1,3 +1,8 @@
+# Added Heroku Support 😋
+I had removed host in this repo so there is a less chances of heroku suspension 
+For now it is not suspended by heroku but dont know when it gonna suspended.
+Since i had removed host bot will download the entire file and then generate screenshots
+
 # [Screenshotit_bot](https://tx.me/screenshotit_bot)
 
 > Telegram Bot For Screenshot Generation.
@@ -48,7 +53,6 @@ Properly setup the environment variables or populate `config.py` with the values
 * `LOG_CHANNEL`(required) - Log channel's id.
 * `DATABASE_URL`(required) - Mongodb database URI.
 * `AUTH_USERS`(required) - Admin(s) of the bot. User's telegram id separated by space. Atleast one id should be specified.
-* `HOST`(required) - Public URL of file streaming service ([See Setting up Streaming Service](#setting-up-streaming-service)).
 * `SESSION_NAME`(optional) - Name you want to call your bot's session, Eg: bot's username.
 * `MAX_PROCESSES_PER_USER`(optional) - Number of parallel processes each user can have, defaults to 2.
 * `MAX_TRIM_DURATION`(optional) - Maximum allowed video trim duration in seconds. Defaults to 600s.
@@ -56,7 +60,6 @@ Properly setup the environment variables or populate `config.py` with the values
 * `SLOW_SPEED_DELAY`(optional) - Delay required between each interaction from users in seconds. Defaults to 5s.
 * `TIMEOUT` (optional) - Maximum time alloted to each process in seconds, after which process will be cancelled. Defaults to 1800s(30 mins).
 * `DEBUG` (optional) - Set some value to use DEBUG logging level. INFO by default.
-* `IAM_HEADER` (optional) - Authentication token for streaming service. Defaults to `''`.
 * `WORKER_COUNT` (optional) - Number of process to be handled at a time. Defaults to `20`.
 
 ### Run bot
@@ -65,10 +68,6 @@ Properly setup the environment variables or populate `config.py` with the values
 
 Now go and `/start` the bot. If everything went right, bot will respond with welcome message.
 
-## Setting up Streaming Service
-
-The streaming service can be a custom version of [TgFileStream](https://github.com/tulir/tgfilestream), modded to work with this setup. The mod basicaly is adding a type of header based authentication and changing the endpoints. The authentication part is optional and the endpoint used here is `/file/:chat_id/:message_id`. Make sure to note these changes when deploying your own instance. The streaming service used for [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot") is not related to [TgFileStream](https://github.com/tulir/tgfilestream) and I do not plan to make it OSS.
-
 ## Supported commands and functions
 
 ### Commands
@@ -76,6 +75,7 @@ The streaming service can be a custom version of [TgFileStream](https://github.c
 **General commands**
 
 * `/start` - Command to start bot or check whether bot is alive.
+* `/help` - Command to know about how to use bot.
 * `/settings` - Command to configure bot's behavior'
 * `/set_watermark` - Command to add custom watermark text to screenshots. Usage: `/set_watermark watermark_text`.
 
@@ -109,12 +109,18 @@ In bot settings.
 Contributions are welcome.
 
 ## Contact
-You can contact me [@odysseusmax](https://tx.me/odysseusmax).
+You can contact me 
+
+## Credits 
+All credits goes to [odysseusmax](https://github.com/odysseusmax) he had made everything the best i just 
+Changed some small things to make the bot supported by heroku.
+
 
 ## Thanks
+Thanks to [odysseusmax](https://github.com/odysseusmax) for his [Animated Lamp](https://github.com/odysseusmax/animated-lamp "Animated Lamp").
+
 Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
-Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.
 
 ## Dependencies
 * pyrogram

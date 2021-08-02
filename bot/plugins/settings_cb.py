@@ -18,7 +18,7 @@ async def settings_cb(c, m):
     except Exception:
         _, typ = m.data.split("+")
     chat_id = m.from_user.id
-    alert_text = "Not supported action."
+    alert_text = None
 
     if typ == "af":
         as_file = await db.is_as_file(chat_id)
@@ -32,6 +32,7 @@ async def settings_cb(c, m):
             alert_text = "Successfully removed watermark text."
         else:
             alert_text = "Use /set_watermark to add new watermark text."
+        await m.answer(alert_text, show_alert=True)
 
     elif typ == "sv":
         sample_duration = await db.get_sample_duration(chat_id)
@@ -75,7 +76,9 @@ async def settings_cb(c, m):
         await db.update_watermark_position(chat_id, current_pos)
         alert_text = f"Successfully changed watermark position to {Config.POSITIONS[current_pos]}"
 
-    await m.answer(alert_text, show_alert=True)
+
+    #i dont like this alert if you want you can add so that i am not removing anything and commented them
+    await m.answer() #alert_text, show_alert=True) 
 
     await Utilities.display_settings(c, m, db, cb=True)
 

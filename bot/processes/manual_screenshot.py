@@ -129,9 +129,6 @@ class ManualScreenshotsProcess(BaseProcess):
 
             ffmpeg_cmd = [
                 "ffmpeg",
-                "-headers",
-                f"IAM:{Config.IAM_HEADER}",
-                "-hide_banner",
                 "-ss",
                 "",  # To be replaced in loop
                 "-i",
@@ -154,7 +151,7 @@ class ManualScreenshotsProcess(BaseProcess):
             with tempfile.TemporaryDirectory() as output_folder:
                 for i, sec in enumerate(valid_positions):
                     thumbnail_file = os.path.join(output_folder, f"{i+1}.png")
-                    ffmpeg_cmd[5] = str(sec)
+                    ffmpeg_cmd[2] = str(sec)
                     ffmpeg_cmd[-1] = thumbnail_file
                     log.debug(ffmpeg_cmd)
                     output = await Utilities.run_subprocess(ffmpeg_cmd)

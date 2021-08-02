@@ -4,3 +4,4 @@ motor
 dnspython
 async-timeout
 aiohttp
+nest_asyncio

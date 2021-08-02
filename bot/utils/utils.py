@@ -1,13 +1,15 @@
 import os
+import math
+import time
 import random
 import asyncio
 import logging
 from urllib.parse import urljoin
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from pyrogram.emoji import *
 from bot.config import Config
-
+from bot.messages import Messages
 
 log = logging.getLogger(__name__)
 
@@ -84,10 +86,69 @@ class Utilities:
         return thumb_file
 
     @staticmethod
-    def generate_stream_link(media_msg):
-        file_id = media_msg.message_id
-        chat_id = media_msg.chat.id
-        return urljoin(Config.HOST, f"file/{chat_id}/{file_id}")
+    async def generate_stream_link(media_msg):
+        media_location = f"/app/bot/DOWNLOADS/{media_msg.from_user.id}{media_msg.message_id}/download.mkv"
+        if not os.path.exists(media_location):
+            status_msg = await media_msg.reply_text("**Downloading Media File....📥**", quote=True)
+            start_time = time.time()
+            media_location = await media_msg.download(
+                file_name=media_location,
+                progress=Utilities.progress_bar,
+                progress_args=(start_time, status_msg)
+            )
+            log.info(media_location)
+            await status_msg.delete()
+        return media_location
+
+    @staticmethod
+    async def progress_bar(current, total, start, msg):
+        present = time.time()
+        if round((present - start) % 5) == 0 or current == total:
+            speed = current / (present - start)
+            percentage = current * 100 / total
+            time_to_complete = round(((total - current) / speed))
+            time_to_complete = Utilities.TimeFormatter(time_to_complete)
+            progressbar = "[{0}{1}]".format(
+                ''.join([f"{BLACK_MEDIUM_SMALL_SQUARE}" for i in range(math.floor(percentage / 10))]),
+                ''.join([f"{WHITE_MEDIUM_SMALL_SQUARE}" for i in range(10 - math.floor(percentage / 10))])
+            )
+            current_message = f"**Downloading:** {round(percentage, 2)}%\n\n"
+            current_message += f"{progressbar}\n\n"
+            current_message += f"{HOLLOW_RED_CIRCLE} **Speed**: {Utilities.humanbytes(speed)}/s\n\n"
+            current_message += f"{HOLLOW_RED_CIRCLE} **Done**: {Utilities.humanbytes(current)}\n\n"
+            current_message += f"{HOLLOW_RED_CIRCLE} **Size**: {Utilities.humanbytes(total)}\n\n"
+            current_message += f"{HOLLOW_RED_CIRCLE} **Time Left**: {time_to_complete}\n\n"
+            try:
+                await msg.edit(
+                    text=current_message
+                )
+            except:
+                pass
+
+    @staticmethod
+    def humanbytes(size):
+        # this code taken from SpEcHiDe Anydl repo
+        if not size:
+            return 0
+        power = 2**10
+        n = 0
+        Dic_powerN = {0: ' ', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
+        while size > power:
+            size /= power
+            n += 1
+        return str(round(size, 2)) + " " + Dic_powerN[n] + 'B'
+
+    @staticmethod
+    def TimeFormatter(seconds: int) -> str:
+        # this code taken from SpEcHiDe Anydl repo
+        minutes, seconds = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+        formatted_txt = f"{days} days, " if days else ""
+        formatted_txt += f"{hours} hrs, " if hours else ""
+        formatted_txt += f"{minutes} min, " if minutes else ""
+        formatted_txt += f"{seconds} sec, " if seconds else ""
+        return formatted_txt[:-2]
 
     @staticmethod
     async def get_media_info(file_link):
@@ -243,55 +304,50 @@ class Utilities:
         watermark_position = await db.get_watermark_position(chat_id)
         screenshot_mode = await db.get_screenshot_mode(chat_id)
         font_size = await db.get_font_size(chat_id)
+        mode_txt = "Document" if as_file else "Image"
+        wm_txt = watermark_text if watermark_text else "No watermark exists!"
+        genmode = "Equally spaced" if screenshot_mode == 0 else "Random screenshots"
 
         sv_btn = [
-            InlineKeyboardButton("Sample Video Duration", "rj"),
-            InlineKeyboardButton(f"{sample_duration}s", "set+sv"),
+            InlineKeyboardButton("⏱ Sample video Duration", "rj"),
+            InlineKeyboardButton(f"{sample_duration}s", "set+sv")
         ]
         wc_btn = [
-            InlineKeyboardButton("Watermark Color", "rj"),
-            InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", "set+wc"),
+            InlineKeyboardButton("🎨 Watermark Color", "rj"),
+            InlineKeyboardButton(f"{Config.COLORS[watermark_color_code]}", "set+wc")
         ]
         fs_btn = [
-            InlineKeyboardButton("Watermark Font Size", "rj"),
-            InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", "set+fs"),
+            InlineKeyboardButton(f"𝔸𝕒 Watermark Font Size", "rj"),
+            InlineKeyboardButton(f"{Config.FONT_SIZES_NAME[font_size]}", "set+fs")
         ]
         wp_btn = [
-            InlineKeyboardButton("Watermark Position", "rj"),
-            InlineKeyboardButton(f"{Config.POSITIONS[watermark_position]}", "set+wp"),
+            InlineKeyboardButton("🎭 Watermark Position", "rj"),
+            InlineKeyboardButton(f"{Config.POSITIONS[watermark_position]}", "set+wp")
         ]
-        as_file_btn = [InlineKeyboardButton("Upload Mode", "rj")]
-        wm_btn = [InlineKeyboardButton("Watermark", "rj")]
-        sm_btn = [InlineKeyboardButton("Screenshot Generation Mode", "rj")]
-
-        if as_file:
-            as_file_btn.append(
-                InlineKeyboardButton("📁 Uploading as Document.", "set+af")
-            )
-        else:
-            as_file_btn.append(InlineKeyboardButton("🖼️ Uploading as Image.", "set+af"))
-
-        if watermark_text:
-            wm_btn.append(InlineKeyboardButton(f"{watermark_text}", "set+wm"))
-        else:
-            wm_btn.append(InlineKeyboardButton("No watermark exists!", "set+wm"))
-
-        if screenshot_mode == 0:
-            sm_btn.append(InlineKeyboardButton("Equally spaced screenshots", "set+sm"))
-        else:
-            sm_btn.append(InlineKeyboardButton("Random screenshots", "set+sm"))
+        as_file_btn = [
+            InlineKeyboardButton("📤 Upload Mode", "rj"),
+            InlineKeyboardButton(f"{mode_txt}", "set+af")
+        ]
+        wm_btn = [
+            InlineKeyboardButton("💧 Watermark", "rj"),
+            InlineKeyboardButton(f"{wm_txt}", "set+wm")
+        ]
+        sm_btn = [
+            InlineKeyboardButton("📸 SS Gen Mode", "rj"),
+            InlineKeyboardButton(f"{genmode}", "set+sm")
+        ]
 
         settings_btn = [as_file_btn, wm_btn, wc_btn, fs_btn, wp_btn, sv_btn, sm_btn]
 
         if cb:
             try:
-                await m.edit_message_reply_markup(InlineKeyboardMarkup(settings_btn))
-            except Exception:
+                await m.message.edit(text=Messages.SETTINGS, reply_markup=InlineKeyboardMarkup(settings_btn))
+            except:
                 pass
             return
 
         await m.reply_text(
-            text="Here You can configure my behavior.\n\nPress the button to change the settings.",
+            text=Messages.SETTINGS,
             quote=True,
             reply_markup=InlineKeyboardMarkup(settings_btn),
         )
@@ -307,7 +363,7 @@ class Utilities:
                 i_keyboard = []
             if i == 10:
                 btns.append(i_keyboard)
-        btns.append([InlineKeyboardButton("Manual Screenshots!", "mscht")])
-        btns.append([InlineKeyboardButton("Trim Video!", "trim")])
+        btns.append([InlineKeyboardButton("Manual Screenshots", "mscht")])
+        btns.append([InlineKeyboardButton("Trim Video", "trim")])
         btns.append([InlineKeyboardButton("Get Media Information", "mi")])
         return btns

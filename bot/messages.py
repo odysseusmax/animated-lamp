@@ -82,4 +82,6 @@ class Messages:
         "and Screen shots where not generated."
     )
 
+    SETTINGS = "Here You can configure my behavior.\n\nPress the button to change the settings."
+
     MEDIAINFO_START = "Finding the media info, media info will be send here shortly!"
