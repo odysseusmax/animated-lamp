@@ -9,7 +9,7 @@
    "Sample video",
    "Trim Video"
   ],
-  "repository": "https://github.com/Ns-AnoNymouS/animated-lamp",
+  "repository": "https://github.com/Ns-AnoNymouS/screenshot-bot",
   "env": {
     "API_ID": {
       "description": "Your Telegram API ID. Get this value from my.telegram.org!",
