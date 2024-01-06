@@ -1,10 +1,10 @@
-# [Screenshotit_bot](https://tx.me/screenshotit_bot)
+# [Screenshotit_bot](https://tx.me/MCU_Screenshot_Bot)
 
 > Telegram Bot For Screenshot Generation.
 
 ## Description
 
-An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot").
+An attempt to implement the screenshot generation of telegram files without downloading the entire file. Live version can be found here [@screenshotit_bot](https://tx.me/MCU_Screenshot_Bot "Screenshot Generator Bot").
 
 ## Installation Guide
 
@@ -66,7 +66,7 @@ Now go and `/start` the bot. If everything went right, bot will respond with wel
 
 ## Setting up Streaming Service
 
-The streaming service can be a custom version of [TgFileStream](https://github.com/tulir/tgfilestream), modded to work with this setup. The mod basicaly is adding a type of header based authentication and changing the endpoints. The authentication part is optional and the endpoint used here is `/file/:chat_id/:message_id`. Make sure to note these changes when deploying your own instance. The streaming service used for [@screenshotit_bot](https://tx.me/screenshotit_bot "Screenshot Generator Bot") is not related to [TgFileStream](https://github.com/tulir/tgfilestream) and I do not plan to make it OSS.
+The streaming service can be a custom version of [TgFileStream](https://github.com/tulir/tgfilestream), modded to work with this setup. The mod basicaly is adding a type of header based authentication and changing the endpoints. The authentication part is optional and the endpoint used here is `/file/:chat_id/:message_id`. Make sure to note these changes when deploying your own instance. The streaming service used for [@screenshotit_bot](https://tx.me/MCU_Screenshot_Bot "Screenshot Generator Bot") is not related to [TgFileStream](https://github.com/tulir/tgfilestream) and I do not plan to make it OSS.
 
 ## Supported commands and functions
 
@@ -108,10 +108,10 @@ In bot settings.
 Contributions are welcome.
 
 ## Contact
-You can contact me [@odysseusmax](https://tx.me/odysseusmax).
+You can contact me [@odysseusmax](https://tx.me/Sudharshan_T).
 
 ## Thanks
-Thanks to [Dan](https://github.com/delivrance "Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
+Thanks to [Dan](https://github.com/Sudharshan1246"Dan") for his [Pyrogram](https://github.com/pyrogram/pyrogram "Pyrogram") library.
 
 Thanks to [Tulir Asokan](https://github.com/tulir "Tulir Asokan") for his [TgFileStream](https://github.com/tulir/tgfilestream "TgFileStream") Bot.
 
